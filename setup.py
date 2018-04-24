@@ -24,6 +24,12 @@ setup(
     packages=[
         'nesgym_super_mario_bros'
     ],
+    package_data = {
+        'nesgym_super_mario_bros': [
+            'lua/*.lua'
+            'roms/*.nes'
+        ]
+    },
     zip_safe=False,
     install_requires=[
         'gym>=0.10.5',
