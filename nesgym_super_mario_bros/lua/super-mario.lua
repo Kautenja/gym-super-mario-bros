@@ -185,6 +185,7 @@ addr_enemy_x = 0x87
 addr_enemy_y = 0xcf
 addr_injury_timer = 0x079e
 addr_swimming_flag = 0x0704
+addr_prelevel_timer = 0x07A0
 
 -- readbyterange - Reads a range of bytes and return a number
 function readbyterange(address, length)
@@ -331,9 +332,12 @@ nes_init()
 -- Press start until the game starts
 while get_time() >= time do
     time = get_time()
+    -- press and release the start button
     handle_command('joypad|S')
     emu.frameadvance()
     handle_command('joypad|')
+    -- force override the timer for pause menus
+    memory.writebyte(addr_prelevel_timer, 0)
     emu.frameadvance()
 end
 -- Backup the save-state so we don't have to go past pause menu again
@@ -346,15 +350,45 @@ local frame_skip = 4
 -- The reward observed by Mario
 local reward = 0
 
+local is_waiting_for_reset = 0
+
+local is_waiting_for_new_life = 0
 
 while true do
+  -- override the timer that controls intermissions to always be zero
+  memory.writebyte(addr_prelevel_timer, 0)
+
+
+  -- print(string.format("%d", get_time()))
+  -- print(string.format("%d", is_game_over()))
+  -- print(string.format("%d", get_is_dead()))
+  -- print()
   -- Check if Mario lost the last life and the state needs reset
   if (is_game_over() == 1) then
     write_to_pipe("game_over" .. SEP .. emu.framecount())
+    is_waiting_for_reset = 1
   end
 
+  -- if (get_is_dead() == 1) then
+  --   -- print('asdf')
+  --   is_waiting_for_new_life = 1
+  -- end
+
+  if (is_waiting_for_reset == 1) then
+    if (is_game_over() == 0) then
+      is_waiting_for_reset = 0
+      is_waiting_for_new_life = 0
+    else
+      emu.frameadvance()
+    end
+  elseif (is_waiting_for_new_life == 1) then
+    if (get_is_dead() == 0) then
+      is_waiting_for_new_life = 0
+    else
+      emu.frameadvance()
+    end
   -- Check if this cycle should accept a new action as input
-  if emu.framecount() % frame_skip == 0 then
+  elseif emu.framecount() % frame_skip == 0 then
     nes_ask_for_command()
     local has_command = nes_process_command()
     if has_command then
@@ -367,6 +401,10 @@ while true do
       nes_update_screen()
       -- update the reward for this time timestep
       reward = get_reward()
+        if (get_is_dead() == 1) then
+          -- print('asdf')
+          is_waiting_for_new_life = 1
+  end
     else
       print('pipe closed')
       break
