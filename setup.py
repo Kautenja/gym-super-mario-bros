@@ -9,13 +9,15 @@ with open('README.md') as README:
 
 setup(
     name='nesgym_super_mario_bros',
-    version=__version__,
+    # version=__version__,
+    use_scm_version=True,
+    setup_requires=['setuptools_scm'],
     description='Super Mario Bros. for Open.ai Gym',
     long_description=long_description,
     long_description_content_type='text/markdown',
     keywords=['Open.ai Gym', 'NES', 'Super Mario Bros.'],
     url=__url__,
-    download_url='{}/archive/{}.tar.gz'.format(__url__, __version__),
+    # download_url='{}/archive/{}.tar.gz'.format(__url__, __version__),
     author='Christian Kauten',
     author_email='kautencreations@gmail.com',
     license='MIT License',
