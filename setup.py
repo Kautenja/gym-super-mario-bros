@@ -18,7 +18,7 @@ setup(
     version_format='{tag}',
     description='Super Mario Bros. for Open.ai Gym',
     long_description=long_description,
-    # long_description_content_type='text/markdown',
+    long_description_content_type='text/markdown',
     keywords=['Open.ai Gym', 'NES', 'Super Mario Bros.'],
     url=__url__,
     author='Christian Kauten',
@@ -27,7 +27,7 @@ setup(
     packages=['nesgym_super_mario_bros'],
     zip_safe=False,
     install_requires=[
-        'gym>=10.5.0',
+        'gym>=0.10.5',
         'Pillow>=5.0.0',
         'numpy>=1.14.2'
     ],
