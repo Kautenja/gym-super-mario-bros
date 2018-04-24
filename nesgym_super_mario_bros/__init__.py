@@ -5,12 +5,6 @@ from .smb_env import SuperMarioBrosEnv
 import math
 
 
-# the version of the package
-__version__ = '0.1.1'
-# the URL to find the source code and releases
-__url__ = 'https://github.com/Kautenja/nesgym-super-mario-bros'
-
-
 # register the environment subclasses with Open.ai Gym
 register(
     id='nesgym/SuperMarioBros-v0',
