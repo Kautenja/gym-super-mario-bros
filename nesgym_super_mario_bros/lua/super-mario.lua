@@ -1,4 +1,5 @@
--- BEGIN nes_interface file
+-- MARK: nes_interface
+
 -- global variables
 screen = {} -- screen pixels [x,y] = p
 pipe_out = nil -- for sending data(output e.g. screen pixels, reward) back to client
@@ -40,7 +41,6 @@ end
 -- called once when emulator starts
 function nes_init()
   emu.speedmode("maximum")
-  -- emu.speedmode("normal")
 
   for x = 0, 255 do
     screen[x] = {}
@@ -160,11 +160,12 @@ function split(self, delimiter)
     table.insert(results, string.sub(self, start))
     return results
 end
--- END nes_interface file
 
 
 
--- Memory addresses for Super Mario Bros.
+
+-- MARK: Memory access for Super Mario Bros.
+
 addr_world = 0x075f
 addr_level = 0x075c
 addr_area = 0x0760
@@ -184,7 +185,6 @@ addr_enemy_x = 0x87
 addr_enemy_y = 0xcf
 addr_injury_timer = 0x079e
 addr_swimming_flag = 0x0704
-
 
 -- readbyterange - Reads a range of bytes and return a number
 function readbyterange(address, length)
@@ -257,31 +257,34 @@ function get_y_viewport()
     return memory.readbyte(addr_y_viewport)
 end
 
--- get_is_dead - Returns 1 if the player is dead or dying
--- 0x06 means dead, 0x0b means dying
-function get_is_dead()
-  if get_life() == 0xff then
-    return 1
-  else
-    return 0
-  end
-    -- local player_state = memory.readbyte(addr_player_state)
-    -- local y_viewport = get_y_viewport()
-    -- if (player_state == 0x06) or (player_state == 0x0b) or (y_viewport > 1) then
-    --     return 1
-    -- else
-    --     return 0
-    -- end
-end
-
 -- get_player_status - Returns the player status
 -- 0 is small, 1 is big, 2+ is fiery (can shoot fireballs)
 function get_player_status()
     return memory.readbyte(addr_player_status)
 end
 
+-- get_is_dead - Returns 1 if the player is dead or dying
+-- 0x06 means dead, 0x0b means dying
+function get_is_dead()
+    local player_state = memory.readbyte(addr_player_state)
+    local y_viewport = get_y_viewport()
+    if (player_state == 0x06) or (player_state == 0x0b) or (y_viewport > 1) then
+        return 1
+    else
+        return 0
+    end
+end
 
+-- Return 1 if the game has ended or a 0 if it has not
+function is_game_over()
+  if get_life() == 0xff then
+    return 1
+  else
+    return 0
+  end
+end
 
+-- MARK: Rewards
 
 -- the current x position of the agent
 local x_pos = 0
@@ -312,13 +315,14 @@ function get_death_penalty()
   return 0
 end
 
-
 -- Return the cumulative reward at the current state
 function get_reward()
   return get_x_reward() + get_time_penalty() + get_death_penalty()
 end
 
 
+
+-- MARK: Main
 
 -- Initialize the NES
 nes_init()
@@ -344,10 +348,9 @@ local reward = 0
 
 
 while true do
-  -- Check if Mario died and the state needs reset
-  if (get_is_dead() == 1) then
-    -- TODO: send terminal flag to the client to have them decide to reset
-    nes_reset()
+  -- Check if Mario lost the last life and the state needs reset
+  if (is_game_over() == 1) then
+    write_to_pipe("game_over" .. SEP .. emu.framecount())
   end
 
   -- Check if this cycle should accept a new action as input

@@ -182,6 +182,7 @@ class NESEnv(gym.Env, utils.EzPickle):
         self.command_cond = Condition()
         self.viewer = None
         self.reward = 0
+        self.done = False
         self.episode_length = max_episode_steps
 
         self.actions = [
@@ -205,7 +206,8 @@ class NESEnv(gym.Env, utils.EzPickle):
     def step(self, action):
         self.frame += 1
         done = False
-        if self.frame >= self.episode_length:
+        if self.done or self.frame >= self.episode_length:
+            self.done = False
             done = True
             self.frame = 0
         obs = self.screen.copy()
@@ -283,7 +285,7 @@ class NESEnv(gym.Env, utils.EzPickle):
         with open(self.pipe_in_name, 'rb') as pipe:
             while not self.closed:
                 msg = pipe.readline()
-                #print('message: ', msg[:100])
+                # print('message: ', msg[:100])
                 body = msg.split(b'\xFF')
                 msg_type, frame = body[0], body[1]
                 msg_type = msg_type.decode('ascii')
@@ -300,6 +302,8 @@ class NESEnv(gym.Env, utils.EzPickle):
                     self.screen = pvs.reshape((SCREEN_HEIGHT, SCREEN_WIDTH, 3))
                 elif msg_type == "data":
                     self.reward = float(body[2])
+                elif msg_type == "game_over":
+                    self.done = True
 
     def _open_pipes(self):
         # emulator to client
