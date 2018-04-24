@@ -1,9 +1,9 @@
 # NESGym - Super Mario Bros
 
-An Open.ai Gym wrapper for the original Super Mario Bros. on the Nintendo
-Entertainment System (NES). Built using a fork of
-[NESGym](https://github.com/codescv/nesgym) and some snippets from
-[gym-super-mario](https://github.com/ppaquette/gym-super-mario).
+An [OpenAI Gym](https://github.com/openai/gym) environment for the original
+Super Mario Bros. game on the Nintendo Entertainment System (NES). Built
+using a fork of [NESGym](https://github.com/codescv/nesgym) and some snippets
+from [gym-super-mario](https://github.com/ppaquette/gym-super-mario).
 
 # Installation
 
