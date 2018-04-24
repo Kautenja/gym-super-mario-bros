@@ -7,6 +7,12 @@ from [gym-super-mario](https://github.com/ppaquette/gym-super-mario).
 
 # Installation
 
+The preferred installation of `nesgym-super-mario-bros` is from `pip`:
+
+```shell
+pip install nesgym-super-mario-bros
+```
+
 ## NES Emulator
 
 NESGym uses [FCEUX](http://www.fceux.com/web/home.html) to emulate NES games.
