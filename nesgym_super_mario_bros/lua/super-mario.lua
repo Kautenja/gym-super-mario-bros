@@ -24,8 +24,9 @@ COMMAND_TABLE = {
 function nes_reset()
   flag_reset = true
   -- load state so we don't have to instruct to skip title screen
-  state = savestate.object(10)
-  savestate.load(state)
+  savestate.load(gamestate)
+  x_pos = get_x_position()
+  time = get_time()
 end
 
 function nes_get_reset_flag()
@@ -222,11 +223,7 @@ end
 
 -- get_life - Returns the number of remaining lives
 function get_life()
-    local life = memory.readbyte(addr_life) + 1
-    if (get_is_dead() == 1) then
-        life = 0
-    end
-    return life;
+    return memory.readbyte(addr_life)
 end
 
 -- get_score - Returns the current player score (0 to 999990)
@@ -263,13 +260,18 @@ end
 -- get_is_dead - Returns 1 if the player is dead or dying
 -- 0x06 means dead, 0x0b means dying
 function get_is_dead()
-    local player_state = memory.readbyte(addr_player_state)
-    local y_viewport = get_y_viewport()
-    if (player_state == 0x06) or (player_state == 0x0b) or (y_viewport > 1) then
-        return 1
-    else
-        return 0
-    end
+  if get_life() == 0xff then
+    return 1
+  else
+    return 0
+  end
+    -- local player_state = memory.readbyte(addr_player_state)
+    -- local y_viewport = get_y_viewport()
+    -- if (player_state == 0x06) or (player_state == 0x0b) or (y_viewport > 1) then
+    --     return 1
+    -- else
+    --     return 0
+    -- end
 end
 
 -- get_player_status - Returns the player status
@@ -342,11 +344,10 @@ local reward = 0
 
 
 while true do
+  print(string.format('%d', get_life()))
   -- Check if Mario died and the state needs reset
   if (get_is_dead() == 1) then
-    savestate.load(gamestate)
-    x_pos = get_x_position()
-    time = get_time()
+    nes_reset()
   end
 
   -- Check if this cycle should accept a new action as input

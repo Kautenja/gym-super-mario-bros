@@ -157,9 +157,23 @@ SCREEN_HEIGHT = 224
 
 
 class NESEnv(gym.Env, utils.EzPickle):
+    """An environment for playing NES games in OpenAI Gym using FCEUX."""
+
+    # meta-data about the environment
     metadata = {'render.modes': ['human', 'rgb_array']}
 
-    def __init__(self, **kwargs):
+    def __init__(self, max_episode_steps: int):
+        """
+        Initialize a new NES environment.
+
+        Args:
+            max_episode_steps: the math number of steps per episode.
+                - pass math.inf to use no max_episode_steps limit
+
+        Returns:
+            None
+
+        """
         utils.EzPickle.__init__(self)
         self.curr_seed = 0
         self.screen = np.zeros((SCREEN_HEIGHT, SCREEN_WIDTH, 3), dtype=np.uint8)
@@ -168,10 +182,7 @@ class NESEnv(gym.Env, utils.EzPickle):
         self.command_cond = Condition()
         self.viewer = None
         self.reward = 0
-        episode_time_length_secs = 7
-        frame_skip = 4
-        fps = 60
-        self.episode_length = episode_time_length_secs * fps / frame_skip
+        self.episode_length = max_episode_steps
 
         self.actions = [
             'U', 'D', 'L', 'R',
@@ -189,7 +200,8 @@ class NESEnv(gym.Env, utils.EzPickle):
         self.lua_interface_path = None
         self.emulator_started = False
 
-    ## ---------- gym.Env methods -------------
+    # MARK: OpenAI Gym API
+
     def step(self, action):
         self.frame += 1
         done = False
@@ -229,9 +241,9 @@ class NESEnv(gym.Env, utils.EzPickle):
 
     def close(self):
         self.closed = True
-    ## ------------- end gym.Env --------------
 
-    ## ------------- emulator related ------------
+    # MARK: FCEUX
+
     def _start_emulator(self):
         if not self.rom_file_path:
             raise Exception('No rom file specified!')
@@ -257,9 +269,9 @@ class NESEnv(gym.Env, utils.EzPickle):
 
     def _joypad(self, button):
         self._write_to_pipe('joypad' + SEP + button)
-    ## ------------  end emulator  -------------
 
-    ## ------------- pipes ---------------
+    # MARK: Pipes
+
     def _write_to_pipe(self, message):
         if not self.pipe_out:
             # arg 1 for line buffering - see python doc
@@ -303,7 +315,6 @@ class NESEnv(gym.Env, utils.EzPickle):
     def _ensure_create_pipe(self, pipe_name):
         if not os.path.exists(pipe_name):
             os.mkfifo(pipe_name)
-    ## ------------ end pipes --------------
 
 
 __all__ = [NESEnv.__name__]

@@ -2,6 +2,7 @@
 from gym.envs.registration import register
 from .nesenv import NESEnv
 from .smb_env import SuperMarioBrosEnv
+import math
 
 
 # the version of the package
@@ -16,7 +17,7 @@ register(
     entry_point='nesgym_super_mario_bros:SuperMarioBrosEnv',
     max_episode_steps=9999999,
     reward_threshold=32000,
-    kwargs={},
+    kwargs={ 'max_episode_steps': math.inf },
     nondeterministic=True,
 )
 
