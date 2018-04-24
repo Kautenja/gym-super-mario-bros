@@ -1,4 +1,6 @@
 gym==0.10.5
 Pillow==5.0.0
 numpy==1.14.2
-twine==1.11.0
+twine>=1.11.0
+tqdm>=4.19.5
+setuptools>=39.0.1
