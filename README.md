@@ -1,5 +1,7 @@
 # NESGym - Super Mario Bros
 
+![smb](https://user-images.githubusercontent.com/2184469/39209488-854e960c-47cb-11e8-9e66-ddadcb0d7874.png)
+
 An [OpenAI Gym](https://github.com/openai/gym) environment for the original
 Super Mario Bros. game on the Nintendo Entertainment System (NES). Built
 using a fork of [NESGym](https://github.com/codescv/nesgym) and some snippets
