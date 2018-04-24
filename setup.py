@@ -18,7 +18,7 @@ setup(
     version_format='{tag}',
     description='Super Mario Bros. for Open.ai Gym',
     long_description=long_description,
-    long_description_content_type='text/markdown',
+    long_description_content_type='text/markdown; charset=UTF-8; variant=GFM',
     keywords=['Open.ai Gym', 'NES', 'Super Mario Bros.'],
     url=__url__,
     author='Christian Kauten',
