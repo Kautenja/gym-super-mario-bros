@@ -1,6 +1,10 @@
 
+# clean the build directory
+clean:
+	rm -rf build/ dist/ || true
+
 # build the deployment package
-deployment:
+deployment: clean
 	python3 setup.py sdist  
 	python3 setup.py bdist_wheel
 
