@@ -25,6 +25,7 @@ def mario_main():
     done = False
     while True:
         state, reward, done, info = env.step(4)
+        print(reward)
         env.render(mode='rgb_array')
         if done:
             state = env.reset()

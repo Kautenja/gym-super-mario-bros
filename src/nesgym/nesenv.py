@@ -276,7 +276,7 @@ class NESEnv(gym.Env, utils.EzPickle):
                     pvs = np.array(palette_rgb[pvs-20], dtype=np.uint8)
                     self.screen = pvs.reshape((SCREEN_HEIGHT, SCREEN_WIDTH, 3))
                 elif msg_type == "data":
-                    self.reward = int(body[2][:2], 16)
+                    self.reward = float(body[2])
 
     def _open_pipes(self):
         # emulator to client
