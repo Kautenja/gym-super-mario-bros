@@ -2,7 +2,9 @@ import os
 from gym import spaces
 from .nesenv import NESEnv
 
+
 package_directory = os.path.dirname(os.path.abspath(__file__))
+
 
 class SuperMarioBrosEnv(NESEnv):
     def __init__(self):
@@ -17,3 +19,6 @@ class SuperMarioBrosEnv(NESEnv):
             'A', 'B', 'AB'
         ]
         self.action_space = spaces.Discrete(len(self.actions))
+
+
+__all__ = [SuperMarioBrosEnv.__name__]

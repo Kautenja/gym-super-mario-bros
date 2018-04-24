@@ -3,17 +3,17 @@ import subprocess
 import sys
 import struct
 from threading import Thread, Condition
-
 import numpy as np
 from PIL import Image
-
 import gym
 from gym.envs.classic_control import rendering
 from gym import utils, spaces
 from gym.utils import seeding
 
+
 package_directory = os.path.dirname(os.path.abspath(__file__))
 SEP = '|'
+
 
 # NES palette
 rgb = {
@@ -147,11 +147,14 @@ rgb = {
     '7F': (0, 0, 0),
 }
 
+
 palette_rgb = np.array([rgb[key] for key in sorted(rgb.keys())])
 palette_grayscale = np.array([(0.299*r+0.587*g+0.114*b) / 256.0 for r, g, b in palette_rgb])
 
+
 SCREEN_WIDTH = 256
 SCREEN_HEIGHT = 224
+
 
 class NESEnv(gym.Env, utils.EzPickle):
     metadata = {'render.modes': ['human', 'rgb_array']}
@@ -237,10 +240,15 @@ class NESEnv(gym.Env, utils.EzPickle):
 
         self._open_pipes()
 
+        package_directory = os.path.dirname(os.path.abspath(__file__))
+        inter = os.path.join(package_directory, '../lua/nes_interface.lua')
+
         args = [
             'fceux',
             '--nogui',
             '--sound 0',
+            '--loadlua',
+            inter,
             '--loadlua',
             self.lua_interface_path,
             self.rom_file_path,
@@ -301,3 +309,6 @@ class NESEnv(gym.Env, utils.EzPickle):
         if not os.path.exists(pipe_name):
             os.mkfifo(pipe_name)
     ## ------------ end pipes --------------
+
+
+__all__ = [NESEnv.__name__]
