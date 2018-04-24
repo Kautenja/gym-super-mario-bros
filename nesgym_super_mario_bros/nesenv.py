@@ -169,7 +169,7 @@ class NESEnv(gym.Env, utils.EzPickle):
         self.viewer = None
         self.reward = 0
         episode_time_length_secs = 7
-        frame_skip = 5
+        frame_skip = 4
         fps = 60
         self.episode_length = episode_time_length_secs * fps / frame_skip
 
@@ -190,7 +190,7 @@ class NESEnv(gym.Env, utils.EzPickle):
         self.emulator_started = False
 
     ## ---------- gym.Env methods -------------
-    def _step(self, action):
+    def step(self, action):
         self.frame += 1
         done = False
         if self.frame >= self.episode_length:
@@ -205,7 +205,7 @@ class NESEnv(gym.Env, utils.EzPickle):
         self._joypad(self.actions[action])
         return obs, self.reward, done, info
 
-    def _reset(self):
+    def reset(self):
         if not self.emulator_started:
             self._start_emulator()
         self.reward = 0
@@ -215,7 +215,7 @@ class NESEnv(gym.Env, utils.EzPickle):
             self.can_send_command = False
         return self.screen
 
-    def _render(self, mode='human', close=False):
+    def render(self, mode='human', close=False):
         if mode == 'human':
             if self.viewer is None:
                 self.viewer = rendering.SimpleImageViewer()
@@ -223,11 +223,11 @@ class NESEnv(gym.Env, utils.EzPickle):
         elif mode == 'rgb_array':
             return self.screen
 
-    def _seed(self, seed=None):
+    def seed(self, seed=None):
         self.curr_seed = seeding.hash_seed(seed) % 256
         return [self.curr_seed]
 
-    def _close(self):
+    def close(self):
         self.closed = True
     ## ------------- end gym.Env --------------
 
