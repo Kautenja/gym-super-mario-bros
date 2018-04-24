@@ -16,7 +16,7 @@ setup(
     description='Super Mario Bros. for Open.ai Gym',
     long_description=README(),
     long_description_content_type='text/markdown',
-    keywords=['OpenAI-Gym', 'NES', 'Super-Mario-Bros'],
+    keywords='OpenAI-Gym NES Super-Mario-Bros',
     url='https://github.com/Kautenja/nesgym-super-mario-bros',
     author='Christian Kauten',
     author_email='kautencreations@gmail.com',
