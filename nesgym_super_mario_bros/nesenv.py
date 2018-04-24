@@ -240,15 +240,10 @@ class NESEnv(gym.Env, utils.EzPickle):
 
         self._open_pipes()
 
-        package_directory = os.path.dirname(os.path.abspath(__file__))
-        inter = os.path.join(package_directory, '../lua/nes_interface.lua')
-
         args = [
             'fceux',
             '--nogui',
             '--sound 0',
-            '--loadlua',
-            inter,
             '--loadlua',
             self.lua_interface_path,
             self.rom_file_path,

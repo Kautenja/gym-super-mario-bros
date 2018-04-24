@@ -1,19 +1,18 @@
 from setuptools import setup, find_packages
-import sys, os
+from nesgym_super_mario_bros import __version__, __url__
 
 
 setup(
-    name='nesgym-super-mario-bros',
-    version='0.1.0',
+    name='nesgym_super_mario_bros',
+    version=__version__,
     description='Super Mario Bros. for Open.ai Gym',
     keywords=['Open.ai Gym', 'NES', 'Super Mario Bros.'],
-    url='https://github.com/Kautenja/nesgym-super-mario-bros',
-    download_url='https://github.com/Kautenja/nesgym-super-mario-bros/archive/0.1.0.tar.gz',
+    url=__url__,
+    download_url='{}/archive/{}.tar.gz'.format(__url__, __version__),
     author='Christian Kauten',
     author_email='kautencreations@gmail.com',
     license='MIT License',
-    packages=find_packages(),
-    package_data=['src/lua/*.lua', 'src/roms/*.nes'],
+    packages=['nesgym_super_mario_bros'],
     zip_safe=False,
     install_requires=[
         'gym>=10.5.0',

@@ -1,6 +1,6 @@
 """A simple script for debugging the Super Mario Bros. Lua code."""
 import gym
-import nesgym
+import nesgym_super_mario_bros
 
 
 if __name__ == "__main__":
