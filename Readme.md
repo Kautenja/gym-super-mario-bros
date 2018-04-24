@@ -1,36 +1,43 @@
-# NESGym
+# NESGym - Super Mario Bros
 
-An openai-gym wrapper for nes games.
+An openai-gym wrapper for the NES game, Super Mario Bros built using a fork
+of [NESGym](https://github.com/codescv/nesgym) and some snippets from
+[gym-super-mario](https://github.com/ppaquette/gym-super-mario).
 
 # Installation
-- Install nes emulator and make sure `fceux` is in your $PATH. In ubuntu, simple use `apt install fceux`.
-- Copy state files from `roms/fcs/*` to your `~/.fceux/fcs/``
 
-# Example usage
-```python
-# import nesgym to register environments to gym
-import nesgym
-env = gym.make('nesgym/NekketsuSoccerPK-v0')
-obs = env.reset()
+## NES Emulator
 
-for step in range(10000):
-  action = env.action_space.sample()
-  obs, reward, done, info = env.step(action)
+NESGym uses FCEUX to emulate NES games. Make sure it's installed and in your
+`$PATH`.
 
+### Unix
+
+```shell
+sudo apt-get install fceux
 ```
 
-# Examples for training dqn
-An implementation of dqn is in src/dqn.
-You can train dqn model for atari and nes with `run-atari.py` and `run-soccer.py`, respectively.
+### Mac
 
-# Integrating new nes games
-You need two files: a lua interface file, and an openai gym environment class(python) file.
-The lua file needs to get the reward from emulator(typically extracting from a memory location), and the python file defines the game specific environment.
-For an example of lua file, see `src/lua/soccer.lua`; for an example of gym env file, see `src/nesgym/nekketsu_soccer_env.py`.
+```shell
+brew install fceux
+```
 
-# Gallery
-## training atari games
-![atari](images/atari.png)
+# Usage
 
-## training fc games
-![fc-soccer](images/soccer.png)
+You _must_ import `nesgym` to register the environments with gym before
+calling `gym.make('nesgym/SuperMarioBros-v0')`. The action `4` used below
+holds right so Mario will move in an infinite loop.
+
+```python
+import gym
+# import nesgym to register environments with gym
+import nesgym
+env = gym.make('nesgym/SuperMarioBros-v0')
+
+done = True
+for step in range(5000):
+    if done:
+        obs = env.reset()
+    obs, reward, done, info = env.step(4)
+```
