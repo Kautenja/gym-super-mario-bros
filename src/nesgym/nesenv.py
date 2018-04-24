@@ -237,7 +237,15 @@ class NESEnv(gym.Env, utils.EzPickle):
 
         self._open_pipes()
 
-        args = ['fceux', '--loadlua', self.lua_interface_path, self.rom_file_path, '&']
+        args = [
+            'fceux',
+            '--nogui',
+            '--sound 0',
+            '--loadlua',
+            self.lua_interface_path,
+            self.rom_file_path,
+            '&'
+        ]
         proc = subprocess.Popen(' '.join(args), shell=True)
         print('started proc')
         proc.communicate()
