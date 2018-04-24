@@ -344,9 +344,9 @@ local reward = 0
 
 
 while true do
-  print(string.format('%d', get_life()))
   -- Check if Mario died and the state needs reset
   if (get_is_dead() == 1) then
+    -- TODO: send terminal flag to the client to have them decide to reset
     nes_reset()
   end
 
