@@ -8,10 +8,13 @@ import nesgym_super_mario_bros
 def play_game(env, episodes: int=5000):
     """Play the game."""
     done = True
-    for step in tqdm(range(episodes)):
+    progress = tqdm(range(episodes))
+    for step in progress:
         if done:
             state = env.reset()
-        state, reward, done, info = env.step(env.action_space.sample())
+        action = env.action_space.sample()
+        state, reward, done, info = env.step(action)
+        progress.set_postfix(reward=reward)
 
     env.close()
 
