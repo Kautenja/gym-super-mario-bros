@@ -192,6 +192,9 @@ class NESEnv(gym.Env, utils.EzPickle):
         self.action_space = spaces.Discrete(len(self.actions))
         self.frame = 0
 
+        frame_skip = 4
+        self.metadata['video.frames_per_second'] = 60 / frame_skip
+
         # for communication with emulator
         self.pipe_in = None
         self.pipe_out = None
