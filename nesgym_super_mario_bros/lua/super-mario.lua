@@ -291,11 +291,7 @@ end
 
 -- Return 1 if the game has ended or a 0 if it has not
 function is_game_over()
-    if get_life() == 0xff then
-        return 1
-    else
-        return 0
-    end
+    return get_life() == 0xff
 end
 
 -- MARK: Rewards
@@ -375,14 +371,14 @@ while true do
     end
 
     -- Check if Mario lost the last life and the state needs reset
-    if (is_waiting_for_reset == 0) and (is_game_over() == 1) then
+    if (is_waiting_for_reset == 0) and is_game_over() then
         write_to_pipe("game_over" .. SEP .. emu.framecount())
         is_waiting_for_reset = 1
     end
 
     -- check if we're waiting for a reset and dont need to send data
     if (is_waiting_for_reset == 1) then
-        if (is_game_over() == 0) then
+        if not is_game_over() then
             is_waiting_for_reset = 0
         end
         emu.frameadvance()
