@@ -357,6 +357,10 @@ while get_time() >= time do
     memory.writebyte(addr_prelevel_timer, 0)
     emu.frameadvance()
 end
+
+-- This command will turn the game into B&W in the emulator
+-- memory.writebyte(0x0779, 0x1f)
+
 -- Backup the save-state so we don't have to go past pause menu again
 gamestate = savestate.object()
 savestate.save(gamestate)
