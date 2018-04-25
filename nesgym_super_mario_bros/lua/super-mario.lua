@@ -264,6 +264,23 @@ function get_player_status()
     return memory.readbyte(addr_player_status)
 end
 
+-- Player State:
+-- 0x00 - Leftmost of screen
+-- 0x01 - Climbing vine
+-- 0x02 - Entering reversed-L pipe
+-- 0x03 - Going down a pipe
+-- 0x04 - Autowalk
+-- 0x05 - Autowalk
+-- 0x06 - Player dies
+-- 0x07 - Entering area
+-- 0x08 - Normal
+-- 0x09 - Cannot move
+-- 0x0B - Dying
+-- 0x0C - Palette cycling, can't move
+function get_player_state()
+    return memory.readbyte(addr_player_state)
+end
+
 -- get_is_dead - Returns 1 if the player is dead or dying
 -- 0x06 means dead, 0x0b means dying
 function get_is_dead()
@@ -347,73 +364,55 @@ savestate.save(gamestate)
 
 -- update screen every screen_update_interval frames
 local frame_skip = 4
--- The reward observed by Mario
-local reward = 0
-
+-- a flag determining if the game is waiting for a reset
 local is_waiting_for_reset = 0
 
-local is_waiting_for_new_life = 0
 
 while true do
-  -- override the timer that controls intermissions to always be zero
-  memory.writebyte(addr_prelevel_timer, 0)
+  -- skip pre-level stuff if Mario is at starting position
+  if (get_player_state() == 0) or is_waiting_for_reset then
+    memory.writebyte(addr_prelevel_timer, 0)
+  end
 
-
-  -- print(string.format("%d", get_time()))
-  -- print(string.format("%d", is_game_over()))
-  -- print(string.format("%d", get_is_dead()))
-  -- print()
   -- Check if Mario lost the last life and the state needs reset
-  if (is_game_over() == 1) then
+  if (is_waiting_for_reset == 0) and (is_game_over() == 1) then
     write_to_pipe("game_over" .. SEP .. emu.framecount())
     is_waiting_for_reset = 1
   end
 
-  -- if (get_is_dead() == 1) then
-  --   -- print('asdf')
-  --   is_waiting_for_new_life = 1
-  -- end
-
+  -- check if we're waiting for a reset and dont need to send data
   if (is_waiting_for_reset == 1) then
     if (is_game_over() == 0) then
       is_waiting_for_reset = 0
-      is_waiting_for_new_life = 0
-    else
-      emu.frameadvance()
     end
-  elseif (is_waiting_for_new_life == 1) then
-    if (get_is_dead() == 0) then
-      is_waiting_for_new_life = 0
-    else
+    emu.frameadvance()
+  -- check if we're dead and dont need to send data
+  elseif (get_is_dead() == 1) then
       emu.frameadvance()
-    end
   -- Check if this cycle should accept a new action as input
-  elseif emu.framecount() % frame_skip == 0 then
+  else
+    -- Get an action from the pipe
     nes_ask_for_command()
+    -- Process the action (i.e press it for one frame)
     local has_command = nes_process_command()
-    if has_command then
-      emu.frameadvance()
-      -- reset the reward and flags if the episode restarted
-      if nes_get_reset_flag() then
-        nes_clear_reset_flag()
-      end
-      nes_send_data(string.format("%d", reward))
-      nes_update_screen()
-      -- update the reward for this time timestep
-      reward = get_reward()
-        if (get_is_dead() == 1) then
-          -- print('asdf')
-          is_waiting_for_new_life = 1
-        end
-    else
+    if not has_command then
       print('pipe closed')
       break
     end
-  else
-    -- skip frames by holding the last action
-    gui.text(5,25, button)
-    joypad.set(1, joypad_command)
     emu.frameadvance()
-    reward = reward + get_reward()
+    -- reset the reward and flags if the episode restarted
+    if nes_get_reset_flag() then
+      nes_clear_reset_flag()
+    end
+    -- update the reward for this time timestep
+    local reward = get_reward()
+    for frame_i=1,frame_skip-1 do
+      gui.text(5,25, button)
+      joypad.set(1, joypad_command)
+      emu.frameadvance()
+      reward = reward + get_reward()
+    end
+    nes_send_data(string.format("%d", reward))
+    nes_update_screen()
   end
 end
