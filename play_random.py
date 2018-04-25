@@ -7,13 +7,14 @@ import nesgym_super_mario_bros
 
 try:
     env = gym.make('nesgym/SuperMarioBros-v0')
+    env = gym.wrappers.Monitor(env, './monitor', force=True)
 
     done = True
     progress = tqdm(range(5000))
     for step in progress:
         if done:
             state = env.reset()
-        action = env.action_space.sample()
+        action = 4# env.action_space.sample()
         state, reward, done, info = env.step(action)
         progress.set_postfix(reward=reward)
 
