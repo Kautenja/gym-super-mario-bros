@@ -1,6 +1,7 @@
 # Ignores specific to this project
 build/
 sample/
+monitor/
 
 # Ignores specific to different operating system files
 
