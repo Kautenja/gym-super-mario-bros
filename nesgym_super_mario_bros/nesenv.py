@@ -222,10 +222,18 @@ class NESEnv(gym.Env, utils.EzPickle):
         if not self.emulator_started:
             self._start_emulator()
         self.reward = 0
-        self.screen = np.zeros((SCREEN_HEIGHT, SCREEN_WIDTH, 3), dtype=np.uint8)
+        # initialize as noise so it's easy to spot if it slips into the stream
+        self.screen = np.random.randint(0, 255, (SCREEN_HEIGHT, SCREEN_WIDTH, 3), dtype=np.uint8)
         self._write_to_pipe('reset' + SEP)
         with self.command_cond:
             self.can_send_command = False
+
+        # hacky fix: the first 3 screens of every episode were noise for some
+        # reason, so here skip the first three frames of every episode with
+        # NOPS and dont tell the agent
+        for _ in range(3):
+            self.step(0)
+
         return self.screen
 
     def render(self, mode='human', close=False):
