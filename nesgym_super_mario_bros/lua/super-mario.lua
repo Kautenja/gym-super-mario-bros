@@ -165,8 +165,6 @@ end
 
 -- MARK: Memory reads.
 
-addr_injury_timer = 0x079e
-
 -- readbyterange - Reads a range of bytes and return a number
 function readbyterange(address, length)
     local return_value = 0
@@ -321,6 +319,11 @@ function runout_prelevel_timer()
     memory.writebyte(0x07A0, 0)
 end
 
+-- Write 6 to the player state register to kill mario.
+function kill_mario()
+    memory.writebyte(0x000e, 0x06)
+end
+
 
 -- MARK: Main
 
@@ -370,6 +373,9 @@ while true do
         emu.frameadvance()
     -- check if we're dead and dont need to send data
     elseif is_dead() then
+        if get_player_state() == 0x0b then
+            kill_mario()
+        end
         emu.frameadvance()
     -- Check if this cycle should accept a new action as input
     else
