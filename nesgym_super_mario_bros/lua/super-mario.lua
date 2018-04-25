@@ -4,7 +4,7 @@
 screen = {} -- screen pixels [x,y] = p
 pipe_out = nil -- for sending data(output e.g. screen pixels, reward) back to client
 pipe_in = nil -- for getting data(input e.g. controller status change) from client
-flag_reset = false -- indicates whether a reset is happening
+local is_waiting_for_reset = false
 
 SEP = string.format('%c', 0xFF) -- as separator in communication protocol
 IN_SEP = '|'
@@ -23,20 +23,14 @@ COMMAND_TABLE = {
 -- exported common functions start with nes_ prefix
 -- called before each episode
 function nes_reset()
-    flag_reset = true
+    print('reset')
     -- load state so we don't have to instruct to skip title screen
+    is_waiting_for_reset = false
     savestate.load(gamestate)
     x_pos = get_x_position()
     time = get_time()
 end
 
-function nes_get_reset_flag()
-    return flag_reset
-end
-
-function nes_clear_reset_flag()
-    flag_reset = false
-end
 
 -- called once when emulator starts
 function nes_init()
@@ -353,13 +347,22 @@ savestate.save(gamestate)
 
 -- update screen every screen_update_interval frames
 local frame_skip = 4
--- a flag determining if the game is waiting for a reset
-local is_waiting_for_reset = false
 
 
-while true do
+function step()
+    -- waiting for a reset still
+    if is_waiting_for_reset then
+        nes_ask_for_command()
+        local has_command = nes_process_command()
+        if not has_command then
+            print('pipe closed')
+            return false
+        end
+        return true
+    end
+
     -- skip pre-level stuff if Mario is at starting position
-    if get_player_state() == 0 or is_waiting_for_reset then
+    if get_player_state() == 0 then
         runout_prelevel_timer()
     end
 
@@ -370,14 +373,20 @@ while true do
     end
 
     -- Check if Mario lost the last life and the state needs reset
-    if not is_waiting_for_reset and is_game_over() then
+    if is_game_over() then
         write_to_pipe("game_over" .. SEP .. emu.framecount())
         is_waiting_for_reset = true
+        nes_ask_for_command()
+        local has_command = nes_process_command()
+        if not has_command then
+            print('pipe closed')
+            return false
+        end
+        return true
     end
 
-    -- check if we're waiting for a reset and dont need to send data
-    if is_waiting_for_reset then
-        is_waiting_for_reset = is_game_over()
+    -- Ignore zero states where the player can't do anything
+    if get_player_state() == 0 then
         emu.frameadvance()
     -- Check if this cycle should accept a new action as input
     else
@@ -387,14 +396,9 @@ while true do
         local has_command = nes_process_command()
         if not has_command then
             print('pipe closed')
-            break
+            return false
         end
         emu.frameadvance()
-        -- reset the reward and flags if the episode restarted
-        -- TODO: what is this, does it really need to be here?
-        if nes_get_reset_flag() then
-            nes_clear_reset_flag()
-        end
         -- get the reward over the frame-skip
         local reward = get_reward()
         for frame_i=1,frame_skip-1 do
@@ -405,5 +409,15 @@ while true do
         -- send the reward and the next state to the client
         nes_send_data(string.format("%d", reward))
         nes_update_screen()
+    end
+
+    return true
+end
+
+
+while true do
+    -- print(is_waiting_for_reset)
+    if not step() then
+        break
     end
 end

@@ -1,4 +1,4 @@
-"""A simple script for debugging the Super Mario Bros. Lua code."""
+"""A simple script to generate output from the emulator for debugging."""
 import os
 import gym
 import nesgym_super_mario_bros
@@ -14,12 +14,17 @@ if not os.path.exists(output_dir):
 
 try:
     env = gym.make('nesgym/SuperMarioBros-v0')
-    done = True
-    for step in tqdm(range(2000)):
-        if done:
-            state = env.reset()
-        state, reward, done, info = env.step(4)
-        Image.fromarray(state).save('{}/{}.png'.format(output_dir, step))
+
+    T = 5
+    for t in range(T):
+        state = env.reset()
+        Image.fromarray(state).save('{}/{}_0.png'.format(output_dir, t))
+        frames = 0
+        done = False
+        while not done:
+            state, _, done, _ = env.step(4)
+            frames += 1
+            Image.fromarray(state).save('{}/{}_{}.png'.format(output_dir, t, frames))
 except KeyboardInterrupt:
     pass
 
