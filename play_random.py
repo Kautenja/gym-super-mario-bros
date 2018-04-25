@@ -1,8 +1,7 @@
 """A simple script for debugging the Super Mario Bros. Lua code."""
 from time import sleep
-import gym
 from tqdm import tqdm
-# the package needs imported to register the environment with OpenAI Gym
+import gym
 import nesgym_super_mario_bros
 
 
@@ -17,7 +16,6 @@ try:
         action = env.action_space.sample()
         state, reward, done, info = env.step(action)
         progress.set_postfix(reward=reward)
-        # sleep(0.3)
 
     env.close()
 except KeyboardInterrupt:
