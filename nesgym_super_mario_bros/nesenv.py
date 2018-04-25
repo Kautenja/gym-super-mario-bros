@@ -222,7 +222,7 @@ class NESEnv(gym.Env, utils.EzPickle):
         if not self.emulator_started:
             self._start_emulator()
         self.reward = 0
-        self.screen = np.zeros(0, 255, (SCREEN_HEIGHT, SCREEN_WIDTH, 3), dtype=np.uint8)
+        self.screen = np.zeros((SCREEN_HEIGHT, SCREEN_WIDTH, 3), dtype=np.uint8)
         self._write_to_pipe('reset' + SEP)
         with self.command_cond:
             self.can_send_command = False
