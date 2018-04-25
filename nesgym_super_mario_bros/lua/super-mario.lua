@@ -404,7 +404,7 @@ while true do
         if (get_is_dead() == 1) then
           -- print('asdf')
           is_waiting_for_new_life = 1
-  end
+        end
     else
       print('pipe closed')
       break
