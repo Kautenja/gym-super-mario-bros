@@ -120,7 +120,7 @@ function handle_command(line)
       local btn = buttons:sub(i,i)
       button = COMMAND_TABLE[buttons:sub(i,i)]
       joypad_command[button] = true
-      gui.text(5,25, button)
+      -- gui.text(5,25, button)
     end
     joypad.set(1, joypad_command)
   end
@@ -401,17 +401,19 @@ while true do
     end
     emu.frameadvance()
     -- reset the reward and flags if the episode restarted
+    -- TODO: what is this, does it really need to be here?
     if nes_get_reset_flag() then
       nes_clear_reset_flag()
     end
-    -- update the reward for this time timestep
+    -- get the reward over the frame-skip
     local reward = get_reward()
     for frame_i=1,frame_skip-1 do
-      gui.text(5,25, button)
+      -- gui.text(5,25, button)
       joypad.set(1, joypad_command)
       emu.frameadvance()
       reward = reward + get_reward()
     end
+    -- send the reward and the next state to the client
     nes_send_data(string.format("%d", reward))
     nes_update_screen()
   end
