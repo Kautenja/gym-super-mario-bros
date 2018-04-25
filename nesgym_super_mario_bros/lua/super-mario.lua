@@ -375,8 +375,11 @@ while true do
         is_waiting_for_reset = true
     end
 
+    if get_player_state() == 0 then
+        print('asdf')
+        emu.frameadvance()
     -- check if we're waiting for a reset and dont need to send data
-    if is_waiting_for_reset then
+    elseif is_waiting_for_reset then
         is_waiting_for_reset = is_game_over()
         emu.frameadvance()
     -- Check if this cycle should accept a new action as input
