@@ -281,16 +281,12 @@ function get_player_state()
     return memory.readbyte(addr_player_state)
 end
 
--- get_is_dead - Returns 1 if the player is dead or dying
+-- is_dead - Returns 1 if the player is dead or dying
 -- 0x06 means dead, 0x0b means dying
-function get_is_dead()
+function is_dead()
     local player_state = memory.readbyte(addr_player_state)
     local y_viewport = get_y_viewport()
-    if (player_state == 0x06) or (player_state == 0x0b) or (y_viewport > 1) then
-        return 1
-    else
-        return 0
-    end
+    return (player_state == 0x06) or (player_state == 0x0b) or (y_viewport > 1)
 end
 
 -- Return 1 if the game has ended or a 0 if it has not
@@ -327,7 +323,7 @@ end
 
 -- Return a penalty for
 function get_death_penalty()
-    if (get_is_dead() == 1) then
+    if is_dead() then
         return -100
     end
     return 0
@@ -391,7 +387,7 @@ while true do
         end
         emu.frameadvance()
     -- check if we're dead and dont need to send data
-    elseif (get_is_dead() == 1) then
+    elseif is_dead() then
         emu.frameadvance()
     -- Check if this cycle should accept a new action as input
     else
