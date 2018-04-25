@@ -351,9 +351,15 @@ local frame_skip = 4
 
 function step()
     -- waiting for a reset still
-    -- if is_waiting_for_reset then
-    --     return true
-    -- end
+    if is_waiting_for_reset then
+        nes_ask_for_command()
+        local has_command = nes_process_command()
+        if not has_command then
+            print('pipe closed')
+            return false
+        end
+        return true
+    end
 
     -- skip pre-level stuff if Mario is at starting position
     if get_player_state() == 0 then
@@ -370,6 +376,12 @@ function step()
     if is_game_over() then
         write_to_pipe("game_over" .. SEP .. emu.framecount())
         is_waiting_for_reset = true
+        nes_ask_for_command()
+        local has_command = nes_process_command()
+        if not has_command then
+            print('pipe closed')
+            return false
+        end
         return true
     end
 
