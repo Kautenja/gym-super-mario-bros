@@ -163,28 +163,9 @@ end
 
 
 
--- MARK: Memory access for Super Mario Bros.
+-- MARK: Memory reads.
 
-addr_world = 0x075f
-addr_level = 0x075c
-addr_area = 0x0760
-addr_life = 0x075a
-addr_score = 0x07de
-addr_time = 0x07f8
-addr_coins = 0x07ed
-addr_curr_page = 0x6d
-addr_curr_x = 0x86
-addr_curr_y = 0x03b8
-addr_left_x = 0x071c
-addr_y_viewport = 0x00b5
-addr_player_state = 0x000e         -- x06 dies, x0b dying
-addr_player_status = 0x0756        -- 0 = small, 1 = big, 2+ = fiery
-addr_enemy_page = 0x6e
-addr_enemy_x = 0x87
-addr_enemy_y = 0xcf
 addr_injury_timer = 0x079e
-addr_swimming_flag = 0x0704
-addr_prelevel_timer = 0x07A0
 
 -- readbyterange - Reads a range of bytes and return a number
 function readbyterange(address, length)
@@ -198,69 +179,73 @@ end
 
 -- get_level - Returns current level (0-indexed) (0 to 31)
 function get_level()
-    return memory.readbyte(addr_world) * 4 + memory.readbyte(addr_level)
+    -- Read the world 0x075f as the base and add the level. there are 4 levels
+    -- per world
+    return memory.readbyte(0x075f) * 4 + memory.readbyte(0x075c)
 end
 
 -- get_world_number - Returns current world number (1 to 8)
 function get_world_number()
-    return memory.readbyte(addr_world) + 1
+    return memory.readbyte(0x075f) + 1
 end
 
 -- get_level_number - Returns current level number (1 to 4)
 function get_level_number()
-    return memory.readbyte(addr_level) + 1
+    return memory.readbyte(0x075c) + 1
 end
 
 -- get_area_number - Returns current area number (1 to 5)
 function get_area_number()
-    return memory.readbyte(addr_area) + 1
+    return memory.readbyte(0x0760) + 1
 end
 
 -- get_coins - Returns the number of coins collected (0 to 99)
 function get_coins()
-    return tonumber(readbyterange(addr_coins, 2))
+    return tonumber(readbyterange(0x07ed, 2))
 end
 
 -- get_life - Returns the number of remaining lives
 function get_life()
-    return memory.readbyte(addr_life)
+    return memory.readbyte(0x075a)
 end
 
 -- get_score - Returns the current player score (0 to 999990)
 function get_score()
-    return tonumber(readbyterange(addr_score, 6))
+    return tonumber(readbyterange(0x07de, 6))
 end
 
 -- get_time - Returns the time left (0 to 999)
 function get_time()
-    return tonumber(readbyterange(addr_time, 3))
+    return tonumber(readbyterange(0x07f8, 3))
 end
 
 -- get_x_position - Returns the current (horizontal) position
 function get_x_position()
-    return memory.readbyte(addr_curr_page) * 0x100 + memory.readbyte(addr_curr_x)
+    -- add the current page 0x6d to the current x
+    return memory.readbyte(0x6d) * 0x100 + memory.readbyte(0x86)
 end
 
 -- get_left_x_position - Returns number of pixels from left of screen
 function get_left_x_position()
-    return (memory.readbyte(addr_curr_x) - memory.readbyte(addr_left_x)) % 256
+    -- subtract the left x position 0x071c from the current x 0x86
+    return (memory.readbyte(0x86) - memory.readbyte(0x071c)) % 256
 end
 
 -- get_y_position - Returns the current (vertical) position
 function get_y_position()
-    return memory.readbyte(addr_curr_y)
+    return memory.readbyte(0x03b8)
 end
 
 -- get_y_viewport - Returns the current y viewport
 -- 1 = in visible viewport, 0 = above viewport, > 1 below viewport (i.e. dead)
 function get_y_viewport()
-    return memory.readbyte(addr_y_viewport)
+    return memory.readbyte(0x00b5)
 end
 
 -- get_player_status - Returns the player status
 -- 0 is small, 1 is big, 2+ is fiery (can shoot fireballs)
 function get_player_status()
-    return memory.readbyte(addr_player_status)
+    return memory.readbyte(0x0756)
 end
 
 -- Player State:
@@ -277,13 +262,13 @@ end
 -- 0x0B - Dying
 -- 0x0C - Palette cycling, can't move
 function get_player_state()
-    return memory.readbyte(addr_player_state)
+    return memory.readbyte(0x000e)
 end
 
 -- is_dead - Returns 1 if the player is dead or dying
 -- 0x06 means dead, 0x0b means dying
 function is_dead()
-    local player_state = memory.readbyte(addr_player_state)
+    local player_state = get_player_state()
     local y_viewport = get_y_viewport()
     return player_state == 0x06 or player_state == 0x0b or y_viewport > 1
 end
@@ -329,6 +314,12 @@ function get_reward()
     return get_x_reward() + get_time_penalty() + get_death_penalty()
 end
 
+-- MARK: Hacks
+
+-- Force the prelevel timer to 0 to skip the unnecessary frames
+function runout_prelevel_timer()
+    memory.writebyte(0x07A0, 0)
+end
 
 
 -- MARK: Main
@@ -345,7 +336,7 @@ while get_time() >= time do
     emu.frameadvance()
     handle_command('joypad|')
     -- force override the timer for pause menus
-    memory.writebyte(addr_prelevel_timer, 0)
+    runout_prelevel_timer()
     emu.frameadvance()
 end
 
@@ -364,7 +355,7 @@ local is_waiting_for_reset = false
 while true do
     -- skip pre-level stuff if Mario is at starting position
     if get_player_state() == 0 or is_waiting_for_reset then
-        memory.writebyte(addr_prelevel_timer, 0)
+        runout_prelevel_timer()
     end
 
     -- Check if Mario lost the last life and the state needs reset
