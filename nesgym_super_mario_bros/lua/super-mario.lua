@@ -120,7 +120,6 @@ function handle_command(line)
             local btn = buttons:sub(i,i)
             button = COMMAND_TABLE[buttons:sub(i,i)]
             joypad_command[button] = true
-            -- gui.text(5,25, button)
         end
         joypad.set(1, joypad_command)
     end
@@ -286,7 +285,7 @@ end
 function is_dead()
     local player_state = memory.readbyte(addr_player_state)
     local y_viewport = get_y_viewport()
-    return (player_state == 0x06) or (player_state == 0x0b) or (y_viewport > 1)
+    return player_state == 0x06 or player_state == 0x0b or y_viewport > 1
 end
 
 -- Return 1 if the game has ended or a 0 if it has not
@@ -301,9 +300,9 @@ local x_pos = 0
 -- Return the reward for moving forward on the x-axis
 function get_x_reward()
     local next_x_pos = get_x_position()
-    local x_r = (next_x_pos - x_pos)
+    local _reward = next_x_pos - x_pos
     x_pos = next_x_pos
-    return x_r
+    return _reward
 end
 
 -- the current time step of the in-game clock
@@ -312,9 +311,9 @@ local time = 0
 -- to convince the agent to be fast
 function get_time_penalty()
     local next_time = get_time()
-    local r = (next_time - time)
+    local _reward = next_time - time
     time = next_time
-    return r
+    return _reward
 end
 
 -- Return a penalty for
@@ -350,8 +349,6 @@ while get_time() >= time do
     emu.frameadvance()
 end
 
--- This command will turn the game into B&W in the emulator
--- memory.writebyte(0x0779, 0x1f)
 
 -- Backup the save-state so we don't have to go past pause menu again
 gamestate = savestate.object()
@@ -366,7 +363,7 @@ local is_waiting_for_reset = false
 
 while true do
     -- skip pre-level stuff if Mario is at starting position
-    if (get_player_state() == 0) or is_waiting_for_reset then
+    if get_player_state() == 0 or is_waiting_for_reset then
         memory.writebyte(addr_prelevel_timer, 0)
     end
 
@@ -402,7 +399,6 @@ while true do
         -- get the reward over the frame-skip
         local reward = get_reward()
         for frame_i=1,frame_skip-1 do
-            -- gui.text(5,25, button)
             joypad.set(1, joypad_command)
             emu.frameadvance()
             reward = reward + get_reward()
