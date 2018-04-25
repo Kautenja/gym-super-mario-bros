@@ -4,7 +4,6 @@
 screen = {} -- screen pixels [x,y] = p
 pipe_out = nil -- for sending data(output e.g. screen pixels, reward) back to client
 pipe_in = nil -- for getting data(input e.g. controller status change) from client
-flag_reset = false -- indicates whether a reset is happening
 
 SEP = string.format('%c', 0xFF) -- as separator in communication protocol
 IN_SEP = '|'
@@ -23,20 +22,12 @@ COMMAND_TABLE = {
 -- exported common functions start with nes_ prefix
 -- called before each episode
 function nes_reset()
-    flag_reset = true
     -- load state so we don't have to instruct to skip title screen
     savestate.load(gamestate)
     x_pos = get_x_position()
     time = get_time()
 end
 
-function nes_get_reset_flag()
-    return flag_reset
-end
-
-function nes_clear_reset_flag()
-    flag_reset = false
-end
 
 -- called once when emulator starts
 function nes_init()
@@ -375,8 +366,8 @@ while true do
         is_waiting_for_reset = true
     end
 
+    -- Ignore zero states where the player can't do anything
     if get_player_state() == 0 then
-        print('asdf')
         emu.frameadvance()
     -- check if we're waiting for a reset and dont need to send data
     elseif is_waiting_for_reset then
@@ -393,11 +384,6 @@ while true do
             break
         end
         emu.frameadvance()
-        -- reset the reward and flags if the episode restarted
-        -- TODO: what is this, does it really need to be here?
-        if nes_get_reset_flag() then
-            nes_clear_reset_flag()
-        end
         -- get the reward over the frame-skip
         local reward = get_reward()
         for frame_i=1,frame_skip-1 do
