@@ -361,7 +361,7 @@ savestate.save(gamestate)
 -- update screen every screen_update_interval frames
 local frame_skip = 4
 -- a flag determining if the game is waiting for a reset
-local is_waiting_for_reset = 0
+local is_waiting_for_reset = false
 
 
 while true do
@@ -371,16 +371,14 @@ while true do
     end
 
     -- Check if Mario lost the last life and the state needs reset
-    if (is_waiting_for_reset == 0) and is_game_over() then
+    if not is_waiting_for_reset and is_game_over() then
         write_to_pipe("game_over" .. SEP .. emu.framecount())
-        is_waiting_for_reset = 1
+        is_waiting_for_reset = true
     end
 
     -- check if we're waiting for a reset and dont need to send data
-    if (is_waiting_for_reset == 1) then
-        if not is_game_over() then
-            is_waiting_for_reset = 0
-        end
+    if is_waiting_for_reset then
+        is_waiting_for_reset = is_game_over()
         emu.frameadvance()
     -- check if we're dead and dont need to send data
     elseif is_dead() then
