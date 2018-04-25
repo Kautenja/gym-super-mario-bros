@@ -15,7 +15,6 @@ def play_game(env, episodes: int=5000):
         action = env.action_space.sample()
         state, reward, done, info = env.step(action)
         progress.set_postfix(reward=reward)
-
     env.close()
 
 
