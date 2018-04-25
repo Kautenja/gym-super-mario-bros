@@ -263,12 +263,14 @@ function get_player_state()
     return memory.readbyte(0x000e)
 end
 
--- is_dead - Returns 1 if the player is dead or dying
--- 0x06 means dead, 0x0b means dying
+-- Return a boolean determining if Mario is in the dying animation
+function is_dying()
+    return get_player_state() == 0x0b or get_y_viewport() > 1
+end
+
+-- Return a boolean determining if Mario is in the dead state
 function is_dead()
-    local player_state = get_player_state()
-    local y_viewport = get_y_viewport()
-    return player_state == 0x06 or player_state == 0x0b or y_viewport > 1
+    return get_player_state() == 0x06
 end
 
 -- Return 1 if the game has ended or a 0 if it has not
@@ -301,7 +303,7 @@ end
 
 -- Return a penalty for
 function get_death_penalty()
-    if is_dead() then
+    if is_dying() or is_dead() then
         return -100
     end
     return 0
@@ -314,7 +316,7 @@ end
 
 -- MARK: Hacks
 
--- Force the prelevel timer to 0 to skip the unnecessary frames
+-- Force the pre-level timer to 0 to skip the unnecessary frames
 function runout_prelevel_timer()
     memory.writebyte(0x07A0, 0)
 end
@@ -361,6 +363,12 @@ while true do
         runout_prelevel_timer()
     end
 
+    -- If Mario is dying set him to dead to skip the animation
+    if is_dying() then
+        kill_mario()
+        emu.frameadvance()
+    end
+
     -- Check if Mario lost the last life and the state needs reset
     if not is_waiting_for_reset and is_game_over() then
         write_to_pipe("game_over" .. SEP .. emu.framecount())
@@ -370,12 +378,6 @@ while true do
     -- check if we're waiting for a reset and dont need to send data
     if is_waiting_for_reset then
         is_waiting_for_reset = is_game_over()
-        emu.frameadvance()
-    -- check if we're dead and dont need to send data
-    elseif is_dead() then
-        if get_player_state() == 0x0b then
-            kill_mario()
-        end
         emu.frameadvance()
     -- Check if this cycle should accept a new action as input
     else
