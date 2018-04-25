@@ -23,7 +23,6 @@ COMMAND_TABLE = {
 -- exported common functions start with nes_ prefix
 -- called before each episode
 function nes_reset()
-    print('reset')
     -- load state so we don't have to instruct to skip title screen
     is_waiting_for_reset = false
     savestate.load(gamestate)
@@ -416,7 +415,6 @@ end
 
 
 while true do
-    -- print(is_waiting_for_reset)
     if not step() then
         break
     end
