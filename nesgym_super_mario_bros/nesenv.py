@@ -205,11 +205,10 @@ class NESEnv(gym.Env, utils.EzPickle):
 
     def step(self, action):
         self.frame += 1
-        done = False
-        if self.done or self.frame >= self.episode_length:
+        if self.done or self.frame > self.episode_length:
             self.done = False
-            done = True
             self.frame = 0
+            return self.screen.copy(), self.reward, True, {'frame': 0}
         obs = self.screen.copy()
         info = {"frame": self.frame}
         with self.command_cond:
@@ -217,7 +216,7 @@ class NESEnv(gym.Env, utils.EzPickle):
                 self.command_cond.wait()
             self.can_send_command = False
         self._joypad(self.actions[action])
-        return obs, self.reward, done, info
+        return obs, self.reward, False, info
 
     def reset(self):
         if not self.emulator_started:
