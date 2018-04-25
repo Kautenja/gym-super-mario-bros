@@ -26,6 +26,9 @@ function nes_reset()
     print('reset')
     -- load state so we don't have to instruct to skip title screen
     is_waiting_for_reset = false
+    savestate.load(gamestate)
+    x_pos = get_x_position()
+    time = get_time()
 end
 
 
@@ -366,9 +369,6 @@ function step()
     -- Check if Mario lost the last life and the state needs reset
     if is_game_over() then
         write_to_pipe("game_over" .. SEP .. emu.framecount())
-        savestate.load(gamestate)
-        x_pos = get_x_position()
-        time = get_time()
         is_waiting_for_reset = true
         return true
     end
