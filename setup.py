@@ -1,8 +1,8 @@
 from setuptools import setup, find_packages
 
 
-# open the README to fill the long description key
-def README():
+def README() -> str:
+    """Return the contents of the README file for this project."""
     with open('README.md') as README_file:
         return README_file.read()
 
@@ -16,7 +16,19 @@ setup(
     description='Super Mario Bros. for Open.ai Gym',
     long_description=README(),
     long_description_content_type='text/markdown',
-    keywords='OpenAI-Gym NES Super-Mario-Bros',
+    keywords='OpenAI-Gym NES Super-Mario-Bros Reinforcement-Learning-Environment',
+    classifiers=[
+        'License :: OSI Approved :: MIT License',
+        'Development Status :: 2 - Pre-Alpha',
+        'Intended Audience :: Developers',
+        'Intended Audience :: Science/Research',
+        'Operating System :: MacOS :: MacOS X',
+        'Operating System :: POSIX :: Linux',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+        'Topic :: Games/Entertainment :: Side-Scrolling/Arcade Games',
+        'Topic :: Scientific/Engineering :: Artificial Intelligence',
+    ],
     url='https://github.com/Kautenja/nesgym-super-mario-bros',
     author='Christian Kauten',
     author_email='kautencreations@gmail.com',
