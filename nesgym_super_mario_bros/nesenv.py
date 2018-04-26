@@ -147,8 +147,7 @@ class NESEnv(gym.Env, gym.utils.EzPickle):
         return [self.curr_seed]
 
     def close(self):
-        """
-        """
+        """Close the emulator and shutdown FCEUX."""
         self.closed = True
 
     # MARK: FCEUX
@@ -178,9 +177,8 @@ class NESEnv(gym.Env, gym.utils.EzPickle):
         ])
         # open the FCEUX process
         proc = subprocess.Popen(command, shell=True)
-        print('started proc')
         proc.communicate()
-        # FIXME: no matter whether it starts, proc.returncode is always zero
+        # TODO: no matter whether it starts, proc.returncode is always zero
         self.emulator_started = True
 
     def _joypad(self, button):
@@ -190,52 +188,50 @@ class NESEnv(gym.Env, gym.utils.EzPickle):
 
     # MARK: Pipes
 
-    def _open_pipes(self):
-        """
-        """
-        self._ensure_create_pipe(self._pipe_in_name)
-        self._ensure_create_pipe(self._pipe_out_name)
-
+    def _open_pipes(self) -> None:
+        """Open the communication path between self and the emulator"""
+        # Open the inbound pipe if it doesn't exist yet
+        if not os.path.exists(self._pipe_in_name):
+            os.mkfifo(self._pipe_in_name)
+        # Open the outbound pipe if it doesn't exist yet
+        if not os.path.exists(self._pipe_out_name):
+            os.mkfifo(self._pipe_out_name)
+        # Setup the thread for listening for messages from the emulator
         self.thread_incoming = Thread(target=self._pipe_handler)
         self.thread_incoming.start()
 
-    def _ensure_create_pipe(self, pipe_name):
-        """
-        """
-        if not os.path.exists(pipe_name):
-            os.mkfifo(pipe_name)
-
-    def _write_to_pipe(self, message):
-        """
-        """
+    def _write_to_pipe(self, message: str) -> None:
+        """Write a message to the outbound pip (emulator)."""
         if not self.pipe_out:
             # arg 1 for line buffering - see python doc
             self.pipe_out = open(self._pipe_out_name, 'w', 1)
         self.pipe_out.write(message + '\n')
         self.pipe_out.flush()
 
-    def _pipe_handler(self):
-        """
-        """
+    def _pipe_handler(self) -> None:
+        """Handle messages from the emulator until the pipe is closed."""
+        # open the inbound pipe to read bytes
         with open(self._pipe_in_name, 'rb') as pipe:
+            # Loop until the connection is closed
             while not self.closed:
-                msg = pipe.readline()
-                body = msg.split(b'\xFF')
-                msg_type, frame = body[0], body[1]
+                # read a message from the pipe (values are delimitted by 0xff)
+                message = pipe.readline().split(b'\xFF')
+                msg_type = message[0]
                 msg_type = msg_type.decode('ascii')
-                frame = int(frame.decode('ascii'))
+                if msg_type == 'ready':
+                    print('client: ready')
                 if msg_type == "wait_for_command":
                     with self.command_cond:
                         self.can_send_command = True
                         self.command_cond.notifyAll()
                 elif msg_type == "screen":
-                    screen_pixels = body[2]
+                    screen_pixels = message[1]
                     pvs = np.array(struct.unpack('B'*len(screen_pixels), screen_pixels))
                     # palette values received from lua are offset by 20 to avoid '\n's
                     pvs = np.array(PALETTE[pvs-20], dtype=np.uint8)
                     self.screen = pvs.reshape((SCREEN_HEIGHT, SCREEN_WIDTH, 3))
                 elif msg_type == "data":
-                    self.reward = float(body[2])
+                    self.reward = float(message[1])
                 elif msg_type == "game_over":
                     self.done = True
 

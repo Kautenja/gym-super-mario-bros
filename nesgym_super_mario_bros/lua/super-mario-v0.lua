@@ -1,55 +1,55 @@
 -- MARK: nes_interface
 
 -- global variables
-screen = {} -- screen pixels [x,y] = p
-pipe_out = nil -- for sending data(output e.g. screen pixels, reward) back to client
-pipe_in = nil -- for getting data(input e.g. controller status change) from client
-local is_waiting_for_reset = false
+-- screen = {} -- screen pixels [x,y] = p
+-- pipe_out = nil -- for sending data(output e.g. screen pixels, reward) back to client
+-- pipe_in = nil -- for getting data(input e.g. controller status change) from client
+-- local is_waiting_for_reset = false
 
-SEP = string.format('%c', 0xFF) -- as separator in communication protocol
-IN_SEP = '|'
+-- SEP = string.format('%c', 0xFF) -- as separator in communication protocol
+-- IN_SEP = '|'
 
-COMMAND_TABLE = {
-    A = "A",
-    B = "B",
-    U = "up",
-    L = "left",
-    D = "down",
-    R = "right",
-    S = "start",
-    s = "select"
-}
+-- COMMAND_TABLE = {
+--     A = "A",
+--     B = "B",
+--     U = "up",
+--     L = "left",
+--     D = "down",
+--     R = "right",
+--     S = "start",
+--     s = "select"
+-- }
 
--- exported common functions start with nes_ prefix
--- called before each episode
-function nes_reset()
-    -- load state so we don't have to instruct to skip title screen
+-- -- exported common functions start with nes_ prefix
+-- -- called before each episode
+-- function nes_reset()
+--     -- load state so we don't have to instruct to skip title screen
     is_waiting_for_reset = false
-    savestate.load(gamestate)
-    x_pos = get_x_position()
-    time = get_time()
-end
+--     savestate.load(gamestate)
+--     x_pos = get_x_position()
+--     time = get_time()
+-- end
 
 
--- called once when emulator starts
-function nes_init()
-    emu.speedmode("maximum")
+-- -- called once when emulator starts
+-- function nes_init()
+--     emu.speedmode("maximum")
 
-    for x = 0, 255 do
-        screen[x] = {}
-        for y = 0, 223 do
-            screen[x][y] = -1
-        end
-    end
+--     for x = 0, 255 do
+--         screen[x] = {}
+--         for y = 0, 223 do
+--             screen[x][y] = -1
+--         end
+--     end
 
-    pipe_prefix = '/tmp/nesgym-pipe'
-    -- from emulator to client
-    pipe_out, _, _ = io.open(pipe_prefix .. "-in", "w")
-    -- from client to emulator
-    pipe_in, _, _ = io.open(pipe_prefix .. "-out", "r")
+--     pipe_prefix = '/tmp/nesgym-pipe'
+--     -- from emulator to client
+--     pipe_out, _, _ = io.open(pipe_prefix .. "-in", "w")
+--     -- from client to emulator
+--     pipe_in, _, _ = io.open(pipe_prefix .. "-out", "r")
 
-    write_to_pipe("ready" .. SEP .. emu.framecount())
-end
+--     write_to_pipe("ready" .. SEP .. emu.framecount())
+-- end
 
 -- update_screen - get current screen pixels and store them (256 x 224)
 -- Palette is a number from 0 to 127 that represents an RGB color (conversion table in python file)

@@ -253,7 +253,7 @@ function init()
     -- open the pipes
     setup_pipes()
     -- Notify the client that setup is complete and the emulator is ready
-    -- write_to_pipe("ready" .. SEP .. emu.framecount())
+    write_to_pipe("ready")
 end
 
 -- Initialize the screen to blank pixels
