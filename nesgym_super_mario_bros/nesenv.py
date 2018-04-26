@@ -99,7 +99,7 @@ class NESEnv(gym.Env, gym.utils.EzPickle):
                 self.command_cond.wait()
             self.can_send_command = False
         self._joypad(self.actions[action])
-        return obs, self.reward, False, info
+        return self.screen.copy(), self.reward, False, info
 
     def reset(self):
         """
@@ -217,10 +217,9 @@ class NESEnv(gym.Env, gym.utils.EzPickle):
                 # read a message from the pipe (values are delimitted by 0xff)
                 message = pipe.readline().split(b'\xFF')
                 opcode = message[0].decode('ascii')
-                print(opcode)
-                if opcode == 'ready':
-                    pass
-                elif opcode == 'wait_for_command':
+                # print(opcode)
+
+                if opcode == 'wait_for_command':
                     with self.command_cond:
                         self.can_send_command = True
                         self.command_cond.notifyAll()

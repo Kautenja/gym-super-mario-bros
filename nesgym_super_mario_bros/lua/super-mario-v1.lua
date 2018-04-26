@@ -242,6 +242,8 @@ frame_skip = nil
 -- the total reward accumulated over `frame_skip` frames
 reward = 0
 
+is_waiting_for_reset = false
+
 
 -- Initialize the emulator and setup instance variables
 function init()
@@ -347,7 +349,13 @@ function handle_command(line)
         reset_state()
     elseif command == 'joypad' then
         -- A string of buttons to press will be the second value in the body
-        press_buttons(body[2])
+        reward = 0
+        -- TODO: make sure these bounds are correct
+        for frame_i=1,frame_skip-1 do
+            press_buttons(body[2])
+            emu.frameadvance()
+            reward = reward + get_reward()
+        end
     end
 end
 
@@ -400,33 +408,32 @@ function send_state(reward, done)
     write_to_pipe_end()
 end
 
--- Respond to the emulator preparing to step forward one more frame
-function before_frame()
-    -- If Mario is dying set him to dead to skip the animation
-    if is_dying() then
-        print('imminent death, killing Mario')
-        kill_mario()
-    end
+
+-- Initialize the emulator and setup the per frame callback for the run loop
+init()
+
+
+while true do
     -- Check if mario is in a nil state indicating a cut screen between lives.
     -- We can rundown this timer outside of the frame skip to keep things
     -- moving quickly
-    if get_player_state() == 0x00 then
-        print('runout')
+    while get_player_state() == 0x00 do
         runout_prelevel_timer()
-        return
+        emu.frameadvance()
+    end
+    while is_waiting_for_reset do
+        write_to_pipe("wait_for_command")
+        local line = pipe_in:read()
+        if line ~= nil then
+            -- handle_command(line)
+            print(line)
+        else
+            print('received nil command')
+            os.exit()
+        end
     end
 
-    -- if the frame count isn't aligned then we need to hold an action and
-    -- skip forward
-    if emu.framecount() % frame_skip ~= 0 then
-        -- Press buttons that were set in the last `frame_skip` aligned step
-        joypad.set(1, joypad_command)
-        return
-    end
-
-
-
-
+    -- Request a command from the client (agent)
     write_to_pipe("wait_for_command")
 
     if not pipe_in then
@@ -442,31 +449,18 @@ function before_frame()
         os.exit()
     end
 
-end
+    -- If Mario is dying set him to dead to skip the animation
+    if is_dying() then
+        print('imminent death, killing Mario')
+        kill_mario()
+        emu.frameadvance()
+    end
 
--- Respond to the emulator after having stepped forward one frame.
-function after_frame()
-    if get_player_state() == 0x00 then
-        print('runout after')
-        return
-    end
-    -- accumulate the reward
-    reward = reward + get_reward()
-    -- if the frame count isn't aligned then we can continue
-    if emu.framecount() % frame_skip ~= 0 then
-        return
-    end
     -- send the reward, done flag, and next state
     send_state(reward, is_game_over())
-    -- reset the reward
-    reward = get_reward()
-end
 
--- Initialize the emulator and setup the per frame callback for the run loop
-init()
-emu.registerbefore(before_frame)
-emu.registerafter(after_frame)
+    if is_game_over() then
+        is_waiting_for_reset = true
+    end
 
-while true do
-    emu.frameadvance()
 end
