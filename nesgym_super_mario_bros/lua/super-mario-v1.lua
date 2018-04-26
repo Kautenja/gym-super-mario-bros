@@ -239,6 +239,8 @@ gamestate = savestate.object()
 joypad_command = {}
 -- the number of frames to "skip" (hold an action for and accumulate reward)
 frame_skip = nil
+-- the total reward accumulated over `frame_skip` frames
+reward = 0
 
 
 -- Initialize the emulator and setup instance variables
@@ -342,7 +344,7 @@ function handle_command(line)
     -- The command itself is the first item in the split
     local command = body[1]
     if command == 'reset' then
-        reset()
+        reset_state()
     elseif command == 'joypad' then
         -- A string of buttons to press will be the second value in the body
         press_buttons(body[2])
@@ -367,15 +369,104 @@ function press_buttons(buttons)
     joypad.set(1, joypad_command)
 end
 
--- Respond to a frame being rendered by the emulator
-function after_frame()
-    -- return if the frame count isn't aligned with the frame skip var
-    if emu.framecount() % frame_skip ~= 0 then
+-- Get the current pixels from the emulator and store them in the local buffer
+-- with shape (256, 224). Palette (p) is a number from 0 to 127 that
+-- represents an RGB color (conversion table on client side)
+function send_state(reward, done)
+    local r, g, b, p
+    -- NES only has y values in the range 8 to 231, so we need to offset y values by 8
+    local offset_y = 8
+    -- write the opcode for a new state
+    write_to_pipe_partial("state" .. SEP)
+    -- write the reward
+    write_to_pipe_partial(string.format("%d", reward) .. SEP)
+    -- write the done flag as an integer
+    if done then
+        write_to_pipe_partial(1 .. SEP)
+    else
+        write_to_pipe_partial(0 .. SEP)
+    end
+    -- write the screen pixels to the pipe one scan-line at a time
+    for y = 0, 223 do
+        local screen_string = ""
+        for x = 0, 255 do
+            r, g, b, p = emu.getscreenpixel(x, y + offset_y, false)
+            -- offset p by 20 so the content can never be '\n'
+            screen_string = screen_string .. string.format("%c", p+20)
+        end
+        write_to_pipe_partial(screen_string)
+    end
+    -- write the terminal command sentinel to the pipe
+    write_to_pipe_end()
+end
+
+-- Respond to the emulator preparing to step forward one more frame
+function before_frame()
+    -- If Mario is dying set him to dead to skip the animation
+    if is_dying() then
+        print('imminent death, killing Mario')
+        kill_mario()
+    end
+    -- Check if mario is in a nil state indicating a cut screen between lives.
+    -- We can rundown this timer outside of the frame skip to keep things
+    -- moving quickly
+    if get_player_state() == 0x00 then
+        print('runout')
+        runout_prelevel_timer()
         return
+    end
+
+    -- if the frame count isn't aligned then we need to hold an action and
+    -- skip forward
+    if emu.framecount() % frame_skip ~= 0 then
+        -- Press buttons that were set in the last `frame_skip` aligned step
+        joypad.set(1, joypad_command)
+        return
+    end
+
+
+
+
+    write_to_pipe("wait_for_command")
+
+    if not pipe_in then
+        print('FCEUX-interface: pipe closed')
+        os.exit()
+    end
+
+    local line = pipe_in:read()
+    if line ~= nil then
+        handle_command(line)
+    else
+        print('received nil command')
+        os.exit()
     end
 
 end
 
+-- Respond to the emulator after having stepped forward one frame.
+function after_frame()
+    if get_player_state() == 0x00 then
+        print('runout after')
+        return
+    end
+    -- accumulate the reward
+    reward = reward + get_reward()
+    -- if the frame count isn't aligned then we can continue
+    if emu.framecount() % frame_skip ~= 0 then
+        return
+    end
+    -- send the reward, done flag, and next state
+    send_state(reward, is_game_over())
+    -- reset the reward
+    reward = get_reward()
+end
+
 -- Initialize the emulator and setup the per frame callback for the run loop
 init()
+emu.registerbefore(before_frame)
 emu.registerafter(after_frame)
+
+while true do
+    emu.frameadvance()
+end

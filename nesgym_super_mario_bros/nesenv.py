@@ -115,8 +115,8 @@ class NESEnv(gym.Env, gym.utils.EzPickle):
         # hacky fix: the first 3 screens of every episode were noise for some
         # reason, so here skip the first three frames of every episode with
         # NOPS and dont tell the agent
-        for _ in range(3):
-            self.step(0)
+        # for _ in range(3):
+        #     self.step(0)
 
         return self.screen
 
@@ -216,24 +216,23 @@ class NESEnv(gym.Env, gym.utils.EzPickle):
             while not self.closed:
                 # read a message from the pipe (values are delimitted by 0xff)
                 message = pipe.readline().split(b'\xFF')
-                msg_type = message[0]
-                msg_type = msg_type.decode('ascii')
-                if msg_type == 'ready':
-                    print('client: ready')
-                if msg_type == "wait_for_command":
+                opcode = message[0].decode('ascii')
+                print(opcode)
+                if opcode == 'ready':
+                    pass
+                elif opcode == 'wait_for_command':
                     with self.command_cond:
                         self.can_send_command = True
                         self.command_cond.notifyAll()
-                elif msg_type == "screen":
-                    screen_pixels = message[1]
-                    pvs = np.array(struct.unpack('B'*len(screen_pixels), screen_pixels))
-                    # palette values received from lua are offset by 20 to avoid '\n's
-                    pvs = np.array(PALETTE[pvs-20], dtype=np.uint8)
-                    self.screen = pvs.reshape((SCREEN_HEIGHT, SCREEN_WIDTH, 3))
-                elif msg_type == "data":
-                    self.reward = float(message[1])
-                elif msg_type == "game_over":
-                    self.done = True
+                elif opcode == 'state':
+                    self.reward = int(message[1].decode('ascii'))
+                    self.done = bool(int(message[2].decode('ascii')))
+                    # unwrap the P value representing a frame from the message
+                    pvs = np.array(struct.unpack('B'*len(message[3]), message[3]))
+                    # use the palette to convert the p values to RGB
+                    rgb = np.array(PALETTE[pvs-20], dtype=np.uint8)
+                    # reshape the screen and assign it to self
+                    self.screen = rgb.reshape((SCREEN_HEIGHT, SCREEN_WIDTH, 3))
 
 
 __all__ = [NESEnv.__name__]

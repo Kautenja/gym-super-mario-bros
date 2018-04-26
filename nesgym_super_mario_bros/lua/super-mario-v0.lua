@@ -51,30 +51,30 @@
 --     write_to_pipe("ready" .. SEP .. emu.framecount())
 -- end
 
--- update_screen - get current screen pixels and store them (256 x 224)
--- Palette is a number from 0 to 127 that represents an RGB color (conversion table in python file)
-function nes_update_screen()
-    local r, g, b, p
-    local framecount = emu.framecount()
-    -- NES only has y values in the range 8 to 231, so we need to offset y values by 8
-    local offset_y = 8
+-- -- update_screen - get current screen pixels and store them (256 x 224)
+-- -- Palette is a number from 0 to 127 that represents an RGB color (conversion table in python file)
+-- function nes_update_screen()
+--     local r, g, b, p
+--     local framecount = emu.framecount()
+--     -- NES only has y values in the range 8 to 231, so we need to offset y values by 8
+--     local offset_y = 8
 
-    write_to_pipe_partial("screen" .. SEP .. framecount .. SEP)
-    for y = 0, 223 do
-        local screen_string = ""
-        for x = 0, 255 do
-            r, g, b, p = emu.getscreenpixel(x, y + offset_y, false)
-            -- offset p by 20 so the content can never be '\n'
-            screen_string = screen_string .. string.format("%c", p+20)
-        end
-        write_to_pipe_partial(screen_string)
-    end
-    write_to_pipe_end()
-end
+--     write_to_pipe_partial("screen" .. SEP .. framecount .. SEP)
+--     for y = 0, 223 do
+--         local screen_string = ""
+--         for x = 0, 255 do
+--             r, g, b, p = emu.getscreenpixel(x, y + offset_y, false)
+--             -- offset p by 20 so the content can never be '\n'
+--             screen_string = screen_string .. string.format("%c", p+20)
+--         end
+--         write_to_pipe_partial(screen_string)
+--     end
+--     write_to_pipe_end()
+-- end
 
-function nes_send_data(data)
-    write_to_pipe("data" .. SEP .. emu.framecount() .. SEP .. data)
-end
+-- function nes_send_data(data)
+--     write_to_pipe("data" .. SEP .. emu.framecount() .. SEP .. data)
+-- end
 
 function nes_process_command()
     if not pipe_in then
@@ -94,29 +94,29 @@ function nes_ask_for_command()
     write_to_pipe("wait_for_command" .. SEP .. emu.framecount())
 end
 
--- the mapping of commands to pass to the joypad
-local joypad_command = {}
-local button = nil
+-- -- the mapping of commands to pass to the joypad
+-- local joypad_command = {}
+-- local button = nil
 
---- private functions
--- handle one command
-function handle_command(line)
-    local body = split(line, IN_SEP)
-    local command = body[1]
-    if command == 'reset' then
-        nes_reset()
-    elseif command == 'joypad' then
-        -- joypad command
-        local buttons = body[2]
-        joypad_command = {}
-        for i = 1, #buttons do
-            local btn = buttons:sub(i,i)
-            button = COMMAND_TABLE[buttons:sub(i,i)]
-            joypad_command[button] = true
-        end
-        joypad.set(1, joypad_command)
-    end
-end
+-- --- private functions
+-- -- handle one command
+-- function handle_command(line)
+--     local body = split(line, IN_SEP)
+--     local command = body[1]
+--     if command == 'reset' then
+--         nes_reset()
+--     elseif command == 'joypad' then
+--         -- joypad command
+--         local buttons = body[2]
+--         joypad_command = {}
+--         for i = 1, #buttons do
+--             local btn = buttons:sub(i,i)
+--             button = COMMAND_TABLE[buttons:sub(i,i)]
+--             joypad_command[button] = true
+--         end
+--         joypad.set(1, joypad_command)
+--     end
+-- end
 
 -- write_to_pipe - Write data to pipe
 function write_to_pipe(data)
