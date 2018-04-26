@@ -349,8 +349,11 @@ local frame_skip = 4
 
 
 function step()
+    -- TODO: commenting out this block seems to have no effect. Is this the
+    -- source of the locking bug from 1.7M frame hang when training SMB?
     -- waiting for a reset still
     if is_waiting_for_reset then
+        print('is_waiting_for_reset')
         nes_ask_for_command()
         local has_command = nes_process_command()
         if not has_command then
@@ -362,17 +365,20 @@ function step()
 
     -- skip pre-level stuff if Mario is at starting position
     if get_player_state() == 0 then
+        print('Burnout')
         runout_prelevel_timer()
     end
 
     -- If Mario is dying set him to dead to skip the animation
     if is_dying() then
+        print('Dying')
         kill_mario()
         emu.frameadvance()
     end
 
     -- Check if Mario lost the last life and the state needs reset
-    if is_game_over() then
+    if is_game_over() and not is_waiting_for_reset then
+        print('Game Over')
         write_to_pipe("game_over" .. SEP .. emu.framecount())
         is_waiting_for_reset = true
         nes_ask_for_command()

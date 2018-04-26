@@ -244,9 +244,9 @@ function init()
     emu.speedmode("maximum")
     init_screen()
     skip_start_screen()
-    -- setup_pipes()
+    setup_pipes()
     -- Notify the client that setup is complete and the emulator is ready
-    -- write_to_pipe("ready" .. SEP .. emu.framecount())
+    write_to_pipe("ready" .. SEP .. emu.framecount())
 end
 
 -- Initialize the screen to blank pixels
@@ -273,15 +273,15 @@ function skip_start_screen()
     end
 end
 
--- -- Open the pipes between the client (agent) and emulator (self)
--- function setup_pipes()
---     -- the prefix name for the inbound and outbound pipes
---     pipe_prefix = '/tmp/nesgym-pipe'
---     -- a pipe from the emulator (self) to the client (agent)
---     pipe_out, _, _ = io.open(pipe_prefix .. "-in", "w")
---     -- a pipe from the client (agent) to the emulator (self)
---     pipe_in, _, _ = io.open(pipe_prefix .. "-out", "r")
--- end
+-- Open the pipes between the client (agent) and emulator (self)
+function setup_pipes()
+    -- the prefix name for the inbound and outbound pipes
+    pipe_prefix = '/tmp/nesgym-pipe'
+    -- a pipe from the emulator (self) to the client (agent)
+    pipe_out, _, _ = io.open(pipe_prefix .. "-in", "w")
+    -- a pipe from the client (agent) to the emulator (self)
+    pipe_in, _, _ = io.open(pipe_prefix .. "-out", "r")
+end
 
 -- Save the state of the game to an anonymous slot in FCEUX
 function save_state()
@@ -338,5 +338,30 @@ function press_buttons(buttons)
     joypad.set(1, joypad_command)
 end
 
+-- Write complete data to the pipe with a separator and new line at the end
+function write_to_pipe(data)
+    if data and pipe_out then
+        pipe_out:write(data .. SEP .. "\n")
+        pipe_out:flush()
+    end
+end
+
+-- Write partial pieces of data to the pipe with _no separator_ at the end.
+-- Use write_to_pipe_end() when done to send the separator and finish the
+-- Message.
+function write_to_pipe_partial(data)
+    if data and pipe_out then
+        pipe_out:write(data)
+    end
+end
+
+-- Finish a partial data message on the pipe by sending the separator and a
+-- new line
+function write_to_pipe_end()
+    if pipe_out then
+        pipe_out:write(SEP .. "\n")
+        pipe_out:flush()
+    end
+end
 
 init()
