@@ -232,21 +232,28 @@ pipe_out = nil
 -- A pipe for receiving messages from the Python client. This pipe carries
 -- action data, and reset commands from the agent.
 pipe_in = nil
--- A save state for resetting the game without having to go past the
--- start/demo screen
-gamestate = nil
+-- An anonymous save state for resetting the game without having to go past
+-- the start/demo screen
+gamestate = savestate.object()
 -- A one-hot mapping of commands to pass to the joy-pad
 joypad_command = {}
+-- the number of frames to "skip" (hold an action for and accumulate reward)
+frame_skip = nil
 
 
 -- Initialize the emulator and setup instance variables
 function init()
+    -- read emulation parameters from the environment
+    frame_skip = tonumber(os.getenv("frame_skip"))
+    -- setup the emulator
     emu.speedmode("maximum")
     init_screen()
     skip_start_screen()
+    save_state()
+    -- open the pipes
     setup_pipes()
     -- Notify the client that setup is complete and the emulator is ready
-    write_to_pipe("ready" .. SEP .. emu.framecount())
+    -- write_to_pipe("ready" .. SEP .. emu.framecount())
 end
 
 -- Initialize the screen to blank pixels
@@ -285,10 +292,6 @@ end
 
 -- Save the state of the game to an anonymous slot in FCEUX
 function save_state()
-    -- Create a new game state
-    -- TODO: can this be at the top level?
-    gamestate = savestate.object()
-    -- save the current state into the gamestate
     savestate.save(gamestate)
 end
 

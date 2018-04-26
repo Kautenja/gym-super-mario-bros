@@ -25,7 +25,19 @@ class NESEnv(gym.Env, gym.utils.EzPickle):
     # meta-data about the environment
     metadata = {'render.modes': ['human', 'rgb_array']}
 
-    def __init__(self, max_episode_steps: int, frame_skip: int=4):
+    # a pipe from the emulator (FCEUX) to client (self)
+    _pipe_in_name = '/tmp/nesgym-pipe-in'
+    # a pipe from the client (self) to emulator (FCEUX)
+    _pipe_out_name = '/tmp/nesgym-pipe-out'
+
+    def __init__(self,
+        max_episode_steps: int,
+        frame_skip: int=4,
+        fceux_args: list=[
+            '--nogui',
+            '--sound 0',
+        ],
+    ) -> None:
         """
         Initialize a new NES environment.
 
@@ -33,6 +45,7 @@ class NESEnv(gym.Env, gym.utils.EzPickle):
             max_episode_steps: the math number of steps per episode.
                 - pass math.inf to use no max_episode_steps limit
             frame_skip: the number of frames to skip between between inputs
+            fceux_args: arguments to pass to the FCEUX command
 
         Returns:
             None
@@ -48,6 +61,8 @@ class NESEnv(gym.Env, gym.utils.EzPickle):
         self.reward = 0
         self.done = False
         self.episode_length = max_episode_steps
+        self.frame_skip = frame_skip
+        self.fceux_args = fceux_args
 
         self.actions = [
             'U', 'D', 'L', 'R',
@@ -56,7 +71,7 @@ class NESEnv(gym.Env, gym.utils.EzPickle):
         self.action_space = gym.spaces.Discrete(len(self.actions))
         self.frame = 0
 
-        self.metadata['video.frames_per_second'] = 60 / frame_skip
+        self.metadata['video.frames_per_second'] = 60 / self.frame_skip
 
         # for communication with emulator
         self.pipe_in = None
@@ -138,26 +153,31 @@ class NESEnv(gym.Env, gym.utils.EzPickle):
 
     # MARK: FCEUX
 
-    def _start_emulator(self):
-        """
-        """
+    def _start_emulator(self) -> None:
+        """Spawn an instance of FCEUX and pass parameters to it."""
+        # validate that the rom file and lua interface are defiend
         if not self.rom_file_path:
             raise Exception('No rom file specified!')
         if not self.lua_interface_path:
             raise Exception("Must specify a lua interface file to get scores!")
+        # setup the environment variables to pass to the emulator instance
+        os.environ['frame_skip'] = str(self.frame_skip)
+        # TODO: define and setup different reward schemes to initialize with
+        # and activate them here using the environment key 'reward_scheme'
 
+        # open up the pipes to the emulator.
         self._open_pipes()
-
-        args = [
+        # build the FCEUX command
+        command = ' '.join([
             'fceux',
-            '--nogui',
-            '--sound 0',
+            *self.fceux_args,
             '--loadlua',
             self.lua_interface_path,
             self.rom_file_path,
             '&'
-        ]
-        proc = subprocess.Popen(' '.join(args), shell=True)
+        ])
+        # open the FCEUX process
+        proc = subprocess.Popen(command, shell=True)
         print('started proc')
         proc.communicate()
         # FIXME: no matter whether it starts, proc.returncode is always zero
@@ -173,12 +193,8 @@ class NESEnv(gym.Env, gym.utils.EzPickle):
     def _open_pipes(self):
         """
         """
-        # emulator to client
-        self.pipe_in_name = '/tmp/nesgym-pipe-in'
-        # client to emulator
-        self.pipe_out_name = '/tmp/nesgym-pipe-out'
-        self._ensure_create_pipe(self.pipe_in_name)
-        self._ensure_create_pipe(self.pipe_out_name)
+        self._ensure_create_pipe(self._pipe_in_name)
+        self._ensure_create_pipe(self._pipe_out_name)
 
         self.thread_incoming = Thread(target=self._pipe_handler)
         self.thread_incoming.start()
@@ -194,17 +210,16 @@ class NESEnv(gym.Env, gym.utils.EzPickle):
         """
         if not self.pipe_out:
             # arg 1 for line buffering - see python doc
-            self.pipe_out = open(self.pipe_out_name, 'w', 1)
+            self.pipe_out = open(self._pipe_out_name, 'w', 1)
         self.pipe_out.write(message + '\n')
         self.pipe_out.flush()
 
     def _pipe_handler(self):
         """
         """
-        with open(self.pipe_in_name, 'rb') as pipe:
+        with open(self._pipe_in_name, 'rb') as pipe:
             while not self.closed:
                 msg = pipe.readline()
-                # print('message: ', msg[:100])
                 body = msg.split(b'\xFF')
                 msg_type, frame = body[0], body[1]
                 msg_type = msg_type.decode('ascii')
