@@ -367,4 +367,15 @@ function press_buttons(buttons)
     joypad.set(1, joypad_command)
 end
 
+-- Respond to a frame being rendered by the emulator
+function after_frame()
+    -- return if the frame count isn't aligned with the frame skip var
+    if emu.framecount() % frame_skip ~= 0 then
+        return
+    end
+
+end
+
+-- Initialize the emulator and setup the per frame callback for the run loop
 init()
+emu.registerafter(after_frame)
