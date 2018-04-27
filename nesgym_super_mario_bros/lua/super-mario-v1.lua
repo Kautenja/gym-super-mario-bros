@@ -417,29 +417,22 @@ while true do
         runout_prelevel_timer()
         emu.frameadvance()
     end
-
-    if not pipe_in then
-        print('FCEUX-interface: pipe closed')
-        os.exit()
-    end
-
+    -- read a line from the pipe and pass it to the handler
     local line = pipe_in:read()
     if line ~= nil then
-        print(line)
+        -- print(line)
         handle_command(line)
     else
         print('received nil command')
         os.exit()
     end
-
-    -- If Mario is dying set him to dead to skip the animation
+    -- If Mario is dying set him to death to skip the animation
     if is_dying() then
         print('imminent death, killing Mario')
         kill_mario()
-        emu.frameadvance()
+        -- emu.frameadvance()
     end
 
     -- send the reward, done flag, and next state
     send_state(reward, is_game_over())
-
 end
