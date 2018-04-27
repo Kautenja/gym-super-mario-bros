@@ -1,26 +1,23 @@
 """A simple script for debugging the Super Mario Bros. Lua code."""
-from time import sleep
 from tqdm import tqdm
 import gym
 import nesgym_super_mario_bros
 
-from time import sleep
+
+env = gym.make('nesgym/SuperMarioBros-v0')
 
 
 try:
-    env = gym.make('nesgym/SuperMarioBros-v0')
-    env = gym.wrappers.Monitor(env, './monitor', force=True)
-
     done = True
-    progress = range(5000)
+    progress = tqdm(range(500))
     for step in progress:
         if done:
             state = env.reset()
-        action = 4# env.action_space.sample()
+        action = env.action_space.sample()
         state, reward, done, info = env.step(action)
-        # progress.set_postfix(reward=reward)
-        # sleep(0.1)
-
-    env.close()
+        progress.set_postfix(reward=reward)
 except KeyboardInterrupt:
-    env.close()
+    pass
+
+
+env.close()
