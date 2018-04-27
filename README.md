@@ -32,14 +32,9 @@ brew install fceux
 
 # Usage
 
-You _must_ import `gym_super_mario_bros` to register the environments with
-gym before calling `gym.make('SuperMarioBros-v0')`.
-
 ```python
-import gym
-# import nesgym_super_mario_bros to register environments with gym
 import gym_super_mario_bros
-env = gym.make('SuperMarioBros-v0')
+env = gym_super_mario_bros.make('SuperMarioBros-v0')
 
 done = True
 for step in range(5000):
@@ -49,3 +44,7 @@ for step in range(5000):
 
 env.close()
 ```
+
+**NOTE:** `gym_super_mario_bros.make` is just an alias to `gym.make` for
+convenience.
+

@@ -1,10 +1,9 @@
 """A simple script for debugging the Super Mario Bros. Lua code."""
 from tqdm import tqdm
-import gym
 import gym_super_mario_bros
 
 
-env = gym.make('SuperMarioBros-v0')
+env = gym_super_mario_bros.make('SuperMarioBros-v0')
 
 
 try:
