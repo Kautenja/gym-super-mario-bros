@@ -1,18 +1,16 @@
-# NESGym - Super Mario Bros
+# OpenAI Gym - Super Mario Bros
 
 ![smb](https://user-images.githubusercontent.com/2184469/39209488-854e960c-47cb-11e8-9e66-ddadcb0d7874.png)
 
 An [OpenAI Gym](https://github.com/openai/gym) environment for the original
-Super Mario Bros. game on the Nintendo Entertainment System (NES). Built
-using a fork of [NESGym](https://github.com/codescv/nesgym) and some snippets
-from [gym-super-mario](https://github.com/ppaquette/gym-super-mario).
+Super Mario Bros. game on the Nintendo Entertainment System (NES).
 
 # Installation
 
-The preferred installation of `nesgym-super-mario-bros` is from `pip`:
+The preferred installation of `gym-super-mario-bros` is from `pip`:
 
 ```shell
-pip install nesgym-super-mario-bros
+pip install gym-super-mario-bros
 ```
 
 ## NES Emulator
@@ -34,14 +32,14 @@ brew install fceux
 
 # Usage
 
-You _must_ import `nesgym_super_mario_bros` to register the environments with
-gym before calling `gym.make('nesgym/SuperMarioBros-v0')`.
+You _must_ import `gym_super_mario_bros` to register the environments with
+gym before calling `gym.make('SuperMarioBros-v0')`.
 
 ```python
 import gym
 # import nesgym_super_mario_bros to register environments with gym
-import nesgym_super_mario_bros
-env = gym.make('nesgym/SuperMarioBros-v0')
+import gym_super_mario_bros
+env = gym.make('SuperMarioBros-v0')
 
 done = True
 for step in range(5000):

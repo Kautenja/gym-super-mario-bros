@@ -8,7 +8,7 @@ def README() -> str:
 
 
 setup(
-    name='nesgym_super_mario_bros',
+    name='gym_super_mario_bros',
     setup_requires=[
         'setuptools-git-version'
     ],
@@ -29,15 +29,15 @@ setup(
         'Topic :: Games/Entertainment :: Side-Scrolling/Arcade Games',
         'Topic :: Scientific/Engineering :: Artificial Intelligence',
     ],
-    url='https://github.com/Kautenja/nesgym-super-mario-bros',
+    url='https://github.com/Kautenja/gym-super-mario-bros',
     author='Christian Kauten',
     author_email='kautencreations@gmail.com',
     license='MIT',
     packages=[
-        'nesgym_super_mario_bros'
+        'gym_super_mario_bros'
     ],
     package_data = {
-        'nesgym_super_mario_bros': ['lua/*.lua', 'roms/*.nes']
+        'gym_super_mario_bros': ['lua/*.lua', 'roms/*.nes']
     },
     zip_safe=False,
     install_requires=[
