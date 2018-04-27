@@ -1,6 +1,5 @@
 """Registration code of Gym environments in this package."""
 from gym.envs.registration import register
-from .nesenv import NESEnv
 from .smb_env import SuperMarioBrosEnv
 import math
 
