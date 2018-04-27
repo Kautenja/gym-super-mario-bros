@@ -240,8 +240,6 @@ frame_skip = nil
 -- the total reward accumulated over `frame_skip` frames
 reward = 0
 
-is_waiting_for_reset = false
-
 
 -- Initialize the emulator and setup instance variables
 function init()
@@ -419,19 +417,6 @@ while true do
         runout_prelevel_timer()
         emu.frameadvance()
     end
-    while is_waiting_for_reset do
-        write_to_pipe("wait_for_command")
-        local line = pipe_in:read()
-        if line ~= nil then
-            -- handle_command(line)
-            print(line)
-        else
-            print('received nil command')
-            os.exit()
-        end
-    end
-    -- Request a command from the client (agent)
-    -- write_to_pipe("wait_for_command")
 
     if not pipe_in then
         print('FCEUX-interface: pipe closed')
@@ -456,9 +441,5 @@ while true do
 
     -- send the reward, done flag, and next state
     send_state(reward, is_game_over())
-
-    if is_game_over() then
-        is_waiting_for_reset = true
-    end
 
 end
