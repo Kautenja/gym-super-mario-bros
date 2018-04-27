@@ -3,7 +3,7 @@ from tqdm import tqdm
 import gym_super_mario_bros
 
 
-env = gym_super_mario_bros.make('SuperMarioBros-v0')
+env = gym_super_mario_bros.make('SuperMarioBros-v1')
 
 
 try:
