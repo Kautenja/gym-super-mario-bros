@@ -13,7 +13,7 @@ setup(
         'setuptools-git-version'
     ],
     version_format='{tag}',
-    description='Super Mario Bros. for Open.ai Gym',
+    description='Super Mario Bros. for OpenAI Gym',
     long_description=README(),
     long_description_content_type='text/markdown',
     keywords='OpenAI-Gym NES Super-Mario-Bros Reinforcement-Learning-Environment',
