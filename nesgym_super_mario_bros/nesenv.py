@@ -96,40 +96,12 @@ class NESEnv(gym.Env, gym.utils.EzPickle):
             -   a dictionary of additional information
 
         """
+        # unwrap the string action value from the list of actions
         self._joypad(self.actions[action])
+        # increment the frame counter
         self.frame += 1
 
-        # read the initial state from the pipe
-        opcode, data = self._read_from_pipe()
-        assert opcode == 'state'
-        # The first two underscores are `reward` and `done`. the last one is
-        # the dummy '\n' at the end of each line
-        reward, done, screen, _ = data
-        reward = int(reward.decode('ascii'))
-        done = bool(int(done.decode('ascii')))
-
-        # unwrap the P value representing a frame from the data
-        pvs = np.array(struct.unpack('B'*len(screen), screen))
-        # use the palette to convert the p values to RGB
-        rgb = np.array(PALETTE[pvs-20], dtype=np.uint8)
-        # reshape the screen and assign it to self
-        self.screen = rgb.reshape((SCREEN_HEIGHT, SCREEN_WIDTH, 3))
-
-        return self.screen.copy(), reward, done, {}
-
-        # self.frame += 1
-        # if self.done or self.frame > self.episode_length:
-        #     self.done = False
-        #     self.frame = 0
-        #     return self.screen.copy(), self.reward, True, {'frame': 0}
-        # obs = self.screen.copy()
-        # info = {"frame": self.frame}
-        # with self.command_cond:
-        #     while not self.can_send_command:
-        #         self.command_cond.wait()
-        #     self.can_send_command = False
-        # self._joypad(self.actions[action])
-        # return self.screen.copy(), self.reward, False, info
+        return (*self._get_state(), {})
 
     def reset(self) -> np.ndarray:
         """Reset the emulator and return the initial state."""
@@ -138,20 +110,8 @@ class NESEnv(gym.Env, gym.utils.EzPickle):
         # write the reset command to the emulator
         self._write_to_pipe('reset' + SEP)
         self.frame = 0
-
-        # read the initial state from the pipe
-        opcode, data = self._read_from_pipe()
-        assert opcode == 'state'
-        # The first two underscores are `reward` and `done`. the last one is
-        # the dummy '\n' at the end of each line
-        _, _, screen, _ = data
-
-        # unwrap the P value representing a frame from the data
-        pvs = np.array(struct.unpack('B'*len(screen), screen))
-        # use the palette to convert the p values to RGB
-        rgb = np.array(PALETTE[pvs-20], dtype=np.uint8)
-        # reshape the screen and assign it to self
-        screen = rgb.reshape((SCREEN_HEIGHT, SCREEN_WIDTH, 3))
+        # get a state from the emulator. ignore the `reward` and `done` flag
+        screen, _, _ = self._get_state()
 
         return screen
 
@@ -222,10 +182,41 @@ class NESEnv(gym.Env, gym.utils.EzPickle):
         opcode, _ = self._read_from_pipe()
         assert 'ready' == opcode
 
-    def _joypad(self, button):
+    def _joypad(self, button: str) -> None:
         """
+        Pass a joy-pad command to the emulator
+
+        Args:
+            button: the button (or combination) to press on the controller
+
+        Returns:
+            None
+
         """
         self._write_to_pipe('joypad' + SEP + button)
+
+    def _get_state(self) -> tuple:
+        """Parse a state message from the emulator and return it."""
+        # read the initial state from the pipe
+        opcode, data = self._read_from_pipe()
+        assert opcode == 'state'
+        # The first two underscores are `reward` and `done`. the last one is
+        # the dummy '\n' at the end of each line
+        reward, done, screen, _ = data
+        reward = int(reward.decode('ascii'))
+        done = bool(int(done.decode('ascii')))
+        # change the done flag to true if this step passes the episode length
+        done = True if self.frame > self.episode_length else done
+
+        # unwrap the P value representing a frame from the data
+        pvs = np.array(struct.unpack('B'*len(screen), screen))
+        # use the palette to convert the p values to RGB
+        rgb = np.array(PALETTE[pvs-20], dtype=np.uint8)
+        # reshape the screen and assign it to self
+        screen = rgb.reshape((SCREEN_HEIGHT, SCREEN_WIDTH, 3))
+
+        return screen, reward, done
+
 
     # MARK: Pipes
 
