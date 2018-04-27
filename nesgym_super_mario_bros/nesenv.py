@@ -80,12 +80,42 @@ class NESEnv(gym.Env, gym.utils.EzPickle):
 
     # MARK: OpenAI Gym API
 
-    def step(self, action):
+    def step(self, action: int) -> tuple:
         """
+        Take a step using the given action.
+
+        Args:
+            action: the discrete action to perform. will use the action in
+                    `self.actions` indexed by this value
+
+        Returns:
+            a tuple of:
+            -   the start as a result of the action
+            -   the reward achieved by taking the action
+            -   a flag denoting whether the episode has ended
+            -   a dictionary of additional information
+
         """
         self._joypad(self.actions[action])
+        self.frame += 1
 
-        return self.screen.copy(), self.reward, False, {}
+        # read the initial state from the pipe
+        opcode, data = self._read_from_pipe()
+        assert opcode == 'state'
+        # The first two underscores are `reward` and `done`. the last one is
+        # the dummy '\n' at the end of each line
+        reward, done, screen, _ = data
+        reward = int(reward.decode('ascii'))
+        done = bool(int(done.decode('ascii')))
+
+        # unwrap the P value representing a frame from the data
+        pvs = np.array(struct.unpack('B'*len(screen), screen))
+        # use the palette to convert the p values to RGB
+        rgb = np.array(PALETTE[pvs-20], dtype=np.uint8)
+        # reshape the screen and assign it to self
+        self.screen = rgb.reshape((SCREEN_HEIGHT, SCREEN_WIDTH, 3))
+
+        return self.screen.copy(), reward, done, {}
 
         # self.frame += 1
         # if self.done or self.frame > self.episode_length:
@@ -107,7 +137,7 @@ class NESEnv(gym.Env, gym.utils.EzPickle):
             self._start_emulator()
         # write the reset command to the emulator
         self._write_to_pipe('reset' + SEP)
-        self.reward = 0
+        self.frame = 0
 
         # read the initial state from the pipe
         opcode, data = self._read_from_pipe()
@@ -121,9 +151,9 @@ class NESEnv(gym.Env, gym.utils.EzPickle):
         # use the palette to convert the p values to RGB
         rgb = np.array(PALETTE[pvs-20], dtype=np.uint8)
         # reshape the screen and assign it to self
-        self.screen = rgb.reshape((SCREEN_HEIGHT, SCREEN_WIDTH, 3))
+        screen = rgb.reshape((SCREEN_HEIGHT, SCREEN_WIDTH, 3))
 
-        return self.screen
+        return screen
 
     def render(self, mode='human', **kwargs):
         """
