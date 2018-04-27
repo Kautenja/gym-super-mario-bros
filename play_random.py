@@ -4,7 +4,7 @@ import gym
 import nesgym_super_mario_bros
 
 
-env = gym.make('nesgym/SuperMarioBros-v0')
+env = gym.make('SuperMarioBros-v0')
 
 
 try:

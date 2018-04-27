@@ -13,7 +13,7 @@ if not os.path.exists(output_dir):
 
 
 try:
-    env = gym.make('nesgym/SuperMarioBros-v0')
+    env = gym.make('SuperMarioBros-v0')
 
     for t in tqdm(range(5)):
         state = env.reset()

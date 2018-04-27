@@ -297,7 +297,7 @@ end
 -- Open the pipes between the client (agent) and emulator (self)
 function setup_pipes()
     -- the prefix name for the inbound and outbound pipes
-    pipe_prefix = '/tmp/nesgym-pipe'
+    pipe_prefix = '/tmp/smb-pipe'
     -- a pipe from the emulator (self) to the client (agent)
     pipe_out, _, _ = io.open(pipe_prefix .. "-in", "w")
     -- a pipe from the client (agent) to the emulator (self)

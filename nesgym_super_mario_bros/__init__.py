@@ -7,7 +7,7 @@ import math
 
 # register the environment subclasses with Open.ai Gym
 register(
-    id='nesgym/SuperMarioBros-v0',
+    id='SuperMarioBros-v0',
     entry_point='nesgym_super_mario_bros:SuperMarioBrosEnv',
     max_episode_steps=9999999,
     reward_threshold=32000,

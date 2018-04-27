@@ -25,9 +25,9 @@ class NESEnv(gym.Env, gym.utils.EzPickle):
     metadata = {'render.modes': ['human', 'rgb_array']}
 
     # a pipe from the emulator (FCEUX) to client (self)
-    _pipe_in_name = '/tmp/nesgym-pipe-in'
+    _pipe_in_name = '/tmp/smb-pipe-in'
     # a pipe from the client (self) to emulator (FCEUX)
-    _pipe_out_name = '/tmp/nesgym-pipe-out'
+    _pipe_out_name = '/tmp/smb-pipe-out'
 
     def __init__(self,
         max_episode_steps: int,
