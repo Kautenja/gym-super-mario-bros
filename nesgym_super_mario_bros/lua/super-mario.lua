@@ -353,6 +353,8 @@ function handle_command(line)
             emu.frameadvance()
             reward = reward + get_reward()
         end
+    elseif command == 'close' then
+        os.exit(0)
     end
 end
 

@@ -2,7 +2,6 @@
 import os
 import subprocess
 import struct
-from threading import Thread, Condition
 import numpy as np
 import gym
 from gym.envs.classic_control.rendering import SimpleImageViewer
@@ -34,6 +33,7 @@ class NESEnv(gym.Env, gym.utils.EzPickle):
         max_episode_steps: int,
         frame_skip: int=4,
         fceux_args: list=('--nogui', '--sound 0'),
+        random_seed: int=0,
     ) -> None:
         """
         Initialize a new NES environment.
@@ -43,109 +43,42 @@ class NESEnv(gym.Env, gym.utils.EzPickle):
                 - pass math.inf to use no max_episode_steps limit
             frame_skip: the number of frames to skip between between inputs
             fceux_args: arguments to pass to the FCEUX command
+            random_seed: the random seed to start the environment with
 
         Returns:
             None
 
         """
         gym.utils.EzPickle.__init__(self)
-        self.curr_seed = 0
-        self.screen = np.zeros((SCREEN_HEIGHT, SCREEN_WIDTH, 3), dtype=np.uint8)
-        self.closed = False
-        self.can_send_command = True
-        self.command_cond = Condition()
-        self.viewer = None
-        self.reward = 0
-        self.done = False
         self.max_episode_steps = max_episode_steps
         self.frame_skip = frame_skip
         self.fceux_args = fceux_args
-
+        self.curr_seed = random_seed
+        # setup the frame rate based on the frame skip rate
+        self.metadata['video.frames_per_second'] = 60 / self.frame_skip
+        self.viewer = None
+        self.step_number = 0
+        # these store the pipe for communicating with the environment
+        self.pipe_in = None
+        self.pipe_out = None
+        # variables for the ROM and FCEUX interface files
+        self.rom_file_path = None
+        self.lua_interface_path = None
+        self.emulator_started = False
+        # Setup the observation space
+        self.observation_space = gym.spaces.Box(
+            low=0,
+            high=255,
+            shape=(SCREEN_HEIGHT, SCREEN_WIDTH, 3),
+            dtype=np.uint8
+        )
+        self.screen = self.observation_space.sample()
+        # Setup the action space
         self.actions = [
             'U', 'D', 'L', 'R',
             'UR', 'DR', 'URA', 'DRB',
             'A', 'B', 'RB', 'RA']
         self.action_space = gym.spaces.Discrete(len(self.actions))
-        self.step_number = 0
-
-        self.metadata['video.frames_per_second'] = 60 / self.frame_skip
-
-        # for communication with emulator
-        self.pipe_in = None
-        self.pipe_out = None
-
-        self.rom_file_path = None
-        self.lua_interface_path = None
-        self.emulator_started = False
-
-    # MARK: OpenAI Gym API
-
-    def step(self, action: int) -> tuple:
-        """
-        Take a step using the given action.
-
-        Args:
-            action: the discrete action to perform. will use the action in
-                    `self.actions` indexed by this value
-
-        Returns:
-            a tuple of:
-            -   the start as a result of the action
-            -   the reward achieved by taking the action
-            -   a flag denoting whether the episode has ended
-            -   a dictionary of additional information
-
-        """
-        # unwrap the string action value from the list of actions
-        self._joypad(self.actions[action])
-        # increment the frame counter
-        self.step_number += 1
-        # get the screen, reward, and done flag from the emulator
-        self.screen, reward, done = self._get_state()
-
-        return self.screen.copy(), reward, done, {}
-
-    def reset(self) -> np.ndarray:
-        """Reset the emulator and return the initial state."""
-        if not self.emulator_started:
-            self._start_emulator()
-        # write the reset command to the emulator
-        self._write_to_pipe('reset' + SEP)
-        self.step_number = 0
-        # get a state from the emulator. ignore the `reward` and `done` flag
-        self.screen, _, _ = self._get_state()
-
-        return self.screen
-
-    def render(self, mode='human', **kwargs):
-        """
-        Render the current screen using the given mode.
-
-        Args:
-            mode: the mode to render the screen using
-                - 'human': render in a window using GTK
-                - 'rgb_array': render in the back-end and return a matrix
-
-        Returns:
-            None if mode is 'human' or a matrix if mode is 'rgb_array'
-
-        """
-        if mode == 'human':
-            if self.viewer is None:
-                self.viewer = SimpleImageViewer()
-            self.viewer.imshow(self.screen)
-        elif mode == 'rgb_array':
-            return self.screen
-
-    def seed(self, seed=None):
-        """
-        """
-        self.curr_seed = gym.utils.seeding.hash_seed(seed) % 256
-        return [self.curr_seed]
-
-    def close(self):
-        """Close the emulator and shutdown FCEUX."""
-        self.closed = True
 
     # MARK: FCEUX
 
@@ -175,14 +108,13 @@ class NESEnv(gym.Env, gym.utils.EzPickle):
         # open the FCEUX process
         proc = subprocess.Popen(command, shell=True)
         proc.communicate()
-        # TODO: no matter whether it starts, proc.returncode is always zero
-        self.emulator_started = True
         # open the pipe files
         self.pipe_in = open(self._pipe_in_name, 'rb')
         self.pipe_out = open(self._pipe_out_name, 'w', 1)
         # make sure the emulator sends the ready message
         opcode, _ = self._read_from_pipe()
         assert 'ready' == opcode
+        self.emulator_started = True
 
     def _joypad(self, button: str) -> None:
         """
@@ -261,6 +193,83 @@ class NESEnv(gym.Env, gym.utils.EzPickle):
         opcode = message[0].decode('ascii')
         # return the opcode and data tuple
         return opcode, message[1:]
+
+    # MARK: OpenAI Gym API
+
+    def step(self, action: int) -> tuple:
+        """
+        Take a step using the given action.
+
+        Args:
+            action: the discrete action to perform. will use the action in
+                    `self.actions` indexed by this value
+
+        Returns:
+            a tuple of:
+            -   the start as a result of the action
+            -   the reward achieved by taking the action
+            -   a flag denoting whether the episode has ended
+            -   a dictionary of additional information
+
+        """
+        # unwrap the string action value from the list of actions
+        self._joypad(self.actions[action])
+        # increment the frame counter
+        self.step_number += 1
+        # get the screen, reward, and done flag from the emulator
+        self.screen, reward, done = self._get_state()
+
+        return self.screen.copy(), reward, done, {}
+
+    def reset(self) -> np.ndarray:
+        """Reset the emulator and return the initial state."""
+        if not self.emulator_started:
+            self._start_emulator()
+        # write the reset command to the emulator
+        self._write_to_pipe('reset' + SEP)
+        self.step_number = 0
+        # get a state from the emulator. ignore the `reward` and `done` flag
+        self.screen, _, _ = self._get_state()
+
+        return self.screen
+
+    def render(self, mode: str='human'):
+        """
+        Render the current screen using the given mode.
+
+        Args:
+            mode: the mode to render the screen using
+                - 'human': render in a window using GTK
+                - 'rgb_array': render in the back-end and return a matrix
+
+        Returns:
+            None if mode is 'human' or a matrix if mode is 'rgb_array'
+
+        """
+        if mode == 'human':
+            if self.viewer is None:
+                self.viewer = SimpleImageViewer()
+            self.viewer.imshow(self.screen)
+        elif mode == 'rgb_array':
+            return self.screen
+
+    def close(self) -> None:
+        """Close the emulator and shutdown FCEUX."""
+        self._write_to_pipe('close')
+        self.pipe_in.close()
+        self.pipe_out.close()
+        self.emulator_started = False
+
+    def seed(self, seed: int=None) -> list:
+        """
+        Set the seed for this env's random number generator(s).
+
+        Returns:
+            A list of seeds used in this env's random number generators.
+            there is only one "main" seed in this env
+        """
+        self.curr_seed = gym.utils.seeding.hash_seed(seed) % 256
+        return [self.curr_seed]
 
 
 __all__ = [NESEnv.__name__]
