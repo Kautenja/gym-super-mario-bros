@@ -1,8 +1,6 @@
 -- An interface to the game Super Mario Bros through the emulator FCEUX using
 -- Unix pipes as a communication medium
 
-
-
 -- MARK: Environment helpers
 -- Lua sucks and doesn't have a lot of primitive built in functions. This is
 -- a short list of them needed here
@@ -432,9 +430,8 @@ while true do
             os.exit()
         end
     end
-
     -- Request a command from the client (agent)
-    write_to_pipe("wait_for_command")
+    -- write_to_pipe("wait_for_command")
 
     if not pipe_in then
         print('FCEUX-interface: pipe closed')
@@ -443,6 +440,7 @@ while true do
 
     local line = pipe_in:read()
     if line ~= nil then
+        print(line)
         handle_command(line)
     else
         print('received nil command')
