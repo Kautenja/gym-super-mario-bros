@@ -255,7 +255,6 @@ class NESEnv(gym.Env, gym.utils.EzPickle):
 
     def close(self) -> None:
         """Close the emulator and shutdown FCEUX."""
-        print('closing')
         self._write_to_pipe('close')
         self.pipe_in.close()
         self.pipe_out.close()

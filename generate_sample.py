@@ -3,7 +3,7 @@ import os
 from tqdm import tqdm
 from PIL import Image
 import gym
-import nesgym_super_mario_bros
+import gym_super_mario_bros
 
 
 # the output directory to dump the sample to

@@ -1,7 +1,7 @@
 """A simple script for debugging the Super Mario Bros. Lua code."""
 from tqdm import tqdm
 import gym
-import nesgym_super_mario_bros
+import gym_super_mario_bros
 
 
 env = gym.make('SuperMarioBros-v0')
