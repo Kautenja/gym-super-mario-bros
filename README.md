@@ -48,3 +48,16 @@ env.close()
 **NOTE:** `gym_super_mario_bros.make` is just an alias to `gym.make` for
 convenience.
 
+# Environments
+
+The following environments play the game as a human would. The agent has
+three lives to make it through the 32 levels of the game. The agent is
+configured to _only_ see reward-able game-play frames. No cut-scenes, loading
+screens, etc. are shown to the agent.
+
+| Environment                    | Description                                      |
+|:-------------------------------|:-------------------------------------------------|
+| `SuperMarioBros-v0`            | 4 frames per action, standard ROM                |
+| `SuperMarioBros-v1`            | 4 frames per action, custom down-sampled ROM     |
+| `SuperMarioBrosNoFrameskip-v0` | 1 frame per action, standard ROM                 |
+| `SuperMarioBrosNoFrameskip-v1` | 1 frame per action, custom down-sampled ROM      |
