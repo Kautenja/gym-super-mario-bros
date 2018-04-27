@@ -61,3 +61,17 @@ screens, etc. are shown to the agent.
 | `SuperMarioBros-v1`            | 4 frames per action, custom down-sampled ROM     |
 | `SuperMarioBrosNoFrameskip-v0` | 1 frame per action, standard ROM                 |
 | `SuperMarioBrosNoFrameskip-v1` | 1 frame per action, custom down-sampled ROM      |
+
+# Citation
+
+Please cite `gym-super-mario-bros` if you use it in your research.
+
+```tex
+@misc{gym-super-mario-bros,
+  author = {Christian Kauten},
+  title = {{S}uper {M}ario {B}ros for {O}pen{AI} Gym},
+  year = {2018},
+  publisher = {GitHub},
+  howpublished = {\url{https://github.com/Kautenja/gym-super-mario-bros}},
+}
+```
