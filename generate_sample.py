@@ -11,9 +11,10 @@ if not os.path.exists(output_dir):
     os.makedirs(output_dir)
 
 
-try:
-    env = gym_super_mario_bros.make('SuperMarioBros-v0')
+env = gym_super_mario_bros.make('SuperMarioBros-v0')
 
+
+try:
     for t in tqdm(range(5)):
         state = env.reset()
         Image.fromarray(state).save('{}/{}_0.png'.format(output_dir, t))
@@ -23,7 +24,6 @@ try:
             state, _, done, _ = env.step(4)
             frames += 1
             Image.fromarray(state).save('{}/{}_{}.png'.format(output_dir, t, frames))
-
 except KeyboardInterrupt:
     pass
 
