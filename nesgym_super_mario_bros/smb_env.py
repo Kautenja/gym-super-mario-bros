@@ -22,7 +22,7 @@ class SuperMarioBrosEnv(NESEnv):
         """
         super().__init__(**kwargs)
         # setup the paths to the Lua server file and NES ROM.
-        self.lua_interface_path = os.path.join(package_directory, 'lua/super-mario-v1.lua')
+        self.lua_interface_path = os.path.join(package_directory, 'lua/super-mario.lua')
         self.rom_file_path = os.path.join(package_directory, 'roms/super-mario.nes')
         # setup the discrete action space for the agent
         self.actions = [

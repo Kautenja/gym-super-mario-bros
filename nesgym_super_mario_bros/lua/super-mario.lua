@@ -411,7 +411,7 @@ init()
 
 
 while true do
-    -- Check if mario is in a nil state indicating a cut screen between lives.
+    -- Check if Mario is in a nil state indicating a cut screen between lives.
     -- We can rundown this timer outside of the frame skip to keep things
     -- moving quickly
     while get_player_state() == 0x00 do

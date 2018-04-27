@@ -198,7 +198,16 @@ class NESEnv(gym.Env, gym.utils.EzPickle):
         self._write_to_pipe('joypad' + SEP + button)
 
     def _get_state(self) -> tuple:
-        """Parse a state message from the emulator and return it."""
+        """
+        Parse a state message from the emulator and return it.
+
+        Returns:
+            a tuple of:
+            -   the screen from the emulator
+            -   the reward from the previous action
+            -   the terminal flag denoting if an episode has ended
+
+        """
         # read the initial state from the pipe
         opcode, data = self._read_from_pipe()
         assert opcode == 'state'
