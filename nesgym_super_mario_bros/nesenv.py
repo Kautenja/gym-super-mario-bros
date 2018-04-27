@@ -57,7 +57,7 @@ class NESEnv(gym.Env, gym.utils.EzPickle):
         self.viewer = None
         self.reward = 0
         self.done = False
-        self.episode_length = max_episode_steps
+        self.max_episode_steps = max_episode_steps
         self.frame_skip = frame_skip
         self.fceux_args = fceux_args
 
@@ -66,7 +66,7 @@ class NESEnv(gym.Env, gym.utils.EzPickle):
             'UR', 'DR', 'URA', 'DRB',
             'A', 'B', 'RB', 'RA']
         self.action_space = gym.spaces.Discrete(len(self.actions))
-        self.frame = 0
+        self.step_number = 0
 
         self.metadata['video.frames_per_second'] = 60 / self.frame_skip
 
@@ -99,9 +99,11 @@ class NESEnv(gym.Env, gym.utils.EzPickle):
         # unwrap the string action value from the list of actions
         self._joypad(self.actions[action])
         # increment the frame counter
-        self.frame += 1
+        self.step_number += 1
+        # get the screen, reward, and done flag from the emulator
+        self.screen, reward, done = self._get_state()
 
-        return (*self._get_state(), {})
+        return self.screen.copy(), reward, done, {}
 
     def reset(self) -> np.ndarray:
         """Reset the emulator and return the initial state."""
@@ -109,11 +111,11 @@ class NESEnv(gym.Env, gym.utils.EzPickle):
             self._start_emulator()
         # write the reset command to the emulator
         self._write_to_pipe('reset' + SEP)
-        self.frame = 0
+        self.step_number = 0
         # get a state from the emulator. ignore the `reward` and `done` flag
-        screen, _, _ = self._get_state()
+        self.screen, _, _ = self._get_state()
 
-        return screen
+        return self.screen
 
     def render(self, mode='human', **kwargs):
         """
@@ -206,7 +208,7 @@ class NESEnv(gym.Env, gym.utils.EzPickle):
         reward = int(reward.decode('ascii'))
         done = bool(int(done.decode('ascii')))
         # change the done flag to true if this step passes the episode length
-        done = True if self.frame > self.episode_length else done
+        done = True if self.step_number > self.max_episode_steps else done
 
         # unwrap the P value representing a frame from the data
         pvs = np.array(struct.unpack('B'*len(screen), screen))

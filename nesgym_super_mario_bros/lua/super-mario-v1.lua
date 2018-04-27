@@ -343,11 +343,12 @@ function handle_command(line)
     local command = body[1]
     if command == 'reset' then
         reset_state()
+        emu.frameadvance()
     elseif command == 'joypad' then
         -- A string of buttons to press will be the second value in the body
         reward = 0
         -- TODO: make sure these bounds are correct
-        for frame_i=1,frame_skip-1 do
+        for frame_i=1,frame_skip do
             press_buttons(body[2])
             emu.frameadvance()
             reward = reward + get_reward()
@@ -421,11 +422,9 @@ while true do
     handle_command(pipe_in:read())
     -- If Mario is dying set him to death to skip the animation
     if is_dying() then
-        -- print('imminent death, killing Mario')
         kill_mario()
-        -- emu.frameadvance()
+        emu.frameadvance()
     end
-
     -- send the reward, done flag, and next state
     send_state(reward, is_game_over())
 end
