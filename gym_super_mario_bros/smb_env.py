@@ -1,6 +1,6 @@
 import os
 from gym import spaces
-from .nesenv import NESEnv
+from .nes_env import NESEnv
 
 
 class SuperMarioBrosEnv(NESEnv):

@@ -25,10 +25,10 @@ gym.envs.registration.register(
 )
 
 
-def make(environment: str) -> 'Environment':
+def make(environment: str) -> gym.Env:
     """Make the environment and return it. same as `gym.make`."""
     return gym.make(environment)
 
 
 # define the outward facing API of this module (none, gym provides the API)
-__all__ = []
+__all__ = [make.__name__]
