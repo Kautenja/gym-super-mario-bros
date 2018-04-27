@@ -15,7 +15,6 @@ try:
     progress = range(5000)
     for step in progress:
         if done:
-            print('reseting')
             state = env.reset()
         action = 4# env.action_space.sample()
         state, reward, done, info = env.step(action)

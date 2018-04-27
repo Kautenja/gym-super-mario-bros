@@ -418,17 +418,10 @@ while true do
         emu.frameadvance()
     end
     -- read a line from the pipe and pass it to the handler
-    local line = pipe_in:read()
-    if line ~= nil then
-        -- print(line)
-        handle_command(line)
-    else
-        print('received nil command')
-        os.exit()
-    end
+    handle_command(pipe_in:read())
     -- If Mario is dying set him to death to skip the animation
     if is_dying() then
-        print('imminent death, killing Mario')
+        -- print('imminent death, killing Mario')
         kill_mario()
         -- emu.frameadvance()
     end
