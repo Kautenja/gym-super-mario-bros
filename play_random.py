@@ -1,9 +1,11 @@
 """A simple script for debugging the Super Mario Bros. Lua code."""
 from tqdm import tqdm
 import gym_super_mario_bros
+from gym_super_mario_bros.wrappers import Monitor
 
 
 env = gym_super_mario_bros.make('SuperMarioBros-v1')
+env = Monitor(env, './monitor')
 
 
 try:
@@ -19,4 +21,5 @@ except KeyboardInterrupt:
     pass
 
 
+env.reset()
 env.close()
