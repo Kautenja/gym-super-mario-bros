@@ -33,7 +33,7 @@ setup(
     author='Christian Kauten',
     author_email='kautencreations@gmail.com',
     license='MIT',
-    packages=find_packages(),
+    packages=find_packages() ,
     package_data = {
         'gym_super_mario_bros': ['lua/*.lua', 'roms/*.nes']
     },
