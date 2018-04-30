@@ -1,5 +1,19 @@
 # OpenAI Gym - Super Mario Bros
 
+[![PackageVersion][pypi-version]][pypi-home]
+[![PythonVersion][python-version]][python-home]
+[![Stable][pypi-status]][pypi-home]
+[![Format][pypi-format]](LICENSE)
+[![License][pypi-license]](LICENSE)
+
+[pypi-version]: https://badge.fury.io/py/gym-super-mario-bros.svg
+[pypi-license]: https://img.shields.io/pypi/l/gym-super-mario-bros.svg
+[pypi-status]: https://img.shields.io/pypi/status/gym-super-mario-bros.svg
+[pypi-format]: https://img.shields.io/pypi/format/gym-super-mario-bros.svg
+[pypi-home]: https://badge.fury.io/py/gym-super-mario-bros
+[python-version]: https://img.shields.io/pypi/pyversions/gym-super-mario-bros.svg
+[python-home]: https://python.org
+
 ![smb](https://user-images.githubusercontent.com/2184469/39209488-854e960c-47cb-11e8-9e66-ddadcb0d7874.png)
 
 An [OpenAI Gym](https://github.com/openai/gym) environment for the original
