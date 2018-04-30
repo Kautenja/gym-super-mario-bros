@@ -3,7 +3,7 @@
 [![PackageVersion][pypi-version]][pypi-home]
 [![PythonVersion][python-version]][python-home]
 [![Stable][pypi-status]][pypi-home]
-[![Format][pypi-format]](LICENSE)
+[![Format][pypi-format]][pypi-home]
 [![License][pypi-license]](LICENSE)
 
 [pypi-version]: https://badge.fury.io/py/gym-super-mario-bros.svg
