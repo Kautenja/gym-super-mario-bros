@@ -149,6 +149,19 @@ function is_game_over()
     return get_life() == 0xff
 end
 
+-- a table of player_state values indicating that Mario is occupied
+occupied = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x07}
+-- Return boolean determining if Mario is occupied by in-game garbage
+function is_occupied()
+    local is_occupied = false
+    local player_state = get_player_state()
+    -- iterate over the values in the occupied table
+    for i, state_code in ipairs(occupied) do
+        is_occupied = is_occupied or player_state == state_code
+    end
+    return is_occupied
+end
+
 -- Hacks
 
 -- Force the pre-level timer to 0 to skip the unnecessary frames during a
@@ -160,8 +173,17 @@ end
 -- Skip the change area animations by checking for the timers sentinel values
 -- and running them out
 function skip_change_area()
-    if memory.readbyte(0x06DE) > 1 and memory.readbyte(0x06DE) < 255 then
+    local change_area_timer = memory.readbyte(0x06DE)
+    if change_area_timer > 1 and change_area_timer < 255 then
         memory.writebyte(0x06DE, 1)
+        emu.frameadvance()
+    end
+end
+
+-- Skip occupied states by running out a timer and skipping frames
+function skip_occupied_states()
+    while is_occupied() do
+        runout_prelevel_timer()
         emu.frameadvance()
     end
 end
@@ -423,13 +445,7 @@ init()
 
 while true do
     skip_change_area()
-    -- Check if Mario is in a nil state indicating a cut screen between lives.
-    -- We can rundown this timer outside of the frame skip to keep things
-    -- moving quickly
-    while get_player_state() == 0x00 do
-        runout_prelevel_timer()
-        emu.frameadvance()
-    end
+    skip_occupied_states()
     -- read a line from the pipe and pass it to the handler
     handle_command(pipe_in:read())
     -- If Mario is dying set him to death to skip the animation

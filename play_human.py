@@ -10,7 +10,8 @@ import gym_super_mario_bros
 sorted_tuple = lambda x: tuple(sorted(x))
 
 
-output_dir = 'play'
+# create a directory to write screen captures to
+output_dir = 'screen_capture'
 if not os.path.exists(output_dir):
     os.makedirs(output_dir)
 
@@ -31,7 +32,8 @@ def callback(s, s2, a, r, d, i) -> None:
         None
 
     """
-    Image.fromarray(s).save('{}/{}.png'.format(output_dir, datetime.now()))
+    # write the initial state to the output directory
+    Image.fromarray(s2).save('{}/{}_{}.png'.format(output_dir, datetime.now(), r))
 
 
 # Mapping of buttons on the NES joy-pad to keyboard keys
