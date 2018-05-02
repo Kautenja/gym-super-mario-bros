@@ -1,7 +1,7 @@
 # Ignores specific to this project
 build/
-sample/
 monitor/
+screen_capture/
 
 # Ignores specific to different operating system files
 
