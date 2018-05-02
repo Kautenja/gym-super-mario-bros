@@ -2,9 +2,11 @@
 import os
 import subprocess
 import struct
+from distutils import spawn
 import numpy as np
 import gym
 from gym.envs.classic_control.rendering import SimpleImageViewer
+from .error import DependencyNotFoundError
 from .palette import PALETTE
 
 
@@ -49,6 +51,10 @@ class NESEnv(gym.Env, gym.utils.EzPickle):
             None
 
         """
+        # validate that fceux can be found in the path
+        if spawn.find_executable('fceux', os.environ['PATH']) is None:
+            msg = 'fceux not found in $PATH. is fceux installed?'
+            raise DependencyNotFoundError(msg)
         gym.utils.EzPickle.__init__(self)
         self.max_episode_steps = max_episode_steps
         self.frame_skip = frame_skip
