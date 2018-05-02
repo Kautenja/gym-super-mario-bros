@@ -26,10 +26,12 @@ class NESEnv(gym.Env, gym.utils.EzPickle):
     # meta-data about the environment
     metadata = {'render.modes': ['human', 'rgb_array']}
 
-    # a pipe from the emulator (FCEUX) to client (self)
-    _pipe_in_name = '/tmp/smb-pipe-in'
-    # a pipe from the client (self) to emulator (FCEUX)
-    _pipe_out_name = '/tmp/smb-pipe-out'
+    # a pipe from the emulator (FCEUX) to client (self). use the PID of this
+    # python process to ensure the pipe is unique
+    _pipe_in_name = '/tmp/smb-pipe-in-{}'.format(os.getpid())
+    # a pipe from the client (self) to emulator (FCEUX). use the PID of this
+    # python process to ensure the pipe is unique
+    _pipe_out_name = '/tmp/smb-pipe-out-{}'.format(os.getpid())
 
     def __init__(self,
         max_episode_steps: int,
@@ -97,6 +99,8 @@ class NESEnv(gym.Env, gym.utils.EzPickle):
             raise Exception("Must specify a lua interface file to get scores!")
         # setup the environment variables to pass to the emulator instance
         os.environ['frame_skip'] = str(self.frame_skip)
+        os.environ['pipe_in_name'] = str(self._pipe_in_name)
+        os.environ['pipe_out_name'] = str(self._pipe_out_name)
         # TODO: define and setup different reward schemes to initialize with
         # and activate them here using the environment key 'reward_scheme'
 

@@ -256,10 +256,14 @@ COMMAND_TABLE = {
 -- A local copy of the pixels on the screen as a table of (x,y) coordinates
 screen = {}
 -- A pipe for sending messages to the Python client. This pipe carries
--- screen data, rewards, and system signals to the agent.
+-- screen data, rewards, and system signals to the agent. The name of the
+-- pipe is defined at runtime by the Python client.
+pipe_out_name = nil
 pipe_out = nil
 -- A pipe for receiving messages from the Python client. This pipe carries
--- action data, and reset commands from the agent.
+-- action data, and reset commands from the agent. The name of the pipe is
+-- defined at runtime by the Python client.
+pipe_in_name = nil
 pipe_in = nil
 -- An anonymous save state for resetting the game without having to go past
 -- the start/demo screen
@@ -276,6 +280,9 @@ reward = 0
 function init()
     -- read emulation parameters from the environment
     frame_skip = tonumber(os.getenv("frame_skip"))
+    -- these are inverted because out from python = in to Lua and vice verse
+    pipe_in_name = os.getenv("pipe_out_name")
+    pipe_out_name = os.getenv("pipe_in_name")
     -- setup the emulator
     emu.speedmode("maximum")
     init_screen()
@@ -327,12 +334,10 @@ end
 
 -- Open the pipes between the client (agent) and emulator (self)
 function setup_pipes()
-    -- the prefix name for the inbound and outbound pipes
-    pipe_prefix = '/tmp/smb-pipe'
     -- a pipe from the emulator (self) to the client (agent)
-    pipe_out, _, _ = io.open(pipe_prefix .. "-in", "w")
+    pipe_out, _, _ = io.open(pipe_out_name, "w")
     -- a pipe from the client (agent) to the emulator (self)
-    pipe_in, _, _ = io.open(pipe_prefix .. "-out", "r")
+    pipe_in, _, _ = io.open(pipe_in_name, "r")
 end
 
 -- Write complete data to the pipe with a separator and new line at the end
