@@ -157,6 +157,15 @@ function runout_prelevel_timer()
     memory.writebyte(0x07A0, 0)
 end
 
+-- Skip the change area animations by checking for the timers sentinel values
+-- and running them out
+function skip_change_area()
+    if memory.readbyte(0x06DE) > 1 and memory.readbyte(0x06DE) < 255 then
+        memory.writebyte(0x06DE, 1)
+        emu.frameadvance()
+    end
+end
+
 -- Write the value to memory indicating that Mario has died to skip a dying
 -- animation.
 function kill_mario()
@@ -413,6 +422,7 @@ init()
 
 
 while true do
+    skip_change_area()
     -- Check if Mario is in a nil state indicating a cut screen between lives.
     -- We can rundown this timer outside of the frame skip to keep things
     -- moving quickly
