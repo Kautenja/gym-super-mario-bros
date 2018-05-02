@@ -34,7 +34,7 @@ class NESEnv(gym.Env, gym.utils.EzPickle):
     def __init__(self,
         max_episode_steps: int,
         frame_skip: int=4,
-        fceux_args: list=('--nogui', '--sound 0'),
+        fceux_args: tuple=('--nogui', '--sound 0'),
         random_seed: int=0,
     ) -> None:
         """
