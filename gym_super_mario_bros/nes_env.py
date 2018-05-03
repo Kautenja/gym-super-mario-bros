@@ -229,7 +229,7 @@ class NESEnv(gym.Env, gym.utils.EzPickle):
         # get the screen, reward, and done flag from the emulator
         self.screen, reward, done = self._get_state()
 
-        return self.screen.copy(), reward, done, {}
+        return self.screen, reward, done, {}
 
     def reset(self) -> np.ndarray:
         """Reset the emulator and return the initial state."""
