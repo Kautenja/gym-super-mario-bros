@@ -1,4 +1,4 @@
-# OpenAI Gym - Super Mario Bros
+# gym-super-mario-bros
 
 [![PackageVersion][pypi-version]][pypi-home]
 [![PythonVersion][python-version]][python-home]
@@ -16,8 +16,8 @@
 
 ![smb](https://user-images.githubusercontent.com/2184469/39209488-854e960c-47cb-11e8-9e66-ddadcb0d7874.png)
 
-An [OpenAI Gym](https://github.com/openai/gym) environment for the original
-Super Mario Bros. game on the Nintendo Entertainment System (NES).
+An [OpenAI Gym](https://github.com/openai/gym) environment for
+Super Mario Bros on the Nintendo Entertainment System (NES).
 
 # Installation
 
@@ -29,7 +29,7 @@ pip install gym-super-mario-bros
 
 ## NES Emulator
 
-NESGym uses [FCEUX](http://www.fceux.com/web/home.html) to emulate NES games.
+`gym-super-mario-bros` uses [FCEUX](http://www.fceux.com/web/home.html) to emulate NES games.
 Make sure it's installed and in your `$PATH`.
 
 ### Unix
@@ -64,10 +64,12 @@ convenience.
 
 # Environments
 
-The following environments play the game as a human would. The agent has
-three lives to make it through the 32 levels of the game. The agent is
-configured to _only_ see reward-able game-play frames. No cut-scenes, loading
-screens, etc. are shown to the agent.
+These environments allow 3 attempts (lives) to make it through the 32 levels 
+of the game. The environments only send reward-able game-play frames to 
+agents; No cut-scenes, loading screens, etc. are sent from the NES emulator 
+to an agent nor can an agent perform actions during these occurences. If a 
+cut-scene is not able to be skipped by hacking the NES's RAM, the environment
+will lock the Pyton process until the emulator is ready for the next action.
 
 | Environment                    | Description                                      |
 |:-------------------------------|:-------------------------------------------------|
