@@ -14,7 +14,10 @@
 [python-version]: https://img.shields.io/pypi/pyversions/gym-super-mario-bros.svg
 [python-home]: https://python.org
 
-![smb](https://user-images.githubusercontent.com/2184469/39209488-854e960c-47cb-11e8-9e66-ddadcb0d7874.png)
+![walk1](gym_super_mario_bros/sprites/img/Characters/Mario/Mario%20-%20Walk1.gif)
+![walk2](gym_super_mario_bros/sprites/img/Characters/Mario/Mario%20-%20Walk2.gif)
+![walk3](gym_super_mario_bros/sprites/img/Characters/Mario/Mario%20-%20Walk3.gif)
+![jump](gym_super_mario_bros/sprites/img/Characters/Mario/Mario%20-%20Jump.gif)
 
 An [OpenAI Gym](https://github.com/openai/gym) environment for
 Super Mario Bros on the Nintendo Entertainment System (NES).
