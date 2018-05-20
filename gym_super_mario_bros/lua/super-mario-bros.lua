@@ -285,11 +285,13 @@ function init()
     pipe_out_name = os.getenv("pipe_in_name")
     -- setup the emulator
     emu.speedmode("maximum")
+
     init_screen()
     skip_start_screen()
     save_state()
     -- open the pipes
     setup_pipes()
+
     -- Notify the client that setup is complete and the emulator is ready
     write_to_pipe("ready")
 end
@@ -308,6 +310,10 @@ end
 function skip_start_screen()
     -- Press start until the game starts
     while get_time() >= time do
+        -- LUIGI: init on start
+        memory.writebyte(0x077A, 0x1)
+        memory.writebyte(0x0753, 0x1)
+
         time = get_time()
         -- press and release the start button
         press_buttons('S')
@@ -315,6 +321,9 @@ function skip_start_screen()
         press_buttons('')
         runout_prelevel_timer()
         emu.frameadvance()
+
+        -- LUIGI: enable movement
+        memory.writebyte(0x0753, 0x0)
     end
 end
 
