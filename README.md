@@ -20,7 +20,8 @@
 ![jump](gym_super_mario_bros/sprites/img/Characters/Mario/Mario%20-%20Jump.gif)
 
 An [OpenAI Gym](https://github.com/openai/gym) environment for
-Super Mario Bros on the Nintendo Entertainment System (NES).
+Super Mario Bros & Super Mario Bros 2 (Lost Levels) on the Nintendo
+Entertainment System (NES).
 
 # Installation
 
@@ -70,19 +71,23 @@ convenience.
 
 # Environments
 
-These environments allow 3 attempts (lives) to make it through the 32 levels 
-of the game. The environments only send reward-able game-play frames to 
-agents; No cut-scenes, loading screens, etc. are sent from the NES emulator 
-to an agent nor can an agent perform actions during these occurences. If a 
+These environments allow 3 attempts (lives) to make it through the 32 levels
+of the game. The environments only send reward-able game-play frames to
+agents; No cut-scenes, loading screens, etc. are sent from the NES emulator
+to an agent nor can an agent perform actions during these occurences. If a
 cut-scene is not able to be skipped by hacking the NES's RAM, the environment
 will lock the Pyton process until the emulator is ready for the next action.
 
-| Environment                    | Description                                      |
-|:-------------------------------|:-------------------------------------------------|
-| `SuperMarioBros-v0`            | 4 frames per action, standard ROM                |
-| `SuperMarioBros-v1`            | 4 frames per action, custom down-sampled ROM     |
-| `SuperMarioBrosNoFrameskip-v0` | 1 frame per action, standard ROM                 |
-| `SuperMarioBrosNoFrameskip-v1` | 1 frame per action, custom down-sampled ROM      |
+| Environment                     | Game | Description                                      |
+|:--------------------------------|:-----|:-------------------------------------------------|
+| `SuperMarioBros-v0`             | SMB  | 4 frames per action, standard ROM                |
+| `SuperMarioBros-v1`             | SMB  | 4 frames per action, custom down-sampled ROM     |
+| `SuperMarioBrosNoFrameskip-v0`  | SMB  | 1 frame per action, standard ROM                 |
+| `SuperMarioBrosNoFrameskip-v1`  | SMB  | 1 frame per action, custom down-sampled ROM      |
+| `SuperMarioBros2-v0`            | SMB2 | 4 frames per action, standard ROM                |
+| `SuperMarioBros2-v1`            | SMB2 | 4 frames per action, custom down-sampled ROM     |
+| `SuperMarioBros2NoFrameskip-v0` | SMB2 | 1 frame per action, standard ROM                 |
+| `SuperMarioBros2NoFrameskip-v1` | SMB2 | 1 frame per action, custom down-sampled ROM      |
 
 # Citation
 
