@@ -14,8 +14,8 @@
 [python-version]: https://img.shields.io/pypi/pyversions/gym-super-mario-bros.svg
 [python-home]: https://python.org
 
-![walk2](gym_super_mario_bros/sprites/img/Characters/Mario/Mario%20-%20Walk2.gif)
 ![walk1](gym_super_mario_bros/sprites/img/Characters/Mario/Mario%20-%20Walk1.gif)
+![walk2](gym_super_mario_bros/sprites/img/Characters/Mario/Mario%20-%20Walk2.gif)
 ![walk3](gym_super_mario_bros/sprites/img/Characters/Mario/Mario%20-%20Walk3.gif)
 ![jump](gym_super_mario_bros/sprites/img/Characters/Mario/Mario%20-%20Jump.gif)
 
