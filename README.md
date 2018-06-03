@@ -20,7 +20,7 @@
 ![jump](gym_super_mario_bros/sprites/img/Characters/Mario/Mario%20-%20Jump.gif)
 
 An [OpenAI Gym](https://github.com/openai/gym) environment for
-Super Mario Bros & Super Mario Bros 2 (Lost Levels) on the Nintendo
+Super Mario Bros. & Super Mario Bros. 2 (Lost Levels) on The Nintendo
 Entertainment System (NES).
 
 # Installation
