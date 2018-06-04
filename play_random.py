@@ -9,6 +9,7 @@ try:
     # try to load the environment name from the command line
     env_name = sys.argv[1]
 except IndexError:
+    # print the script documentation and exit
     print(__doc__)
     sys.exit(-1)
 
