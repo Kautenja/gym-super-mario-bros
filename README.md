@@ -14,10 +14,10 @@
 [python-version]: https://img.shields.io/pypi/pyversions/gym-super-mario-bros.svg
 [python-home]: https://python.org
 
-![walk1](https://github.com/Kautenja/gym-super-mario-bros/blob/master/gym_super_mario_bros/sprites/img/Characters/Mario/Mario%20-%20Walk1.gif)
-![walk2](https://github.com/Kautenja/gym-super-mario-bros/blob/master/gym_super_mario_bros/sprites/img/Characters/Mario/Mario%20-%20Walk2.gif)
-![walk3](https://github.com/Kautenja/gym-super-mario-bros/blob/master/gym_super_mario_bros/sprites/img/Characters/Mario/Mario%20-%20Walk3.gif)
-![jump](https://github.com/Kautenja/gym-super-mario-bros/blob/master/gym_super_mario_bros/sprites/img/Characters/Mario/Mario%20-%20Jump.gif)
+![walk1](https://github.com/Kautenja/gym-super-mario-bros/blob/master/gym_super_mario_bros/sprites/smb1/Characters/Mario/Mario%20-%20Walk1.gif)
+![walk2](https://github.com/Kautenja/gym-super-mario-bros/blob/master/gym_super_mario_bros/sprites/smb1/Characters/Mario/Mario%20-%20Walk2.gif)
+![walk3](https://github.com/Kautenja/gym-super-mario-bros/blob/master/gym_super_mario_bros/sprites/smb1/Characters/Mario/Mario%20-%20Walk3.gif)
+![jump](https://github.com/Kautenja/gym-super-mario-bros/blob/master/gym_super_mario_bros/sprites/smb1/Characters/Mario/Mario%20-%20Jump.gif)
 
 An [OpenAI Gym](https://github.com/openai/gym) environment for
 Super Mario Bros. & Super Mario Bros. 2 (Lost Levels) on The Nintendo
