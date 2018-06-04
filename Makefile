@@ -1,7 +1,7 @@
 
 # clean the build directory
 clean:
-	rm -rf build/ dist/ || true
+	rm -rf build/ dist/ .eggs/ *.egg-info/ || true
 
 # build the deployment package
 deployment: clean
