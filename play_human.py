@@ -1,5 +1,27 @@
-"""A script to play the environment with a keyboard."""
-import os
+"""Play a Super Mario Bros environment using keyboard and mouse as a human.
+
+Usage:
+
+    python play_human.py <Environment Name>
+
+Controls:
+
+    WASD: standard movement
+    O: A Button
+    P: B Button
+"""
+import os, sys
+
+
+try:
+    # try to load the environment name from the command line
+    env_name = sys.argv[1]
+except IndexError:
+    print(__doc__)
+    sys.exit(-1)
+
+
+# import these here so command line error handling (above) runs fast
 from PIL import Image
 from datetime import datetime
 from gym.utils.play import play
@@ -65,5 +87,5 @@ keys_to_action = {
 
 
 # Create the environment and play the game
-env = gym_super_mario_bros.make('SuperMarioBros-v0')
+env = gym_super_mario_bros.make(env_name)
 play(env, keys_to_action=keys_to_action, callback=callback)
