@@ -1,10 +1,26 @@
-"""A simple script for debugging the Super Mario Bros. Lua code."""
+"""Play a Super Mario Bros environment using uniform random movement.
+
+    python play_random.py <Environment Name>
+"""
+import sys
+
+
+try:
+    # try to load the environment name from the command line
+    env_name = sys.argv[1]
+except IndexError:
+    print(__doc__)
+    sys.exit(-1)
+
+
+# import these here so command line error handling (above) runs fast
 from tqdm import tqdm
 import gym_super_mario_bros
 from gym_super_mario_bros.wrappers import Monitor
 
 
-env = gym_super_mario_bros.make('SuperMarioBros-v0')
+# create the environment and wrap it with a monitor
+env = gym_super_mario_bros.make(env_name)
 env = Monitor(env, './monitor')
 
 
