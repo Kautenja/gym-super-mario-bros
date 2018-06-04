@@ -17,6 +17,7 @@ try:
     # try to load the environment name from the command line
     env_name = sys.argv[1]
 except IndexError:
+    # print the script documentation and exit
     print(__doc__)
     sys.exit(-1)
 
@@ -88,4 +89,12 @@ keys_to_action = {
 
 # Create the environment and play the game
 env = gym_super_mario_bros.make(env_name)
-play(env, keys_to_action=keys_to_action, callback=callback)
+
+try:
+    play(env, keys_to_action=keys_to_action, callback=callback)
+except KeyboardInterrupt:
+    pass
+
+
+env.reset()
+env.close()
