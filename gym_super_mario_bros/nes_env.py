@@ -83,9 +83,19 @@ class NESEnv(gym.Env, gym.utils.EzPickle):
         self.screen = self.observation_space.sample()
         # Setup the action space
         self.actions = [
-            'U', 'D', 'L', 'R',
-            'UR', 'DR', 'URA', 'DRB',
-            'A', 'B', 'RB', 'RA']
+            'U',   # Up
+            'D',   # Down
+            'L',   # Left
+            'R',   # Right
+            'UR',  # Up + Right
+            'DR',  # Down + Right
+            'URA', # Up + Right + A
+            'DRB', # Down + Right + B
+            'A',   # A
+            'B',   # B
+            'RB',  # Right + B
+            'RA'   # Right + A
+        ]
         self.action_space = gym.spaces.Discrete(len(self.actions))
 
     # MARK: FCEUX
