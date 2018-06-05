@@ -47,6 +47,8 @@ brew install fceux
 
 # Usage
 
+## Python
+
 You must import `gym_super_mario_bros` before trying to make an environment. This is
 because gym environments are registered at runtime.
 
@@ -65,6 +67,18 @@ env.close()
 
 **NOTE:** `gym_super_mario_bros.make` is just an alias to `gym.make` for
 convenience.
+
+## Command Line
+
+`gym_super_mario_bros` feature a command line interface for playing
+environments using either the keyboard, or uniform random movement.
+
+```shell
+gym_super_mario_bros -e <the environment ID to play> -m <`human` or `random`>
+```
+
+**NOTE:** by default, `-e` is set to `SuperMarioBros-v0` and `-m` is set to
+`human`.
 
 # Environments
 
