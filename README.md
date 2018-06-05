@@ -83,9 +83,11 @@ will lock the Pyton process until the emulator is ready for the next action.
 | `SuperMarioBros-v0`             | SMB  | 4 frames per action, standard ROM                |
 | `SuperMarioBros-v1`             | SMB  | 4 frames per action, custom down-sampled ROM     |
 | `SuperMarioBros-v2`             | SMB  | 4 frames per action, custom pixel-based ROM      |
+| `SuperMarioBros-v3`             | SMB  | 4 frames per action, custom rectangle-based ROM  |
 | `SuperMarioBrosNoFrameskip-v0`  | SMB  | 1 frame per action, standard ROM                 |
 | `SuperMarioBrosNoFrameskip-v1`  | SMB  | 1 frame per action, custom down-sampled ROM      |
 | `SuperMarioBrosNoFrameskip-v2`  | SMB  | 1 frame per action, custom pixel-based ROM       |
+| `SuperMarioBrosNoFrameskip-v3`  | SMB  | 1 frame per action, custom rectangle-based ROM   |
 | `SuperMarioBros2-v0`            | SMB2 | 4 frames per action, standard ROM                |
 | `SuperMarioBros2-v1`            | SMB2 | 4 frames per action, custom down-sampled ROM     |
 | `SuperMarioBros2NoFrameskip-v0` | SMB2 | 1 frame per action, standard ROM                 |

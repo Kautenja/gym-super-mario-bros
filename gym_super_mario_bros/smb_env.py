@@ -8,6 +8,7 @@ class SuperMarioBrosEnv(NESEnv):
 
     def __init__(self,
         pixel_rom: bool=False,
+        rectangle_rom: bool=False,
         downsampled_rom: bool=False,
         lost_levels: bool=False,
         **kwargs
@@ -32,6 +33,8 @@ class SuperMarioBrosEnv(NESEnv):
         if lost_levels:
             if pixel_rom:
                 raise ValueError('pixel_rom not supported for Lost Levels')
+            elif rectangle_rom:
+                raise ValueError('rectangle_rom not supported for Lost Levels')
             elif downsampled_rom:
                 rom_name = 'roms/super-mario-bros-2-downsampled.nes'
             else:
@@ -39,6 +42,8 @@ class SuperMarioBrosEnv(NESEnv):
         else:
             if pixel_rom:
                 rom_name = 'roms/super-mario-bros-pixel.nes'
+            elif rectangle_rom:
+                rom_name = 'roms/super-mario-bros-rect.nes'
             elif downsampled_rom:
                 rom_name = 'roms/super-mario-bros-downsampled.nes'
             else:
