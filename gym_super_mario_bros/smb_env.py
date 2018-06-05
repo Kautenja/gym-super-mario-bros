@@ -7,9 +7,7 @@ class SuperMarioBrosEnv(NESEnv):
     """An environment for playing Super Mario Bros with OpenAI Gym."""
 
     def __init__(self,
-        pixel_rom: bool=False,
-        rectangle_rom: bool=False,
-        downsampled_rom: bool=False,
+        rom_mode: str=None,
         lost_levels: bool=False,
         **kwargs
     ) -> None:
@@ -17,7 +15,12 @@ class SuperMarioBrosEnv(NESEnv):
         Initialize a new Super Mario Bros environment.
 
         Args:
-            downsampled_rom: whether to use the downsampled ROM
+            rom_mode: the ROM mode to use when loading ROMs from disk. valid
+                options are:
+                - 'standard': the standard ROM with no modifications
+                - 'downsample': down-sampled ROM with static artifacts removed
+                - 'pixel': a simpler pixelated version of graphics
+                - 'rectangle': an even simpler rectangular version of graphics
 
         Returns:
             None
@@ -31,23 +34,27 @@ class SuperMarioBrosEnv(NESEnv):
         self.lua_interface_path = os.path.join(package_directory, lua_name)
         # setup the path to the game ROM
         if lost_levels:
-            if pixel_rom:
+            if rom_mode is None:
+                rom_name = 'roms/super-mario-bros-2.nes'
+            elif rom_mode == 'pixel':
                 raise ValueError('pixel_rom not supported for Lost Levels')
-            elif rectangle_rom:
+            elif rom_mode == 'rectangle':
                 raise ValueError('rectangle_rom not supported for Lost Levels')
-            elif downsampled_rom:
+            elif rom_mode == 'downsample':
                 rom_name = 'roms/super-mario-bros-2-downsampled.nes'
             else:
-                rom_name = 'roms/super-mario-bros-2.nes'
+                raise ValueError('invalid rom_mode ({})'.format(rom_mode))
         else:
-            if pixel_rom:
+            if rom_mode is None:
+                rom_name = 'roms/super-mario-bros.nes'
+            elif rom_mode == 'pixel':
                 rom_name = 'roms/super-mario-bros-pixel.nes'
-            elif rectangle_rom:
+            elif rom_mode == 'rectangle':
                 rom_name = 'roms/super-mario-bros-rect.nes'
-            elif downsampled_rom:
+            elif rom_mode == 'downsample':
                 rom_name = 'roms/super-mario-bros-downsampled.nes'
             else:
-                rom_name = 'roms/super-mario-bros.nes'
+                raise ValueError('invalid rom_mode ({})'.format(rom_mode))
         # convert the path to an absolute path
         self.rom_file_path = os.path.join(package_directory, rom_name)
         # setup the discrete action space for the agent

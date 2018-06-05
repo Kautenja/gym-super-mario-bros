@@ -14,7 +14,6 @@ gym.envs.registration.register(
         'max_episode_steps': math.inf,
         'frame_skip': 4,
         'lost_levels': False,
-        'downsampled_rom': False,
     },
     nondeterministic=True,
 )
@@ -30,7 +29,7 @@ gym.envs.registration.register(
         'max_episode_steps': math.inf,
         'frame_skip': 4,
         'lost_levels': False,
-        'downsampled_rom': True,
+        'rom_mode': 'downsample',
     },
     nondeterministic=True,
 )
@@ -46,7 +45,7 @@ gym.envs.registration.register(
         'max_episode_steps': math.inf,
         'frame_skip': 4,
         'lost_levels': False,
-        'pixel_rom': True,
+        'rom_mode': 'pixel',
     },
     nondeterministic=True,
 )
@@ -62,7 +61,7 @@ gym.envs.registration.register(
         'max_episode_steps': math.inf,
         'frame_skip': 4,
         'lost_levels': False,
-        'rectangle_rom': True,
+        'rom_mode': 'rectangle',
     },
     nondeterministic=True,
 )
@@ -78,7 +77,6 @@ gym.envs.registration.register(
         'max_episode_steps': math.inf,
         'frame_skip': 1,
         'lost_levels': False,
-        'downsampled_rom': False,
     },
     nondeterministic=True,
 )
@@ -94,7 +92,7 @@ gym.envs.registration.register(
         'max_episode_steps': math.inf,
         'frame_skip': 1,
         'lost_levels': False,
-        'downsampled_rom': True,
+        'rom_mode': 'downsample',
     },
     nondeterministic=True,
 )
@@ -110,7 +108,7 @@ gym.envs.registration.register(
         'max_episode_steps': math.inf,
         'frame_skip': 1,
         'lost_levels': False,
-        'pixel_rom': True,
+        'rom_mode': 'pixel',
     },
     nondeterministic=True,
 )
@@ -126,7 +124,7 @@ gym.envs.registration.register(
         'max_episode_steps': math.inf,
         'frame_skip': 1,
         'lost_levels': False,
-        'rectangle_rom': True,
+        'rom_mode': 'rectangle',
     },
     nondeterministic=True,
 )
@@ -144,7 +142,6 @@ gym.envs.registration.register(
         'max_episode_steps': math.inf,
         'frame_skip': 4,
         'lost_levels': True,
-        'downsampled_rom': False,
     },
     nondeterministic=True,
 )
@@ -160,7 +157,7 @@ gym.envs.registration.register(
         'max_episode_steps': math.inf,
         'frame_skip': 4,
         'lost_levels': True,
-        'downsampled_rom': True,
+        'rom_mode': 'downsample',
     },
     nondeterministic=True,
 )
@@ -176,7 +173,6 @@ gym.envs.registration.register(
         'max_episode_steps': math.inf,
         'frame_skip': 1,
         'lost_levels': True,
-        'downsampled_rom': False,
     },
     nondeterministic=True,
 )
@@ -192,7 +188,7 @@ gym.envs.registration.register(
         'max_episode_steps': math.inf,
         'frame_skip': 1,
         'lost_levels': True,
-        'downsampled_rom': True,
+        'rom_mode': 'downsample',
     },
     nondeterministic=True,
 )
