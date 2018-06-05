@@ -45,7 +45,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'gym_super_mario_bros = gym_super_mario_bros.cli:main',
+            'gym_super_mario_bros = gym_super_mario_bros._cli:main',
         ],
     },
 )
