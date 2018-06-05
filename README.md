@@ -78,20 +78,20 @@ to an agent nor can an agent perform actions during these occurences. If a
 cut-scene is not able to be skipped by hacking the NES's RAM, the environment
 will lock the Pyton process until the emulator is ready for the next action.
 
-| Environment                     | Game | Frameskip | Description                 | Screenshot |
-|:--------------------------------|:-----|:----------|:----------------------------|:-----------|
-| `SuperMarioBros-v0`             | SMB  | 4         | standard ROM                | ![][v0]    |
-| `SuperMarioBros-v1`             | SMB  | 4         | custom down-sampled ROM     | ![][v1]    |
-| `SuperMarioBros-v2`             | SMB  | 4         | custom pixel-based ROM      | ![][v2]    |
-| `SuperMarioBros-v3`             | SMB  | 4         | custom rectangle-based ROM  | ![][v3]    |
-| `SuperMarioBrosNoFrameskip-v0`  | SMB  | 1         | standard ROM                | ![][v0]    |
-| `SuperMarioBrosNoFrameskip-v1`  | SMB  | 1         | custom down-sampled ROM     | ![][v1]    |
-| `SuperMarioBrosNoFrameskip-v2`  | SMB  | 1         | custom pixel-based ROM      | ![][v2]    |
-| `SuperMarioBrosNoFrameskip-v3`  | SMB  | 1         | custom rectangle-based ROM  | ![][v3]    |
-| `SuperMarioBros2-v0`            | SMB2 | 4         | standard ROM                | ![][2-v0]  |
-| `SuperMarioBros2-v1`            | SMB2 | 4         | custom down-sampled ROM     | ![][2-v1]  |
-| `SuperMarioBros2NoFrameskip-v0` | SMB2 | 1         | standard ROM                | ![][2-v0]  |
-| `SuperMarioBros2NoFrameskip-v1` | SMB2 | 1         | custom down-sampled ROM     | ![][2-v1]  |
+| Environment                     | Game | Frameskip | ROM           | Screenshot |
+|:--------------------------------|:-----|:----------|:--------------|:-----------|
+| `SuperMarioBros-v0`             | SMB  | 4         | standard      | ![][v0]    |
+| `SuperMarioBros-v1`             | SMB  | 4         | down-sampled  | ![][v1]    |
+| `SuperMarioBros-v2`             | SMB  | 4         | pixelated     | ![][v2]    |
+| `SuperMarioBros-v3`             | SMB  | 4         | rectangles    | ![][v3]    |
+| `SuperMarioBrosNoFrameskip-v0`  | SMB  | 1         | standard      | ![][v0]    |
+| `SuperMarioBrosNoFrameskip-v1`  | SMB  | 1         | down-sampled  | ![][v1]    |
+| `SuperMarioBrosNoFrameskip-v2`  | SMB  | 1         | pixelated     | ![][v2]    |
+| `SuperMarioBrosNoFrameskip-v3`  | SMB  | 1         | rectangles    | ![][v3]    |
+| `SuperMarioBros2-v0`            | SMB2 | 4         | standard      | ![][2-v0]  |
+| `SuperMarioBros2-v1`            | SMB2 | 4         | down-sampled  | ![][2-v1]  |
+| `SuperMarioBros2NoFrameskip-v0` | SMB2 | 1         | standard      | ![][2-v0]  |
+| `SuperMarioBros2NoFrameskip-v1` | SMB2 | 1         | down-sampled  | ![][2-v1]  |
 
 [v0]: https://user-images.githubusercontent.com/2184469/40948820-3d15e5c2-6830-11e8-81d4-ecfaffee0a14.png
 [v1]: https://user-images.githubusercontent.com/2184469/40948819-3cff6c48-6830-11e8-8373-8fad1665ac72.png
