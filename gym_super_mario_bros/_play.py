@@ -1,7 +1,7 @@
 """Methods for playing the game randomly, or as a human."""
 from tqdm import tqdm
 import gym
-from gym.utils.play import play
+from .human_play import play
 
 
 def play_human(env: gym.Env) -> None:
