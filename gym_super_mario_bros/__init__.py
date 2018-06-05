@@ -10,6 +10,3 @@ __all__ = [
     make.__name__,
     wrap.__name__,
 ]
-
-if __name__ == '__main__':
-    print('init')
