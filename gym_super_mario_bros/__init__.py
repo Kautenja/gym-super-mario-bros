@@ -4,194 +4,50 @@ import gym
 from .smb_env import SuperMarioBrosEnv
 
 
-# Super Mario Bros with 4 frame skip and no down-sampling
-gym.envs.registration.register(
-    id='SuperMarioBros-v0',
-    entry_point='gym_super_mario_bros:SuperMarioBrosEnv',
-    max_episode_steps=9999999,
-    reward_threshold=32000,
-    kwargs={
-        'max_episode_steps': math.inf,
-        'frame_skip': 4,
-        'lost_levels': False,
-    },
-    nondeterministic=True,
-)
+def _register_mario_env(id: str, **kwargs: dict) -> None:
+    """
+    Register a Super Mario Bros. (1/2) environment with OpenAI Gym.
+
+    Args:
+        id: the id for the env to register
+        kwargs: the keyword arguments for the SuperMarioBrosEnv initializer
+
+    Returns:
+        None
+
+    """
+    gym.envs.registration.register(
+        id=id,
+        entry_point='gym_super_mario_bros:SuperMarioBrosEnv',
+        max_episode_steps=9999999,
+        reward_threshold=32000,
+        kwargs={ 'max_episode_steps': math.inf, **kwargs},
+        nondeterministic=True,
+    )
 
 
-# Super Mario Bros with 4 frame skip and down-sampling
-gym.envs.registration.register(
-    id='SuperMarioBros-v1',
-    entry_point='gym_super_mario_bros:SuperMarioBrosEnv',
-    max_episode_steps=9999999,
-    reward_threshold=32000,
-    kwargs={
-        'max_episode_steps': math.inf,
-        'frame_skip': 4,
-        'lost_levels': False,
-        'rom_mode': 'downsample',
-    },
-    nondeterministic=True,
-)
+# Super Mario Bros. with standard frame skip
+_register_mario_env('SuperMarioBros-v0', frame_skip=4)
+_register_mario_env('SuperMarioBros-v1', frame_skip=4, rom_mode='downsample')
+_register_mario_env('SuperMarioBros-v2', frame_skip=4, rom_mode='pixel')
+_register_mario_env('SuperMarioBros-v3', frame_skip=4, rom_mode='rectangle')
 
 
-# Super Mario Bros with 4 frame skip and pixel ROM Hack
-gym.envs.registration.register(
-    id='SuperMarioBros-v2',
-    entry_point='gym_super_mario_bros:SuperMarioBrosEnv',
-    max_episode_steps=9999999,
-    reward_threshold=32000,
-    kwargs={
-        'max_episode_steps': math.inf,
-        'frame_skip': 4,
-        'lost_levels': False,
-        'rom_mode': 'pixel',
-    },
-    nondeterministic=True,
-)
+# Super Mario Bros. with no frame skip
+_register_mario_env('SuperMarioBrosNoFrameskip-v0', frame_skip=1)
+_register_mario_env('SuperMarioBrosNoFrameskip-v1', frame_skip=1, rom_mode='downsample')
+_register_mario_env('SuperMarioBrosNoFrameskip-v2', frame_skip=1, rom_mode='pixel')
+_register_mario_env('SuperMarioBrosNoFrameskip-v3', frame_skip=1, rom_mode='rectangle')
 
 
-# Super Mario Bros with 4 frame skip and rectangle ROM Hack
-gym.envs.registration.register(
-    id='SuperMarioBros-v3',
-    entry_point='gym_super_mario_bros:SuperMarioBrosEnv',
-    max_episode_steps=9999999,
-    reward_threshold=32000,
-    kwargs={
-        'max_episode_steps': math.inf,
-        'frame_skip': 4,
-        'lost_levels': False,
-        'rom_mode': 'rectangle',
-    },
-    nondeterministic=True,
-)
+# Super Mario Bros. 2 (Lost Levels) with standard frame skip
+_register_mario_env('SuperMarioBros2-v0', lost_levels=True, frame_skip=4)
+_register_mario_env('SuperMarioBros2-v1', lost_levels=True, frame_skip=4, rom_mode='downsample')
 
 
-# Super Mario Bros with 1 frame skip and no down-sampling
-gym.envs.registration.register(
-    id='SuperMarioBrosNoFrameskip-v0',
-    entry_point='gym_super_mario_bros:SuperMarioBrosEnv',
-    max_episode_steps=9999999,
-    reward_threshold=32000,
-    kwargs={
-        'max_episode_steps': math.inf,
-        'frame_skip': 1,
-        'lost_levels': False,
-    },
-    nondeterministic=True,
-)
-
-
-# Super Mario Bros with 1 frame skip and down-sampling
-gym.envs.registration.register(
-    id='SuperMarioBrosNoFrameskip-v1',
-    entry_point='gym_super_mario_bros:SuperMarioBrosEnv',
-    max_episode_steps=9999999,
-    reward_threshold=32000,
-    kwargs={
-        'max_episode_steps': math.inf,
-        'frame_skip': 1,
-        'lost_levels': False,
-        'rom_mode': 'downsample',
-    },
-    nondeterministic=True,
-)
-
-
-# Super Mario Bros with 1 frame skip and pixel ROM Hack
-gym.envs.registration.register(
-    id='SuperMarioBrosNoFrameskip-v2',
-    entry_point='gym_super_mario_bros:SuperMarioBrosEnv',
-    max_episode_steps=9999999,
-    reward_threshold=32000,
-    kwargs={
-        'max_episode_steps': math.inf,
-        'frame_skip': 1,
-        'lost_levels': False,
-        'rom_mode': 'pixel',
-    },
-    nondeterministic=True,
-)
-
-
-# Super Mario Bros with 1 frame skip and rectangle ROM Hack
-gym.envs.registration.register(
-    id='SuperMarioBrosNoFrameskip-v3',
-    entry_point='gym_super_mario_bros:SuperMarioBrosEnv',
-    max_episode_steps=9999999,
-    reward_threshold=32000,
-    kwargs={
-        'max_episode_steps': math.inf,
-        'frame_skip': 1,
-        'lost_levels': False,
-        'rom_mode': 'rectangle',
-    },
-    nondeterministic=True,
-)
-
-
-
-
-# Super Mario Bros 2 with 4 frame skip and no down-sampling
-gym.envs.registration.register(
-    id='SuperMarioBros2-v0',
-    entry_point='gym_super_mario_bros:SuperMarioBrosEnv',
-    max_episode_steps=9999999,
-    reward_threshold=32000,
-    kwargs={
-        'max_episode_steps': math.inf,
-        'frame_skip': 4,
-        'lost_levels': True,
-    },
-    nondeterministic=True,
-)
-
-
-# Super Mario Bros 2 with 4 frame skip and down-sampling
-gym.envs.registration.register(
-    id='SuperMarioBros2-v1',
-    entry_point='gym_super_mario_bros:SuperMarioBrosEnv',
-    max_episode_steps=9999999,
-    reward_threshold=32000,
-    kwargs={
-        'max_episode_steps': math.inf,
-        'frame_skip': 4,
-        'lost_levels': True,
-        'rom_mode': 'downsample',
-    },
-    nondeterministic=True,
-)
-
-
-# Super Mario Bros 2 with 1 frame skip and no down-sampling
-gym.envs.registration.register(
-    id='SuperMarioBros2NoFrameskip-v0',
-    entry_point='gym_super_mario_bros:SuperMarioBrosEnv',
-    max_episode_steps=9999999,
-    reward_threshold=32000,
-    kwargs={
-        'max_episode_steps': math.inf,
-        'frame_skip': 1,
-        'lost_levels': True,
-    },
-    nondeterministic=True,
-)
-
-
-# Super Mario Bros 2 with 1 frame skip and down-sampling
-gym.envs.registration.register(
-    id='SuperMarioBros2NoFrameskip-v1',
-    entry_point='gym_super_mario_bros:SuperMarioBrosEnv',
-    max_episode_steps=9999999,
-    reward_threshold=32000,
-    kwargs={
-        'max_episode_steps': math.inf,
-        'frame_skip': 1,
-        'lost_levels': True,
-        'rom_mode': 'downsample',
-    },
-    nondeterministic=True,
-)
+# Super Mario Bros. 2 (Lost Levels) with no frame skip
+_register_mario_env('SuperMarioBros2NoFrameskip-v0', lost_levels=True, frame_skip=1)
+_register_mario_env('SuperMarioBros2NoFrameskip-v1', lost_levels=True, frame_skip=1, rom_mode='downsample')
 
 
 def make(environment: str) -> gym.Env:
