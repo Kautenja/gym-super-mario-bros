@@ -74,9 +74,9 @@ convenience.
 These environments allow 3 attempts (lives) to make it through the 32 levels
 of the game. The environments only send reward-able game-play frames to
 agents; No cut-scenes, loading screens, etc. are sent from the NES emulator
-to an agent nor can an agent perform actions during these occurences. If a
+to an agent nor can an agent perform actions during these occurrences. If a
 cut-scene is not able to be skipped by hacking the NES's RAM, the environment
-will lock the Pyton process until the emulator is ready for the next action.
+will lock the Python process until the emulator is ready for the next action.
 
 | Environment                     | Game | Frameskip | ROM           | Screenshot |
 |:--------------------------------|:-----|:----------|:--------------|:-----------|
@@ -99,11 +99,6 @@ will lock the Pyton process until the emulator is ready for the next action.
 [v3]: https://user-images.githubusercontent.com/2184469/40948817-3cd6600a-6830-11e8-8abb-9cee6a31d377.png
 [2-v0]: https://user-images.githubusercontent.com/2184469/40948821-3d2d61a2-6830-11e8-8789-a92e750aa9a8.png
 [2-v1]: https://user-images.githubusercontent.com/2184469/40948822-3d3b8412-6830-11e8-860b-af3802f5373f.png
-
-
-<!-- ROM Hacks
-more can be found here: http://l.j-factor.com/emulation/
--->
 
 # Citation
 
