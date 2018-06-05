@@ -7,6 +7,7 @@ class SuperMarioBrosEnv(NESEnv):
     """An environment for playing Super Mario Bros with OpenAI Gym."""
 
     def __init__(self,
+        pixel_rom: bool=False,
         downsampled_rom: bool=False,
         lost_levels: bool=False,
         **kwargs
@@ -29,12 +30,16 @@ class SuperMarioBrosEnv(NESEnv):
         self.lua_interface_path = os.path.join(package_directory, lua_name)
         # setup the path to the game ROM
         if lost_levels:
-            if downsampled_rom:
+            if pixel_rom:
+                raise ValueError('pixel_rom not supported for Lost Levels')
+            elif downsampled_rom:
                 rom_name = 'roms/super-mario-bros-2-downsampled.nes'
             else:
                 rom_name = 'roms/super-mario-bros-2.nes'
         else:
-            if downsampled_rom:
+            if pixel_rom:
+                rom_name = 'roms/super-mario-bros-pixel.nes'
+            elif downsampled_rom:
                 rom_name = 'roms/super-mario-bros-downsampled.nes'
             else:
                 rom_name = 'roms/super-mario-bros.nes'

@@ -50,7 +50,7 @@ brew install fceux
 
 # Usage
 
-You must import `gym_super_mario_bros` before trying to make an environment. This is 
+You must import `gym_super_mario_bros` before trying to make an environment. This is
 because gym environments are registered at runtime.
 
 ```python
@@ -82,12 +82,18 @@ will lock the Pyton process until the emulator is ready for the next action.
 |:--------------------------------|:-----|:-------------------------------------------------|
 | `SuperMarioBros-v0`             | SMB  | 4 frames per action, standard ROM                |
 | `SuperMarioBros-v1`             | SMB  | 4 frames per action, custom down-sampled ROM     |
+| `SuperMarioBros-v2`             | SMB  | 4 frames per action, custom pixel-based ROM      |
 | `SuperMarioBrosNoFrameskip-v0`  | SMB  | 1 frame per action, standard ROM                 |
 | `SuperMarioBrosNoFrameskip-v1`  | SMB  | 1 frame per action, custom down-sampled ROM      |
+| `SuperMarioBrosNoFrameskip-v2`  | SMB  | 1 frame per action, custom pixel-based ROM       |
 | `SuperMarioBros2-v0`            | SMB2 | 4 frames per action, standard ROM                |
 | `SuperMarioBros2-v1`            | SMB2 | 4 frames per action, custom down-sampled ROM     |
 | `SuperMarioBros2NoFrameskip-v0` | SMB2 | 1 frame per action, standard ROM                 |
 | `SuperMarioBros2NoFrameskip-v1` | SMB2 | 1 frame per action, custom down-sampled ROM      |
+
+<!-- ROM Hacks
+more can be found here: http://l.j-factor.com/emulation/
+-->
 
 # Citation
 
