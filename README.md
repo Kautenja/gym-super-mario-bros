@@ -93,6 +93,23 @@ will lock the Pyton process until the emulator is ready for the next action.
 | `SuperMarioBros2NoFrameskip-v0` | SMB2 | 1 frame per action, standard ROM                 |
 | `SuperMarioBros2NoFrameskip-v1` | SMB2 | 1 frame per action, custom down-sampled ROM      |
 
+## Super Mario Bros.
+
+<p float="left" align="center">
+<img src="https://user-images.githubusercontent.com/2184469/40948820-3d15e5c2-6830-11e8-81d4-ecfaffee0a14.png" width="200"/>
+<img src="https://user-images.githubusercontent.com/2184469/40948819-3cff6c48-6830-11e8-8373-8fad1665ac72.png" width="200"/>
+<img src="https://user-images.githubusercontent.com/2184469/40948818-3cea09d4-6830-11e8-8efa-8f34d8b05b11.png" width="200"/>
+<img src="https://user-images.githubusercontent.com/2184469/40948817-3cd6600a-6830-11e8-8abb-9cee6a31d377.png" width="200"/>
+</p>
+
+## Super Mario Bros. 2 (Lost Levels)
+
+<p float="left" align="center">
+<img src="https://user-images.githubusercontent.com/2184469/40948821-3d2d61a2-6830-11e8-8789-a92e750aa9a8.png" width="200"/>
+<img src="https://user-images.githubusercontent.com/2184469/40948822-3d3b8412-6830-11e8-860b-af3802f5373f.png" width="200"/>
+</p>
+
+
 <!-- ROM Hacks
 more can be found here: http://l.j-factor.com/emulation/
 -->
