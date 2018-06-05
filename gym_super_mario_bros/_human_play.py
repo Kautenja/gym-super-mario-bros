@@ -16,103 +16,69 @@ def display_arr(screen, arr, video_size, transpose):
 def play(env: gym.Env,
     transpose: bool=True,
     fps: int=30,
-    zoom: float=None,
     callback: Callable=None,
-    keys_to_action: dict=None
+    nop_: any=0,
 ) -> None:
-    """Allows one to play the game using keyboard.
+    """Play the game using the keyboard as a human.
 
-    To simply play the game use:
+    Args:
+        env: gym.Env
+            Environment to use for playing.
+        transpose: bool
+            If True the output of observation is transposed.
+            Defaults to true.
+        fps: int
+            Maximum number of steps of the environment to execute every second.
+            Defaults to 30.
+        callback: lambda or None
+            Callback if a callback is provided it will be executed after
+            every step. It takes the following input:
+                obs_t: observation before performing action
+                obs_tp1: observation after performing action
+                action: action that was executed
+                rew: reward that was received
+                done: whether the environemnt is done or not
+                info: debug info
+        nop_: the object to use as a null op action for the environment
 
-        play(gym.make("Pong-v3"))
+    Returns:
+        None
 
-    Above code works also if env is wrapped, so it's particularly useful in
-    verifying that the frame-level preprocessing does not render the game
-    unplayable.
-
-    If you wish to plot real time statistics as you play, you can use
-    gym.utils.play.PlayPlot. Here's a sample code for plotting the reward
-    for last 5 second of gameplay.
-
-        def callback(obs_t, obs_tp1, rew, done, info):
-            return [rew,]
-        env_plotter = EnvPlotter(callback, 30 * 5, ["reward"])
-
-        env = gym.make("Pong-v3")
-        play(env, callback=env_plotter.callback)
-
-
-    Arguments
-    ---------
-    env: gym.Env
-        Environment to use for playing.
-    transpose: bool
-        If True the output of observation is transposed.
-        Defaults to true.
-    fps: int
-        Maximum number of steps of the environment to execute every second.
-        Defaults to 30.
-    zoom: float
-        Make screen edge this many times bigger
-    callback: lambda or None
-        Callback if a callback is provided it will be executed after
-        every step. It takes the following input:
-            obs_t: observation before performing action
-            obs_tp1: observation after performing action
-            action: action that was executed
-            rew: reward that was received
-            done: whether the environemnt is done or not
-            info: debug info
-    keys_to_action: dict: tuple(int) -> int or None
-        Mapping from keys pressed to action performed.
-        For example if pressed 'w' and space at the same time is supposed
-        to trigger action number 2 then key_to_action dict would look like this:
-
-            {
-                # ...
-                sorted(ord('w'), ord(' ')) -> 2
-                # ...
-            }
-        If None, default key_to_action mapping for that env is used, if provided.
     """
+    # type check the observation space
     obs_s = env.observation_space
     assert type(obs_s) == gym.spaces.box.Box
     assert len(obs_s.shape) == 2 or (len(obs_s.shape) == 3 and obs_s.shape[2] in [1,3])
-
-    if keys_to_action is None:
-        if hasattr(env, 'get_keys_to_action'):
-            keys_to_action = env.get_keys_to_action()
-        elif hasattr(env.unwrapped, 'get_keys_to_action'):
-            keys_to_action = env.unwrapped.get_keys_to_action()
-        else:
-            assert False, env.spec.id + " does not have explicit key to action mapping, " + \
-                          "please specify one manually"
+    # get the mapping of keyboard keys to actions in the environment
+    if hasattr(env, 'get_keys_to_action'):
+        keys_to_action = env.get_keys_to_action()
+    elif hasattr(env.unwrapped, 'get_keys_to_action'):
+        keys_to_action = env.unwrapped.get_keys_to_action()
+    else:
+        raise ValueError('env has no get_keys_to_action method')
     relevant_keys = set(sum(map(list, keys_to_action.keys()),[]))
-
+    # transpose the video is specified
     if transpose:
         video_size = env.observation_space.shape[1], env.observation_space.shape[0]
     else:
         video_size = env.observation_space.shape[0], env.observation_space.shape[1]
 
-    if zoom is not None:
-        video_size = int(video_size[0] * zoom), int(video_size[1] * zoom)
-
     pressed_keys = []
     running = True
     env_done = True
-
+    # setup the screen using pygame
     screen = pygame.display.set_mode(video_size)
+    pygame.display.set_caption(env.unwrapped.__class__.__name__)
     # disable the SDL video driver so FCEUX wont open a window
     os.environ['SDL_VIDEODRIVER'] = 'dummy'
     clock = pygame.time.Clock()
-
-
+    # start the main game loop
     while running:
         if env_done:
             env_done = False
             obs = env.reset()
         else:
-            action = keys_to_action.get(tuple(sorted(pressed_keys)), 0)
+            action = keys_to_action.get(tuple(sorted(pressed_keys)), nop_)
             prev_obs = obs
             obs, rew, env_done, info = env.step(action)
             if callback is not None:
@@ -143,4 +109,5 @@ def play(env: gym.Env,
     pygame.quit()
 
 
+# explicitly define the outward facing API of the module
 __all__ = [play.__name__]

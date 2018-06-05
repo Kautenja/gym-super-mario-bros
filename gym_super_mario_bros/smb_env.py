@@ -76,5 +76,34 @@ class SuperMarioBrosEnv(NESEnv):
         ]
         self.action_space = spaces.Discrete(len(self.actions))
 
+    def get_keys_to_action(self) -> dict:
+        """Return the dictionary of keyboard keys to actions."""
+        # Mapping of buttons on the NES joy-pad to keyboard keys
+        up =    ord('w')
+        down =  ord('s')
+        left =  ord('a')
+        right = ord('d')
+        A =     ord('o')
+        B =     ord('p')
+        # A mapping of pressed key combinations to discrete actions in action space
+        keys_to_action = {
+            (): 0,
+            (up, ): 1,
+            (down, ): 2,
+            (left, ): 3,
+            (right, ): 4,
+            tuple(sorted((left, A, ))): 5,
+            tuple(sorted((left, B, ))): 6,
+            tuple(sorted((left, A, B, ))): 7,
+            tuple(sorted((right, A, ))): 8,
+            tuple(sorted((right, B, ))): 9,
+            tuple(sorted((right, A, B, ))): 10,
+            (A, ): 11,
+            (B, ): 12,
+            tuple(sorted((A, B))): 13
+        }
+
+        return keys_to_action
+
 
 __all__ = [SuperMarioBrosEnv.__name__]
