@@ -43,4 +43,9 @@ setup(
         'Pillow>=5.0.0',
         'numpy>=1.14.2'
     ],
+    entry_points={
+        'console_scripts': [
+            'gym_super_mario_bros = gym_super_mario_bros.cli:main',
+        ],
+    },
 )

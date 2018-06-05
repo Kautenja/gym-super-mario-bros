@@ -6,8 +6,8 @@ from distutils import spawn
 import numpy as np
 import gym
 from gym.envs.classic_control.rendering import SimpleImageViewer
-from .error import DependencyNotFoundError
-from .palette import PALETTE
+from ._error import DependencyNotFoundError
+from ._palette import PALETTE
 
 
 # A separator used to split pieces of string commands sent to the emulator
