@@ -78,17 +78,17 @@ will lock the Python process until the emulator is ready for the next action.
 | Environment                     | Game | Frameskip | ROM           | Screenshot |
 |:--------------------------------|:-----|:----------|:--------------|:-----------|
 | `SuperMarioBros-v0`             | SMB  | 4         | standard      | ![][v0]    |
-| `SuperMarioBros-v1`             | SMB  | 4         | down-sampled  | ![][v1]    |
-| `SuperMarioBros-v2`             | SMB  | 4         | pixelated     | ![][v2]    |
-| `SuperMarioBros-v3`             | SMB  | 4         | rectangles    | ![][v3]    |
+| `SuperMarioBros-v1`             | SMB  | 4         | downsample    | ![][v1]    |
+| `SuperMarioBros-v2`             | SMB  | 4         | pixel         | ![][v2]    |
+| `SuperMarioBros-v3`             | SMB  | 4         | rectangle     | ![][v3]    |
 | `SuperMarioBrosNoFrameskip-v0`  | SMB  | 1         | standard      | ![][v0]    |
-| `SuperMarioBrosNoFrameskip-v1`  | SMB  | 1         | down-sampled  | ![][v1]    |
-| `SuperMarioBrosNoFrameskip-v2`  | SMB  | 1         | pixelated     | ![][v2]    |
-| `SuperMarioBrosNoFrameskip-v3`  | SMB  | 1         | rectangles    | ![][v3]    |
+| `SuperMarioBrosNoFrameskip-v1`  | SMB  | 1         | downsample    | ![][v1]    |
+| `SuperMarioBrosNoFrameskip-v2`  | SMB  | 1         | pixel         | ![][v2]    |
+| `SuperMarioBrosNoFrameskip-v3`  | SMB  | 1         | rectangle     | ![][v3]    |
 | `SuperMarioBros2-v0`            | SMB2 | 4         | standard      | ![][2-v0]  |
-| `SuperMarioBros2-v1`            | SMB2 | 4         | down-sampled  | ![][2-v1]  |
+| `SuperMarioBros2-v1`            | SMB2 | 4         | downsample    | ![][2-v1]  |
 | `SuperMarioBros2NoFrameskip-v0` | SMB2 | 1         | standard      | ![][2-v0]  |
-| `SuperMarioBros2NoFrameskip-v1` | SMB2 | 1         | down-sampled  | ![][2-v1]  |
+| `SuperMarioBros2NoFrameskip-v1` | SMB2 | 1         | downsample    | ![][2-v1]  |
 
 [v0]: https://user-images.githubusercontent.com/2184469/40948820-3d15e5c2-6830-11e8-81d4-ecfaffee0a14.png
 [v1]: https://user-images.githubusercontent.com/2184469/40948819-3cff6c48-6830-11e8-8373-8fad1665ac72.png
