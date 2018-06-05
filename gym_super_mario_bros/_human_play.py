@@ -68,7 +68,7 @@ def play(env: gym.Env,
     env_done = True
     # setup the screen using pygame
     screen = pygame.display.set_mode(video_size)
-    pygame.display.set_caption(env.unwrapped.__class__.__name__)
+    pygame.display.set_caption(env.spec.id)
     # disable the SDL video driver so FCEUX wont open a window
     os.environ['SDL_VIDEODRIVER'] = 'dummy'
     clock = pygame.time.Clock()
