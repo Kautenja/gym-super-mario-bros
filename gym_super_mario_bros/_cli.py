@@ -1,6 +1,7 @@
 """Super Mario Bros for OpenAI Gym."""
 import argparse
 from ._registration import make
+from ._play import play_human, play_random
 from .wrappers import wrap
 
 
@@ -40,9 +41,18 @@ def create_argparser() -> argparse.ArgumentParser:
 
 def main() -> None:
     """The main entry point for the command line interface."""
+    # parse arguments from the command line (args are validated by argparse)
     args = create_argparser().parse_args()
-    env_name = args.env
+    # select the method for playing the game
     mode = args.mode
+    if mode == 'human':
+        play = play_human
+    elif mode == 'random':
+        play = play_random
+    # play the game
+    env = make(args.env)
+    play(env)
 
-    print(env_name)
-    print(mode)
+
+# explicitly define the outward facing API of this module
+__all__ = [main.__name__]
