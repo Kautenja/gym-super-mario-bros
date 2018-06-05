@@ -14,10 +14,7 @@
 [python-version]: https://img.shields.io/pypi/pyversions/gym-super-mario-bros.svg
 [python-home]: https://python.org
 
-![walk1](https://github.com/Kautenja/gym-super-mario-bros/blob/master/gym_super_mario_bros/sprites/smb1/Characters/Mario/Mario%20-%20Walk1.gif)
-![walk2](https://github.com/Kautenja/gym-super-mario-bros/blob/master/gym_super_mario_bros/sprites/smb1/Characters/Mario/Mario%20-%20Walk2.gif)
-![walk3](https://github.com/Kautenja/gym-super-mario-bros/blob/master/gym_super_mario_bros/sprites/smb1/Characters/Mario/Mario%20-%20Walk3.gif)
-![jump](https://github.com/Kautenja/gym-super-mario-bros/blob/master/gym_super_mario_bros/sprites/smb1/Characters/Mario/Mario%20-%20Jump.gif)
+![Mario](https://user-images.githubusercontent.com/2184469/40949613-7542733a-6834-11e8-895b-ce1cc3af9dbb.gif)
 
 An [OpenAI Gym](https://github.com/openai/gym) environment for
 Super Mario Bros. & Super Mario Bros. 2 (Lost Levels) on The Nintendo
