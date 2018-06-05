@@ -78,46 +78,25 @@ to an agent nor can an agent perform actions during these occurences. If a
 cut-scene is not able to be skipped by hacking the NES's RAM, the environment
 will lock the Pyton process until the emulator is ready for the next action.
 
-| Environment                     | Game | Description                                      |
-|:--------------------------------|:-----|:-------------------------------------------------|
-| `SuperMarioBros-v0`             | SMB  | 4 frames per action, standard ROM                |
-| `SuperMarioBros-v1`             | SMB  | 4 frames per action, custom down-sampled ROM     |
-| `SuperMarioBros-v2`             | SMB  | 4 frames per action, custom pixel-based ROM      |
-| `SuperMarioBros-v3`             | SMB  | 4 frames per action, custom rectangle-based ROM  |
-| `SuperMarioBrosNoFrameskip-v0`  | SMB  | 1 frame per action, standard ROM                 |
-| `SuperMarioBrosNoFrameskip-v1`  | SMB  | 1 frame per action, custom down-sampled ROM      |
-| `SuperMarioBrosNoFrameskip-v2`  | SMB  | 1 frame per action, custom pixel-based ROM       |
-| `SuperMarioBrosNoFrameskip-v3`  | SMB  | 1 frame per action, custom rectangle-based ROM   |
-| `SuperMarioBros2-v0`            | SMB2 | 4 frames per action, standard ROM                |
-| `SuperMarioBros2-v1`            | SMB2 | 4 frames per action, custom down-sampled ROM     |
-| `SuperMarioBros2NoFrameskip-v0` | SMB2 | 1 frame per action, standard ROM                 |
-| `SuperMarioBros2NoFrameskip-v1` | SMB2 | 1 frame per action, custom down-sampled ROM      |
+| Environment                     | Game | Description                                      | Screenshot |
+|:--------------------------------|:-----|:-------------------------------------------------|:-----------|
+| `SuperMarioBros-v0`             | SMB  | 4 frames per action, standard ROM                | ![][v0]    |
+| `SuperMarioBros-v1`             | SMB  | 4 frames per action, custom down-sampled ROM     | ![][v1]    |
+| `SuperMarioBros-v2`             | SMB  | 4 frames per action, custom pixel-based ROM      | ![][v2]    |
+| `SuperMarioBros-v3`             | SMB  | 4 frames per action, custom rectangle-based ROM  | ![][v3]    |
+| `SuperMarioBrosNoFrameskip-v0`  | SMB  | 1 frame per action, standard ROM                 | ![][v0]    |
+| `SuperMarioBrosNoFrameskip-v1`  | SMB  | 1 frame per action, custom down-sampled ROM      | ![][v1]    |
+| `SuperMarioBrosNoFrameskip-v2`  | SMB  | 1 frame per action, custom pixel-based ROM       | ![][v2]    |
+| `SuperMarioBrosNoFrameskip-v3`  | SMB  | 1 frame per action, custom rectangle-based ROM   | ![][v3]    |
+| `SuperMarioBros2-v0`            | SMB2 | 4 frames per action, standard ROM                | ![][2-v0]  |
+| `SuperMarioBros2-v1`            | SMB2 | 4 frames per action, custom down-sampled ROM     | ![][2-v1]  |
+| `SuperMarioBros2NoFrameskip-v0` | SMB2 | 1 frame per action, standard ROM                 | ![][2-v0]  |
+| `SuperMarioBros2NoFrameskip-v1` | SMB2 | 1 frame per action, custom down-sampled ROM      | ![][2-v1]  |
 
-## Super Mario Bros.
-
-<center>
-    
-| v0      | v1      | v2      | v3      |
-|:--------|:--------|:--------|:--------|
-| ![][v0] | ![][v1] | ![][v2] | ![][v3] |
-
-</center>
-    
 [v0]: https://user-images.githubusercontent.com/2184469/40948820-3d15e5c2-6830-11e8-81d4-ecfaffee0a14.png
 [v1]: https://user-images.githubusercontent.com/2184469/40948819-3cff6c48-6830-11e8-8373-8fad1665ac72.png
 [v2]: https://user-images.githubusercontent.com/2184469/40948818-3cea09d4-6830-11e8-8efa-8f34d8b05b11.png
 [v3]: https://user-images.githubusercontent.com/2184469/40948817-3cd6600a-6830-11e8-8abb-9cee6a31d377.png
-
-## Super Mario Bros. 2 (Lost Levels)
-
-<center>
-    
-| v0        | v1        |
-|:----------|:----------|
-| ![][2-v0] | ![][2-v1] |
-
-</center>
-
 [2-v0]: https://user-images.githubusercontent.com/2184469/40948821-3d2d61a2-6830-11e8-8789-a92e750aa9a8.png
 [2-v1]: https://user-images.githubusercontent.com/2184469/40948822-3d3b8412-6830-11e8-860b-af3802f5373f.png
 
