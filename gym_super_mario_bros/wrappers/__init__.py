@@ -10,10 +10,10 @@ from .reward_cache_env import RewardCacheEnv
 
 
 def wrap(env: gym.Env,
-    image_size: tuple=(84, 84),
-    skip_frames: int=4,
-    death_penalty: int=-1,
-    clip_rewards: bool=True,
+    image_size: tuple=(100, 100),
+    skip_frames: int=None,
+    death_penalty: int=-100,
+    clip_rewards: bool=False,
     agent_history_length: int=4
 ) -> gym.Env:
     """
