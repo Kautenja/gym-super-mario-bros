@@ -229,20 +229,22 @@ end
 
 
 
+-- memory addresses for the world, level, and area
 addr_world = 0x075f;
 addr_level = 0x075c;
 addr_area = 0x0760;
-
-target_world = 3 + 1 -- math.floor(level / 4) + 1
-target_level = 1 + 1 -- (level % 4) + 1
+-- setup the target world, level, and area
+target_world = 8
+target_level = 4
 target_area = target_level
-
+-- setup the target area depending on the target world and level
 if (target_world == 1) or (target_world == 2) or (target_world == 4) or (target_world == 7) then
     if (target_level >= 2) then
         target_area = target_area + 1;
     end;
 end;
 
+-- Respond to the memory address for the world being set
 function hook_set_world()
     if (get_world_number() ~= target_world) then
         memory.writebyte(addr_world, (target_world - 1));
@@ -250,6 +252,9 @@ function hook_set_world()
         memory.writebyte(addr_area, (target_area - 1));
     end;
 end;
+memory.registerwrite(addr_world, hook_set_world);
+
+-- Respond to the memory address for the level being set
 function hook_set_level()
     if (get_level_number() ~= target_level) then
         memory.writebyte(addr_world, (target_world - 1));
@@ -257,6 +262,9 @@ function hook_set_level()
         memory.writebyte(addr_area, (target_area - 1));
     end;
 end;
+memory.registerwrite(addr_level, hook_set_level);
+
+-- Respond to the memory address for the area being set
 function hook_set_area()
     if (get_area_number() ~= target_area) then
         memory.writebyte(addr_world, (target_world - 1));
@@ -264,8 +272,6 @@ function hook_set_area()
         memory.writebyte(addr_area, (target_area - 1));
     end;
 end;
-memory.registerwrite(addr_world, hook_set_world);
-memory.registerwrite(addr_level, hook_set_level);
 memory.registerwrite(addr_area, hook_set_area);
 
 
