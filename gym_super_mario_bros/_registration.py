@@ -51,13 +51,12 @@ _register_mario_env('SuperMarioBros2NoFrameskip-v0', lost_levels=True, frame_ski
 _register_mario_env('SuperMarioBros2NoFrameskip-v1', lost_levels=True, frame_skip=1, rom_mode='downsample')
 
 
-# different ROM modes for the game
-rom_modes = [None, 'downsample', 'pixel', 'rectangle']
+# a template for making individual level environments
 id_template = 'SuperMarioBros{}-{}-{}-v{}'
-# iterate over all the worlds (1-8) and levels (1-4)
-for world in range(1, 9):
-    for level in range(1, 5):
-        for version, rom_mode in enumerate(rom_modes):
+# iterate over all the rom modes, worlds (1-8), and levels (1-4)
+for version, rom_mode in enumerate([None, 'downsample', 'pixel', 'rectangle']):
+    for world in range(1, 9):
+        for level in range(1, 5):
             # setup the frame-skipping environment
             env_id = id_template.format('', world, level, version)
             _register_mario_env(env_id,
