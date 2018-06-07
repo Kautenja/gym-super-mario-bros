@@ -111,6 +111,30 @@ will lock the Python process until the emulator is ready for the next action.
 [2-v0]: https://user-images.githubusercontent.com/2184469/40948822-3d3b8412-6830-11e8-860b-af3802f5373f.png
 [2-v1]: https://user-images.githubusercontent.com/2184469/40948821-3d2d61a2-6830-11e8-8789-a92e750aa9a8.png
 
+## Individual Levels
+
+These environments allow a single attempt (life) to make it through a single
+level of the game.
+
+Use the template
+
+    SuperMarioBros-<world>-<level>-v<version>`
+
+where:
+
+-   `<world>` is a number in {1, 2, 3, 4, 5, 6, 7, 8} indicating the world
+-   `<level>` is a number in {1, 2, 3, 4} indicating the level within a world
+-   `<version>` is a number in {0, 1, 2, 3} specifying the ROM mode to use
+    - 0: standard ROM
+    - 1: downsampled ROM
+    - 2: pixel ROM
+    - 3: rectangle ROM
+-   `NoFrameskip` can be added before the first hyphen to disable frame skip
+
+For example, to play 4-2 on the downsampled ROM, you would use the environment
+id `SuperMarioBros-4-2-v1`. To disable frame skip you would use
+`SuperMarioBrosNoFrameskip-4-2-v1`.
+
 # Citation
 
 Please cite `gym-super-mario-bros` if you use it in your research.
