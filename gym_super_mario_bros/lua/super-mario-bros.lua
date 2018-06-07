@@ -228,6 +228,51 @@ end
 
 
 
+
+addr_world = 0x075f;
+addr_level = 0x075c;
+addr_area = 0x0760;
+
+target_world = 3 + 1 -- math.floor(level / 4) + 1
+target_level = 1 + 1 -- (level % 4) + 1
+target_area = target_level
+
+if (target_world == 1) or (target_world == 2) or (target_world == 4) or (target_world == 7) then
+    if (target_level >= 2) then
+        target_area = target_area + 1;
+    end;
+end;
+
+function hook_set_world()
+    if (get_world_number() ~= target_world) then
+        memory.writebyte(addr_world, (target_world - 1));
+        memory.writebyte(addr_level, (target_level - 1));
+        memory.writebyte(addr_area, (target_area - 1));
+    end;
+end;
+function hook_set_level()
+    if (get_level_number() ~= target_level) then
+        memory.writebyte(addr_world, (target_world - 1));
+        memory.writebyte(addr_level, (target_level - 1));
+        memory.writebyte(addr_area, (target_area - 1));
+    end;
+end;
+function hook_set_area()
+    if (get_area_number() ~= target_area) then
+        memory.writebyte(addr_world, (target_world - 1));
+        memory.writebyte(addr_level, (target_level - 1));
+        memory.writebyte(addr_area, (target_area - 1));
+    end;
+end;
+memory.registerwrite(addr_world, hook_set_world);
+memory.registerwrite(addr_level, hook_set_level);
+memory.registerwrite(addr_area, hook_set_area);
+
+
+
+
+
+
 -- MARK: Emulator
 -- The following methods provide an interface to the machinery of the emulator
 -- for storing resetting the game, storing screens, stepping forward, etc.
