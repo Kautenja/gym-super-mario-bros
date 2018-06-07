@@ -8,8 +8,8 @@ class SuperMarioBrosEnv(NESEnv):
 
     def __init__(self,
         rom_mode: str=None,
-        target_world: int=1,
-        target_level: int=1,
+        target_world: int=None,
+        target_level: int=None,
         lost_levels: bool=False,
         **kwargs
     ) -> None:
