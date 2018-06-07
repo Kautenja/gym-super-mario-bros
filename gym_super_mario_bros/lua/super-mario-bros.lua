@@ -251,7 +251,7 @@ if target_world ~= nil and target_level ~= nil then
         elseif (target_world >= 5) then
             -- TODO: figure out why all worlds greater than 5 seem to fail.
             -- >=6 causes a change for
-            -- target_area = 6;
+            target_area = target_area + 1;
         end;
     else
         -- setup the target area depending on the target world and level
