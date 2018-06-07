@@ -191,6 +191,11 @@ end
 -- Write the value to memory indicating that Mario has died to skip a dying
 -- animation.
 function kill_mario()
+    -- if there is a specific level specified, ignore the notion of lives
+    if target_world ~= nil and target_level ~= nil then
+        memory.writebyte(0x075a, 0)
+    end
+    -- force Mario's state to dead
     memory.writebyte(0x000e, 0x06)
 end
 
