@@ -12,20 +12,6 @@ def create_argparser() -> argparse.ArgumentParser:
     parser.add_argument('--env', '-e',
         type=str,
         default='SuperMarioBros-v0',
-        choices=[
-            'SuperMarioBros-v0',
-            'SuperMarioBros-v1',
-            'SuperMarioBros-v2',
-            'SuperMarioBros-v3',
-            'SuperMarioBrosNoFrameskip-v0',
-            'SuperMarioBrosNoFrameskip-v1',
-            'SuperMarioBrosNoFrameskip-v2',
-            'SuperMarioBrosNoFrameskip-v3',
-            'SuperMarioBros2-v0',
-            'SuperMarioBros2-v1',
-            'SuperMarioBros2NoFrameskip-v0',
-            'SuperMarioBros2NoFrameskip-v1',
-        ],
         help='The name of the environment to play.'
     )
     # add the argument for the mode of execution as either human or random

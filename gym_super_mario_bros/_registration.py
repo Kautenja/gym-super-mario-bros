@@ -16,6 +16,7 @@ def _register_mario_env(id: str, **kwargs: dict) -> None:
         None
 
     """
+    # register the environment
     gym.envs.registration.register(
         id=id,
         entry_point='gym_super_mario_bros:SuperMarioBrosEnv',
@@ -48,6 +49,30 @@ _register_mario_env('SuperMarioBros2-v1', lost_levels=True, frame_skip=4, rom_mo
 # Super Mario Bros. 2 (Lost Levels) with no frame skip
 _register_mario_env('SuperMarioBros2NoFrameskip-v0', lost_levels=True, frame_skip=1)
 _register_mario_env('SuperMarioBros2NoFrameskip-v1', lost_levels=True, frame_skip=1, rom_mode='downsample')
+
+
+# a template for making individual level environments
+id_template = 'SuperMarioBros{}-{}-{}-v{}'
+# iterate over all the rom modes, worlds (1-8), and levels (1-4)
+for version, rom_mode in enumerate([None, 'downsample', 'pixel', 'rectangle']):
+    for world in range(1, 9):
+        for level in range(1, 5):
+            # setup the frame-skipping environment
+            env_id = id_template.format('', world, level, version)
+            _register_mario_env(env_id,
+                frame_skip=4,
+                rom_mode=rom_mode,
+                target_world=world,
+                target_level=level
+            )
+            # setup the no frame-skipping environment
+            env_id = id_template.format('NoFrameskip', world, level, version)
+            _register_mario_env(env_id,
+                frame_skip=1,
+                rom_mode=rom_mode,
+                target_world=world,
+                target_level=level
+            )
 
 
 def make(environment: str) -> gym.Env:
