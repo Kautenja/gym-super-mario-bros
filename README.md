@@ -118,7 +118,7 @@ level of the game.
 
 Use the template
 
-    SuperMarioBros-<world>-<level>-v<version>`
+    SuperMarioBros-<world>-<level>-v<version>
 
 where:
 
