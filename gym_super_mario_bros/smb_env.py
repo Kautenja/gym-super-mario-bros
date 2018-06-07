@@ -8,6 +8,8 @@ class SuperMarioBrosEnv(NESEnv):
 
     def __init__(self,
         rom_mode: str=None,
+        target_world: int=1,
+        target_level: int=1,
         lost_levels: bool=False,
         **kwargs
     ) -> None:
@@ -75,6 +77,10 @@ class SuperMarioBrosEnv(NESEnv):
             'AB'   # A + B
         ]
         self.action_space = spaces.Discrete(len(self.actions))
+        # setup the environment variables for the target levels
+        os.environ['lost_levels'] = str(int(lost_levels))
+        os.environ['target_world'] = str(target_world)
+        os.environ['target_level'] = str(target_level)
 
     def get_keys_to_action(self) -> dict:
         """Return the dictionary of keyboard keys to actions."""

@@ -229,52 +229,69 @@ end
 
 
 
+
 -- memory addresses for the world, level, and area
 addr_world = 0x075f;
 addr_level = 0x075c;
 addr_area = 0x0760;
--- setup the target world, level, and area
-target_world = 8
-target_level = 4
+-- get the target world and level from environment variables
+target_world = tonumber(os.getenv("target_world"))
+target_level = tonumber(os.getenv("target_level"))
 target_area = target_level
--- setup the target area depending on the target world and level
-if (target_world == 1) or (target_world == 2) or (target_world == 4) or (target_world == 7) then
-    if (target_level >= 2) then
-        target_area = target_area + 1;
+lost_levels = tonumber(os.getenv("lost_levels"))
+-- setup the target world and level if specified
+if target_world ~= nil and target_level ~= nil then
+    -- setup the target area depending on whether this is SMB 1 or 2
+    if lost_levels == 1 then
+        -- setup the target area depending on the target world and level
+        if (target_world == 1) or (target_world == 3) then
+            if (target_level >= 2) then
+                target_area = target_area + 1;
+            end;
+        elseif (target_world >= 5) then
+            -- TODO: figure out why all worlds greater than 5 seem to fail.
+            -- >=6 causes a change for
+            -- target_area = 6;
+        end;
+    else
+        -- setup the target area depending on the target world and level
+        if (target_world == 1) or (target_world == 2) or (target_world == 4) or (target_world == 7) then
+            if (target_level >= 2) then
+                target_area = target_area + 1;
+            end;
+        end;
     end;
-end;
-
--- Respond to the memory address for the world being set
-function hook_set_world()
-    if (get_world_number() ~= target_world) then
-        memory.writebyte(addr_world, (target_world - 1));
-        memory.writebyte(addr_level, (target_level - 1));
-        memory.writebyte(addr_area, (target_area - 1));
+    -- Respond to the memory address for the world being set
+    function hook_set_world()
+        if (get_world_number() ~= target_world) then
+            memory.writebyte(addr_world, (target_world - 1));
+            memory.writebyte(addr_level, (target_level - 1));
+            memory.writebyte(addr_area, (target_area - 1));
+        end;
     end;
-end;
-memory.registerwrite(addr_world, hook_set_world);
+    memory.registerwrite(addr_world, hook_set_world);
 
--- Respond to the memory address for the level being set
-function hook_set_level()
-    if (get_level_number() ~= target_level) then
-        memory.writebyte(addr_world, (target_world - 1));
-        memory.writebyte(addr_level, (target_level - 1));
-        memory.writebyte(addr_area, (target_area - 1));
+    -- Respond to the memory address for the level being set
+    function hook_set_level()
+        if (get_level_number() ~= target_level) then
+            memory.writebyte(addr_world, (target_world - 1));
+            memory.writebyte(addr_level, (target_level - 1));
+            memory.writebyte(addr_area, (target_area - 1));
+        end;
     end;
-end;
-memory.registerwrite(addr_level, hook_set_level);
+    memory.registerwrite(addr_level, hook_set_level);
 
--- Respond to the memory address for the area being set
-function hook_set_area()
-    if (get_area_number() ~= target_area) then
-        memory.writebyte(addr_world, (target_world - 1));
-        memory.writebyte(addr_level, (target_level - 1));
-        memory.writebyte(addr_area, (target_area - 1));
+    -- Respond to the memory address for the area being set
+    function hook_set_area()
+        if (get_area_number() ~= target_area) then
+            memory.writebyte(addr_world, (target_world - 1));
+            memory.writebyte(addr_level, (target_level - 1));
+            memory.writebyte(addr_area, (target_area - 1));
+        end;
     end;
+    memory.registerwrite(addr_area, hook_set_area);
+
 end;
-memory.registerwrite(addr_area, hook_set_area);
-
-
 
 
 
