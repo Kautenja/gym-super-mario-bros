@@ -3,7 +3,6 @@ import gym
 from .clip_reward_env import ClipRewardEnv
 from .downsample_env import DownsampleEnv
 from .frame_stack_env import FrameStackEnv
-from .max_frameskip_env import MaxFrameskipEnv
 from .monitor import Monitor
 from .penalize_death_env import PenalizeDeathEnv
 from .reward_cache_env import RewardCacheEnv
@@ -11,7 +10,6 @@ from .reward_cache_env import RewardCacheEnv
 
 def wrap(env: gym.Env,
     image_size: tuple=(84, 84),
-    skip_frames: int=None,
     death_penalty: int=-100,
     clip_rewards: bool=False,
     agent_history_length: int=4
@@ -22,7 +20,6 @@ def wrap(env: gym.Env,
     Args:
         env: the environment to wrap
         image_size: the size to down-sample images to
-        skip_frames: the number of frames to hold each action for
         death_penatly: the penalty for losing a life in a game
         clip_rewards: whether to clip rewards in {-1, 0, +1}
         agent_history_length: the size of the frame buffer for the agent
@@ -33,9 +30,6 @@ def wrap(env: gym.Env,
     """
     # wrap the environment with a reward cacher
     env = RewardCacheEnv(env)
-    # apply the frame skip feature if enabled
-    if skip_frames is not None:
-        env = MaxFrameskipEnv(env, skip=skip_frames)
     # apply a down-sampler for the given game
     env = DownsampleEnv(env, image_size)
     # apply the death penalty feature if enabled
@@ -56,7 +50,6 @@ __all__ = [
     ClipRewardEnv.__name__,
     DownsampleEnv.__name__,
     FrameStackEnv.__name__,
-    MaxFrameskipEnv.__name__,
     Monitor.__name__,
     PenalizeDeathEnv.__name__,
     RewardCacheEnv.__name__,
