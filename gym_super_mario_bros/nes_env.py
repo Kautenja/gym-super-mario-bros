@@ -5,7 +5,6 @@ import struct
 from distutils import spawn
 import numpy as np
 import gym
-from gym.envs.classic_control.rendering import SimpleImageViewer
 from ._error import DependencyNotFoundError
 from ._palette import PALETTE
 
@@ -268,6 +267,7 @@ class NESEnv(gym.Env, gym.utils.EzPickle):
         """
         if mode == 'human':
             if self.viewer is None:
+                from gym.envs.classic_control.rendering import SimpleImageViewer
                 self.viewer = SimpleImageViewer()
             self.viewer.imshow(self.screen)
         elif mode == 'rgb_array':
