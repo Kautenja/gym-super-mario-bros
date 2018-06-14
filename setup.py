@@ -10,7 +10,7 @@ def README() -> str:
 setup(
     name='gym_super_mario_bros',
     setup_requires=[
-        'setuptools-git-version'
+        'very-good-setuptools-git-version'
     ],
     version_format='{tag}',
     description='Super Mario Bros. for OpenAI Gym',
