@@ -1,3 +1,4 @@
+"""An OpenAI Gym environment for Super Mario Bros. and Lost Levels."""
 import os
 from gym import spaces
 from .nes_env import NESEnv
