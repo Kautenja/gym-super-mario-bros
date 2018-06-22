@@ -41,7 +41,6 @@ setup(
     },
     install_requires=[
         'gym>=0.10.5',
-        'Pillow>=5.0.0',
         'numpy>=1.14.2',
         'opencv-python>=3.4.0.12',
         'pygame>=1.9.3',
