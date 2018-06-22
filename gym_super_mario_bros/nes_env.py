@@ -296,4 +296,13 @@ class NESEnv(gym.Env, gym.utils.EzPickle):
         return [self.curr_seed]
 
 
-__all__ = [NESEnv.__name__]
+def headless() -> None:
+    """Set up the package for headless usage."""
+    import os
+    os.environ['SDL_VIDEODRIVER'] = 'dummy'
+
+
+__all__ = [
+    headless.__name__,
+    NESEnv.__name__
+]

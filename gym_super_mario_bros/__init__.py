@@ -1,13 +1,8 @@
 """Registration code of Gym environments in this package."""
-from .smb_env import SuperMarioBrosEnv
 from ._registration import make
+from .nes_env import headless
+from .smb_env import SuperMarioBrosEnv
 from .wrappers import wrap
-
-
-def headless() -> None:
-    """Set up the package for headless usage."""
-    import os
-    os.environ['SDL_VIDEODRIVER'] = 'dummy'
 
 
 # define the outward facing API of this package
