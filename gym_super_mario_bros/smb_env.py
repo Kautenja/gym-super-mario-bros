@@ -23,6 +23,12 @@ class SuperMarioBrosEnv(NESEnv):
                 - 'downsample': down-sampled ROM with static artifacts removed
                 - 'pixel': a simpler pixelated version of graphics
                 - 'rectangle': an even simpler rectangular version of graphics
+            target_world: the world to target in the ROM
+            target_level: the level to target in the given world
+            lost_levels: whether to load the ROM with lost levels. False will
+                load the original Super Mario Bros. game. True will load the
+                Japanese Super Mario Bros. 2 (commonly known as Lost Levels)
+            kwargs: additional keyword arguments for super class constructor
 
         Returns:
             None
@@ -62,8 +68,6 @@ class SuperMarioBrosEnv(NESEnv):
         # setup the discrete action space for the agent
         self.actions = [
             '',    # NOP
-            'U',   # Up
-            'D',   # Down
             'L',   # Left
             'R',   # Right
             'LA',  # Left + A
@@ -72,9 +76,6 @@ class SuperMarioBrosEnv(NESEnv):
             'RA',  # Right + A
             'RB',  # Right + B
             'RAB', # Right + A + B
-            'A',   # A
-            'B',   # B
-            'AB'   # A + B
         ]
         self.action_space = spaces.Discrete(len(self.actions))
         # setup the environment variables for the target levels
@@ -91,23 +92,22 @@ class SuperMarioBrosEnv(NESEnv):
         right = ord('d')
         A =     ord('o')
         B =     ord('p')
-        # A mapping of pressed key combinations to discrete actions in action space
-        keys_to_action = {
-            (): 0,
-            (up, ): 1,
-            (down, ): 2,
-            (left, ): 3,
-            (right, ): 4,
-            tuple(sorted((left, A, ))): 5,
-            tuple(sorted((left, B, ))): 6,
-            tuple(sorted((left, A, B, ))): 7,
-            tuple(sorted((right, A, ))): 8,
-            tuple(sorted((right, B, ))): 9,
-            tuple(sorted((right, A, B, ))): 10,
-            (A, ): 11,
-            (B, ): 12,
-            tuple(sorted((A, B))): 13
-        }
+        # a list of keyboard keys with indexes matching the discrete actions
+        # in self.actions
+        keys = [
+            (),
+            (left, ),
+            (right, ),
+            tuple(sorted((left, A, ))),
+            tuple(sorted((left, B, ))),
+            tuple(sorted((left, A, B, ))),
+            tuple(sorted((right, A, ))),
+            tuple(sorted((right, B, ))),
+            tuple(sorted((right, A, B, ))),
+        ]
+        # A mapping of pressed key combinations to discrete actions in action
+        # space
+        keys_to_action = {key: index for index, key in enumerate(keys)}
 
         return keys_to_action
 
