@@ -1,4 +1,4 @@
-"""A simple environment for interacting with the NES emulator."""
+"""A simple environment for interacting with the FCEUX NES emulator."""
 import os
 import subprocess
 import struct
