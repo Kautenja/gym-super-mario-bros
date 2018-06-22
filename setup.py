@@ -9,6 +9,7 @@ def README() -> str:
 
 setup(
     name='gym_super_mario_bros',
+    python_requires='>=3.5',
     setup_requires=[
         'very-good-setuptools-git-version'
     ],
