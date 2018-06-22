@@ -19,29 +19,33 @@ setup(
     keywords='OpenAI-Gym NES Super-Mario-Bros Reinforcement-Learning-Environment',
     classifiers=[
         'License :: OSI Approved :: MIT License',
-        'Development Status :: 2 - Pre-Alpha',
+        'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
         'Intended Audience :: Science/Research',
         'Operating System :: MacOS :: MacOS X',
         'Operating System :: POSIX :: Linux',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
         'Topic :: Games/Entertainment :: Side-Scrolling/Arcade Games',
         'Topic :: Scientific/Engineering :: Artificial Intelligence',
+        'Topic :: Software Development :: Libraries :: Python Modules',
     ],
     url='https://github.com/Kautenja/gym-super-mario-bros',
     author='Christian Kauten',
     author_email='kautencreations@gmail.com',
     license='MIT',
-    packages=find_packages() ,
+    packages=find_packages(),
     package_data = {
         'gym_super_mario_bros': ['lua/*.lua', 'roms/*.nes']
     },
-    zip_safe=False,
     install_requires=[
         'gym>=0.10.5',
         'Pillow>=5.0.0',
-        'numpy>=1.14.2'
+        'numpy>=1.14.2',
+        'opencv-python>=3.4.0.12',
+        'pygame>=1.9.3',
+        'tqdm>=4.19.5',
     ],
     entry_points={
         'console_scripts': [
