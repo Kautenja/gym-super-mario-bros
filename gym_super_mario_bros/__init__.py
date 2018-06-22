@@ -4,9 +4,16 @@ from ._registration import make
 from .wrappers import wrap
 
 
-# define the outward facing API of this module (none, gym provides the API)
+def headless() -> None:
+    """Set up the package for headless usage."""
+    import os
+    os.environ['SDL_VIDEODRIVER'] = 'dummy'
+
+
+# define the outward facing API of this package
 __all__ = [
-    SuperMarioBrosEnv.__name__,
+    headless.__name__,
     make.__name__,
+    SuperMarioBrosEnv.__name__,
     wrap.__name__,
 ]
