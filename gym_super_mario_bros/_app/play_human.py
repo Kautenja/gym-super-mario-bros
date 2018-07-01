@@ -4,6 +4,7 @@ from typing import Callable
 import gym
 import pygame
 import numpy as np
+from .visualize.realtime_plot import RealtimePlot
 
 
 def display_arr(
@@ -94,6 +95,7 @@ def play(env: gym.Env,
     # disable the SDL video driver so FCEUX wont open a window
     os.environ['SDL_VIDEODRIVER'] = 'dummy'
     clock = pygame.time.Clock()
+    plot = RealtimePlot()
     # start the main game loop
     while running:
         if env_done:
@@ -103,6 +105,7 @@ def play(env: gym.Env,
             action = keys_to_action.get(tuple(sorted(pressed_keys)), nop_)
             prev_obs = obs
             obs, rew, env_done, info = env.step(action)
+            plot(rew)
             if callback is not None:
                 callback(prev_obs, obs, action, rew, env_done, info)
         if obs is not None:
