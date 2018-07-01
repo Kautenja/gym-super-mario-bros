@@ -1,23 +1,12 @@
 """A simple environment for interacting with the FCEUX NES emulator."""
-import os
-import threading
-import subprocess
-import struct
-from distutils import spawn
-import numpy as np
-import gym
+import os, threading, subprocess, struct, distutils
+import numpy as np, gym
 from ._error import DependencyNotFoundError
 from ._palette import PALETTE
 
 
-# A separator used to split pieces of string commands sent to the emulator
-SEP = '|'
-
-
-# The width of images rendered by the NES
-SCREEN_WIDTH = 256
-# The height of images rendered by the NES
-SCREEN_HEIGHT = 224
+# the shape of the NES screen as (height X width X channels)
+SCREEN_SHAPE = (224, 256, 3)
 
 
 class NESEnv(gym.Env, gym.utils.EzPickle):
@@ -25,6 +14,31 @@ class NESEnv(gym.Env, gym.utils.EzPickle):
 
     # meta-data about the environment
     metadata = {'render.modes': ['human', 'rgb_array']}
+
+    # the observation space for the environment is static across all instances
+    observation_space = gym.spaces.Box(
+        low=0,
+        high=255,
+        shape=SCREEN_SHAPE,
+        dtype=np.uint8
+    )
+
+    # the list of discrete actions
+    actions = [
+        '',    # NOP
+        'U',   # Up
+        'D',   # Down
+        'L',   # Left
+        'R',   # Right
+        'UR',  # Up + Right
+        'DR',  # Down + Right
+        'URA', # Up + Right + A
+        'DRB', # Down + Right + B
+        'A',   # A
+        'B',   # B
+        'RB',  # Right + B
+        'RA'   # Right + A
+    ]
 
     def __init__(self,
         max_episode_steps: int,
@@ -51,7 +65,7 @@ class NESEnv(gym.Env, gym.utils.EzPickle):
 
         """
         # validate that fceux can be found in the path
-        if spawn.find_executable('fceux', os.environ['PATH']) is None:
+        if distutils.spawn.find_executable('fceux', os.environ['PATH']) is None:
             msg = 'fceux not found in $PATH. is fceux installed?'
             raise DependencyNotFoundError(msg)
         gym.utils.EzPickle.__init__(self)
@@ -63,6 +77,12 @@ class NESEnv(gym.Env, gym.utils.EzPickle):
         self.metadata['video.frames_per_second'] = 60 / self.frame_skip
         self.viewer = None
         self.step_number = 0
+
+        # variables for the ROM and FCEUX interface files
+        self.rom_file_path = None
+        self.lua_interface_path = None
+        self.emulator_started = False
+
         # get the PID to differentiate between different Python processes
         pid = os.getpid()
         # get the TID to differentiate between internal process threads
@@ -74,34 +94,54 @@ class NESEnv(gym.Env, gym.utils.EzPickle):
         # these store the pipe for communicating with the environment
         self.pipe_in = None
         self.pipe_out = None
-        # variables for the ROM and FCEUX interface files
-        self.rom_file_path = None
-        self.lua_interface_path = None
-        self.emulator_started = False
+
         # Setup the observation space
-        self.observation_space = gym.spaces.Box(
-            low=0,
-            high=255,
-            shape=(SCREEN_HEIGHT, SCREEN_WIDTH, 3),
-            dtype=np.uint8
-        )
         self.screen = self.observation_space.sample()
         # Setup the action space
-        self.actions = [
-            'U',   # Up
-            'D',   # Down
-            'L',   # Left
-            'R',   # Right
-            'UR',  # Up + Right
-            'DR',  # Down + Right
-            'URA', # Up + Right + A
-            'DRB', # Down + Right + B
-            'A',   # A
-            'B',   # B
-            'RB',  # Right + B
-            'RA'   # Right + A
-        ]
         self.action_space = gym.spaces.Discrete(len(self.actions))
+
+    # MARK: Pipes
+
+    def _open_pipes(self) -> None:
+        """Open the communication path between self and the emulator"""
+        # Open the inbound pipe if it doesn't exist yet
+        if not os.path.exists(self._pipe_in_name):
+            os.mkfifo(self._pipe_in_name)
+        # Open the outbound pipe if it doesn't exist yet
+        if not os.path.exists(self._pipe_out_name):
+            os.mkfifo(self._pipe_out_name)
+
+    def _write_to_pipe(self, message: str) -> None:
+        """
+        Write a message to the outbound pip (emulator).
+
+        Args:
+            message: the message to write to the pipe
+
+        Returns:
+            None
+
+        """
+        # write the message to the pipe and flush it
+        self.pipe_out.write(message + '\n')
+        self.pipe_out.flush()
+
+    def _read_from_pipe(self) -> tuple:
+        """
+        Read a message from the pipe.
+
+        Returns:
+            a tuple of
+            -   the opcode
+            -   the data with the message (as another tuple)
+
+        """
+        # Read a message from the pipe and separate along the delimiter 0xff
+        message = self.pipe_in.readline().split(b'\xFF')
+        # decode the opcde
+        opcode = message[0].decode('ascii')
+        # return the opcode and data tuple
+        return opcode, message[1:]
 
     # MARK: FCEUX
 
@@ -143,7 +183,7 @@ class NESEnv(gym.Env, gym.utils.EzPickle):
 
     def _joypad(self, button: str) -> None:
         """
-        Pass a joy-pad command to the emulator
+        Pass a joy-pad command to the emulator.
 
         Args:
             button: the button (or combination) to press on the controller
@@ -152,7 +192,7 @@ class NESEnv(gym.Env, gym.utils.EzPickle):
             None
 
         """
-        self._write_to_pipe('joypad' + SEP + button)
+        self._write_to_pipe('joypad|{}'.format(button))
 
     def _get_state(self) -> tuple:
         """
@@ -181,43 +221,9 @@ class NESEnv(gym.Env, gym.utils.EzPickle):
         # use the palette to convert the p values to RGB
         rgb = np.array(PALETTE[pvs-20], dtype=np.uint8)
         # reshape the screen and assign it to self
-        screen = rgb.reshape((SCREEN_HEIGHT, SCREEN_WIDTH, 3))
+        screen = rgb.reshape(SCREEN_SHAPE)
 
         return screen, reward, done
-
-    # MARK: Pipes
-
-    def _open_pipes(self) -> None:
-        """Open the communication path between self and the emulator"""
-        # Open the inbound pipe if it doesn't exist yet
-        if not os.path.exists(self._pipe_in_name):
-            os.mkfifo(self._pipe_in_name)
-        # Open the outbound pipe if it doesn't exist yet
-        if not os.path.exists(self._pipe_out_name):
-            os.mkfifo(self._pipe_out_name)
-
-    def _write_to_pipe(self, message: str) -> None:
-        """Write a message to the outbound pip (emulator)."""
-        # write the message to the pipe and flush it
-        self.pipe_out.write(message + '\n')
-        self.pipe_out.flush()
-
-    def _read_from_pipe(self) -> tuple:
-        """
-        Read a message from the pipe.
-
-        Returns:
-            a tuple of
-            -   the opcode
-            -   the data with the message (as another tuple)
-
-        """
-        # Read a message from the pipe and separate along the delimiter 0xff
-        message = self.pipe_in.readline().split(b'\xFF')
-        # decode the opcde
-        opcode = message[0].decode('ascii')
-        # return the opcode and data tuple
-        return opcode, message[1:]
 
     # MARK: OpenAI Gym API
 
@@ -251,7 +257,7 @@ class NESEnv(gym.Env, gym.utils.EzPickle):
         if not self.emulator_started:
             self._start_emulator()
         # write the reset command to the emulator
-        self._write_to_pipe('reset' + SEP)
+        self._write_to_pipe('reset|')
         self.step_number = 0
         # get a state from the emulator. ignore the `reward` and `done` flag
         self.screen, _, _ = self._get_state()
@@ -290,20 +296,25 @@ class NESEnv(gym.Env, gym.utils.EzPickle):
         """
         Set the seed for this env's random number generator(s).
 
+        Args:
+            seed: the seed to set the RNG to
+
         Returns:
             A list of seeds used in this env's random number generators.
             there is only one "main" seed in this env
+
         """
         self.curr_seed = gym.utils.seeding.hash_seed(seed) % 256
         return [self.curr_seed]
 
 
 def headless() -> None:
-    """Set up the package for headless usage."""
+    """Set up the NES environment for headless usage."""
     import os
     os.environ['SDL_VIDEODRIVER'] = 'dummy'
 
 
+# explicitly define the outward facing API of this module
 __all__ = [
     headless.__name__,
     NESEnv.__name__

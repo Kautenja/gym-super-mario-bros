@@ -1,11 +1,23 @@
 """An OpenAI Gym environment for Super Mario Bros. and Lost Levels."""
 import os
-from gym import spaces
 from .nes_env import NESEnv
 
 
 class SuperMarioBrosEnv(NESEnv):
     """An environment for playing Super Mario Bros with OpenAI Gym."""
+
+    # the list of discrete actions
+    actions = [
+        '',    # NOP
+        'L',   # Left
+        'R',   # Right
+        'LA',  # Left + A
+        'LB',  # Left + B
+        'LAB', # Left + A + B
+        'RA',  # Right + A
+        'RB',  # Right + B
+        'RAB', # Right + A + B
+    ]
 
     def __init__(self,
         rom_mode: str=None,
@@ -66,19 +78,6 @@ class SuperMarioBrosEnv(NESEnv):
                 raise ValueError('invalid rom_mode: {}'.format(repr(rom_mode)))
         # convert the path to an absolute path
         self.rom_file_path = os.path.join(package_directory, rom_name)
-        # setup the discrete action space for the agent
-        self.actions = [
-            '',    # NOP
-            'L',   # Left
-            'R',   # Right
-            'LA',  # Left + A
-            'LB',  # Left + B
-            'LAB', # Left + A + B
-            'RA',  # Right + A
-            'RB',  # Right + B
-            'RAB', # Right + A + B
-        ]
-        self.action_space = spaces.Discrete(len(self.actions))
         # setup the environment variables for the target levels
         os.environ['lost_levels'] = str(int(lost_levels))
         os.environ['target_world'] = str(target_world)
@@ -113,4 +112,5 @@ class SuperMarioBrosEnv(NESEnv):
         return keys_to_action
 
 
+# explicitly define the outward facing API of this module
 __all__ = [SuperMarioBrosEnv.__name__]
