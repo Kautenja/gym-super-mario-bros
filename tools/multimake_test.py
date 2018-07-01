@@ -1,5 +1,7 @@
-import gym_super_mario_bros
+"""Test that multiple calls to make from the same process works."""
 import multiprocessing as mp
+import base
+import gym_super_mario_bros
 
 
 class Env(object):
