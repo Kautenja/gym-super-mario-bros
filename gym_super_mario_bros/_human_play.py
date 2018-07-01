@@ -1,16 +1,42 @@
 """A method to play gym environments using human IO inputs."""
 import os
+from typing import Callable
 import gym
 import pygame
-from typing import Callable
+import numpy as np
 
 
-def display_arr(screen, arr, video_size, transpose):
+def display_arr(
+    screen: pygame.Surface,
+    arr: np.ndarray,
+    video_size: tuple,
+    transpose: bool
+) -> None:
+    """
+    Display an image to the pygame screen.
+
+    Args:
+        screen: the pygame surface to write frames to
+        arr: the numpy array representing a single frame of gameplay
+        video_size: the size to render the frame as
+        transpose: whether to transpose the frame before displaying
+
+    Returns:
+        None
+
+    """
+    # normalize the pixel values within [0, 255]
     arr_min, arr_max = arr.min(), arr.max()
     arr = 255.0 * (arr - arr_min) / (arr_max - arr_min)
-    pyg_img = pygame.surfarray.make_surface(arr.swapaxes(0, 1) if transpose else arr)
+    # take the transpose if necessary
+    if transpose:
+        pyg_img = pygame.surfarray.make_surface(arr.swapaxes(0, 1))
+    else:
+        pyg_img = arr
+    # resize the image according to given image size
     pyg_img = pygame.transform.scale(pyg_img, video_size)
-    screen.blit(pyg_img, (0,0))
+    # blit the image to the surface
+    screen.blit(pyg_img, (0, 0))
 
 
 def play(env: gym.Env,
@@ -22,33 +48,30 @@ def play(env: gym.Env,
     """Play the game using the keyboard as a human.
 
     Args:
-        env: gym.Env
-            Environment to use for playing.
-        transpose: bool
-            If True the output of observation is transposed.
-            Defaults to true.
-        fps: int
-            Maximum number of steps of the environment to execute every second.
-            Defaults to 30.
-        callback: lambda or None
-            Callback if a callback is provided it will be executed after
-            every step. It takes the following input:
-                obs_t: observation before performing action
-                obs_tp1: observation after performing action
-                action: action that was executed
-                rew: reward that was received
-                done: whether the environemnt is done or not
-                info: debug info
+        env: the environment to use for playing
+        transpose: whether to transpose frame before viewing them
+        fps: Max number of steps of the environment to execute every second
+        callback: a callback to execute after every step.
+            It takes the following inputs:
+            - state: observation before performing action
+            - next_state: observation after performing action
+            - action: action that fired
+            - reward: reward from the action taken
+            - done: a flag to determine if the episode is over
+            - info: extra information from the environment
         nop_: the object to use as a null op action for the environment
 
     Returns:
         None
 
     """
-    # type check the observation space
+    # ensure the observation space is a box of pixels
+    assert isinstance(env.observation_space, gym.spaces.box.Box)
+    # ensure the observation space is either B&W pixels or RGB Pixels
     obs_s = env.observation_space
-    assert type(obs_s) == gym.spaces.box.Box
-    assert len(obs_s.shape) == 2 or (len(obs_s.shape) == 3 and obs_s.shape[2] in [1,3])
+    is_bw = len(obs_s.shape) == 2
+    is_rgb = len(obs_s.shape) == 3 and obs_s.shape[2] in [1, 3]
+    assert is_bw or is_rgb
     # get the mapping of keyboard keys to actions in the environment
     if hasattr(env, 'get_keys_to_action'):
         keys_to_action = env.get_keys_to_action()
@@ -56,13 +79,12 @@ def play(env: gym.Env,
         keys_to_action = env.unwrapped.get_keys_to_action()
     else:
         raise ValueError('env has no get_keys_to_action method')
-    relevant_keys = set(sum(map(list, keys_to_action.keys()),[]))
-    # transpose the video is specified
+    relevant_keys = set(sum(map(list, keys_to_action.keys()), []))
+    # determine the size of the video in pixels
+    video_size = env.observation_space.shape[0], env.observation_space.shape[1]
     if transpose:
-        video_size = env.observation_space.shape[1], env.observation_space.shape[0]
-    else:
-        video_size = env.observation_space.shape[0], env.observation_space.shape[1]
-
+        video_size = tuple(reversed(video_size))
+    # generate variables to determine the running state of the game
     pressed_keys = []
     running = True
     env_done = True
@@ -88,7 +110,7 @@ def play(env: gym.Env,
                 obs = obs[:, :, None]
             if obs.shape[2] == 1:
                 obs = obs.repeat(3, axis=2)
-            display_arr(screen, obs, transpose=transpose, video_size=video_size)
+            display_arr(screen, obs, video_size, transpose)
 
         # process pygame events
         for event in pygame.event.get():
