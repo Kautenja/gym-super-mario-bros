@@ -68,6 +68,8 @@ class NESEnv(gym.Env, gym.utils.EzPickle):
         if distutils.spawn.find_executable('fceux', os.environ['PATH']) is None:
             msg = 'fceux not found in $PATH. is fceux installed?'
             raise DependencyNotFoundError(msg)
+        if os.environ.get('HUMAN_PLAY', None) is None:
+            os.environ["SDL_VIDEODRIVER"] = "dummy"
         gym.utils.EzPickle.__init__(self)
         self.max_episode_steps = max_episode_steps
         self.frame_skip = frame_skip
