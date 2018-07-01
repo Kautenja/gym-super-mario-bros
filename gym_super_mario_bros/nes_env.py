@@ -1,5 +1,6 @@
 """A simple environment for interacting with the FCEUX NES emulator."""
 import os
+import threading
 import subprocess
 import struct
 from distutils import spawn
@@ -24,13 +25,6 @@ class NESEnv(gym.Env, gym.utils.EzPickle):
 
     # meta-data about the environment
     metadata = {'render.modes': ['human', 'rgb_array']}
-
-    # a pipe from the emulator (FCEUX) to client (self). use the PID of this
-    # python process to ensure the pipe is unique
-    _pipe_in_name = '/tmp/smb-pipe-in-{}'.format(os.getpid())
-    # a pipe from the client (self) to emulator (FCEUX). use the PID of this
-    # python process to ensure the pipe is unique
-    _pipe_out_name = '/tmp/smb-pipe-out-{}'.format(os.getpid())
 
     def __init__(self,
         max_episode_steps: int,
@@ -69,6 +63,14 @@ class NESEnv(gym.Env, gym.utils.EzPickle):
         self.metadata['video.frames_per_second'] = 60 / self.frame_skip
         self.viewer = None
         self.step_number = 0
+        # get the PID to differentiate between different Python processes
+        pid = os.getpid()
+        # get the TID to differentiate between internal process threads
+        tid = threading.current_thread().getName()
+        # a pipe from the emulator (FCEUX) to client (self).
+        self._pipe_in_name = '/tmp/smb-pipe-in-{}-{}'.format(pid, tid)
+        # a pipe from the client (self) to emulator (FCEUX).
+        self._pipe_out_name = '/tmp/smb-pipe-out-{}-{}'.format(pid, tid)
         # these store the pipe for communicating with the environment
         self.pipe_in = None
         self.pipe_out = None
