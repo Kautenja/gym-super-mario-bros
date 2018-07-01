@@ -1,8 +1,8 @@
 """Super Mario Bros for OpenAI Gym."""
 import os
 import argparse
-from ._registration import make
-from ._play import play_human, play_random
+from .._registration import make
+from .play import play_human, play_random
 
 
 def create_argparser() -> argparse.ArgumentParser:
