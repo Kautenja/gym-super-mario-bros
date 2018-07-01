@@ -1,5 +1,5 @@
 """A simple environment for interacting with the FCEUX NES emulator."""
-import os, threading, subprocess, struct, distutils
+import os, uuid, subprocess, struct, distutils
 import numpy as np, gym
 from ._error import DependencyNotFoundError
 from ._palette import PALETTE
@@ -83,14 +83,12 @@ class NESEnv(gym.Env, gym.utils.EzPickle):
         self.lua_interface_path = None
         self.emulator_started = False
 
-        # get the PID to differentiate between different Python processes
-        pid = os.getpid()
-        # get the TID to differentiate between internal process threads
-        tid = threading.current_thread().getName()
+        # get a unique ID based on host identity and current time
+        unique_id = uuid.uuid1()
         # a pipe from the emulator (FCEUX) to client (self).
-        self._pipe_in_name = '/tmp/smb-pipe-in-{}-{}'.format(pid, tid)
+        self._pipe_in_name = '/tmp/smb-pipe-in-{}'.format(unique_id)
         # a pipe from the client (self) to emulator (FCEUX).
-        self._pipe_out_name = '/tmp/smb-pipe-out-{}-{}'.format(pid, tid)
+        self._pipe_out_name = '/tmp/smb-pipe-out-{}'.format(unique_id)
         # these store the pipe for communicating with the environment
         self.pipe_in = None
         self.pipe_out = None
