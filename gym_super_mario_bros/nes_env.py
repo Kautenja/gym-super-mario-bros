@@ -264,7 +264,7 @@ class NESEnv(gym.Env, gym.utils.EzPickle):
 
         return self.screen
 
-    def render(self, mode: str='human'):
+    def render(self, mode: str='human') -> np.ndarray:
         """
         Render the current screen using the given mode.
 
@@ -279,18 +279,27 @@ class NESEnv(gym.Env, gym.utils.EzPickle):
         """
         if mode == 'human':
             if self.viewer is None:
-                from gym.envs.classic_control.rendering import SimpleImageViewer
-                self.viewer = SimpleImageViewer()
-            self.viewer.imshow(self.screen)
+                from ._image_viewer import ImageViewer
+                self.viewer = ImageViewer(
+                    caption=self.spec.id,
+                    height=SCREEN_SHAPE[0],
+                    width=SCREEN_SHAPE[1],
+                )
+            self.viewer.show(self.screen)
+            return None
         elif mode == 'rgb_array':
             return self.screen
 
     def close(self) -> None:
         """Close the emulator and shutdown FCEUX."""
+        # write the shutdown signal and close the pipes
         self._write_to_pipe('close')
         self.pipe_in.close()
         self.pipe_out.close()
         self.emulator_started = False
+        # if there is an image viewer open, delete it
+        if self.viewer is not None:
+            self.viewer.close()
 
     def seed(self, seed: int=None) -> list:
         """
