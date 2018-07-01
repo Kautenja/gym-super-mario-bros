@@ -5,7 +5,7 @@ import gym
 class PenalizeDeathEnv(gym.Wrapper):
     """a wrapper that penalizes deaths, without terminating episodes."""
 
-    def __init__(self, env, penalty: int=-1) -> None:
+    def __init__(self, env, penalty: int=-10) -> None:
         """
         Initialize a new death penalizing environment wrapper.
 
