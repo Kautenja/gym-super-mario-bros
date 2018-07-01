@@ -206,6 +206,12 @@ function get_x_reward()
     local next_x_pos = get_x_position()
     local _reward = next_x_pos - x_pos
     x_pos = next_x_pos
+    -- resolve an issue where after death the x position resets. The x delta
+    -- is typically has at most magnitude of 3, 5 is a safe bound
+    if _reward < -5 or _reward > 5 then
+        return 0
+    end
+
     return _reward
 end
 
@@ -215,13 +221,19 @@ function get_time_penalty()
     local next_time = get_time()
     local _reward = next_time - time
     time = next_time
+    -- time can only decrease, a positive reward results from a reset and
+    -- should default to 0 reward
+    if _reward > 0 then
+        return 0
+    end
+
     return _reward
 end
 
 -- Return a penalty for
 function get_death_penalty()
     if is_dying() or is_dead() then
-        return -100
+        return -10
     end
     return 0
 end
