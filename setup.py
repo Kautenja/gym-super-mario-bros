@@ -1,10 +1,11 @@
+"""The setup script for installing the package."""
 from setuptools import setup, find_packages
 
 
-def README() -> str:
-    """Return the contents of the README file for this project."""
-    with open('README.md') as README_file:
-        return README_file.read()
+def long_description() -> str:
+    """Return the contents of the read me file for this project."""
+    with open('README.md') as readme:
+        return readme.read()
 
 
 setup(
@@ -15,9 +16,15 @@ setup(
     ],
     version_format='{tag}',
     description='Super Mario Bros. for OpenAI Gym',
-    long_description=README(),
+    long_description=long_description(),
     long_description_content_type='text/markdown',
-    keywords='OpenAI-Gym NES Super-Mario-Bros Reinforcement-Learning-Environment',
+    keywords=' '.join([
+        'OpenAI-Gym',
+        'NES',
+        'Super-Mario-Bros',
+        'Lost-Levels',
+        'Reinforcement-Learning-Environment',
+    ]),
     classifiers=[
         'License :: OSI Approved :: MIT License',
         'Development Status :: 3 - Alpha',
@@ -37,7 +44,7 @@ setup(
     author_email='kautencreations@gmail.com',
     license='MIT',
     packages=find_packages(),
-    package_data = {
+    package_data={
         'gym_super_mario_bros': ['lua/*.lua', 'roms/*.nes']
     },
     install_requires=[
