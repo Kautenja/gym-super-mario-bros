@@ -17,7 +17,7 @@ def play_human(env: gym.Env) -> None:
     """
     # play the game and catch a potential keyboard interrupt
     try:
-        play(env)
+        play(env, fps=env.metadata['video.frames_per_second'])
     except KeyboardInterrupt:
         pass
     # reset and close the environment
