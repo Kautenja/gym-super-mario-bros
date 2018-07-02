@@ -86,3 +86,7 @@ class ImageViewer(object):
         if self.is_open:
             self._window.close()
             self._window = None
+
+
+# explicitly define the outward facing API of this module
+__all__ = [ImageViewer.__name__]
