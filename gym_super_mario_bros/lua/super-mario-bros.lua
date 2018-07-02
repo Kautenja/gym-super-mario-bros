@@ -474,6 +474,13 @@ function handle_command(line)
             emu.frameadvance()
             reward = reward + get_reward()
         end
+        -- limit the reward to stay within a static range [-15, 15]
+        if reward < -15 then
+            reward = -15
+        end
+        if reward > 15 then
+            reward = 15
+        end
     elseif command == 'close' then
         os.exit(0)
     end
