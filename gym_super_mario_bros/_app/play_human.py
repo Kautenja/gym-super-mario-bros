@@ -26,9 +26,6 @@ def display_arr(
         None
 
     """
-    # normalize the pixel values within [0, 255]
-    arr_min, arr_max = arr.min(), arr.max()
-    arr = 255.0 * (arr - arr_min) / (arr_max - arr_min)
     # take the transpose if necessary
     if transpose:
         pyg_img = pygame.surfarray.make_surface(arr.swapaxes(0, 1))
