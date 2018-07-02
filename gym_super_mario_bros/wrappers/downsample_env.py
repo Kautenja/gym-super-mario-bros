@@ -7,12 +7,13 @@ import numpy as np
 class DownsampleEnv(gym.ObservationWrapper):
     """An environment that down-samples frames."""
 
-    def __init__(self, env, image_size: tuple):
+    def __init__(self, env: gym.Env, image_size: tuple):
         """
         Create a new down-sampler.
 
         Args:
-            image_size: the size to output frames as
+            env: the environment to wrap
+            image_size: the size to output frames as (width X height)
 
         Returns:
             None
@@ -28,7 +29,17 @@ class DownsampleEnv(gym.ObservationWrapper):
             dtype=np.uint8
         )
 
-    def observation(self, frame):
+    def observation(self, frame: np.ndarray) -> np.ndarray:
+        """
+        Downsample an observation from RGB to gray scale and resize it
+
+        Args:
+            frame: the image to convert to grayscale and resize
+
+        Returns:
+            the frame in B&W and resized to self.image_size
+
+        """
         # convert the frame from RGB to gray scale
         frame = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
         # resize the frame to the expected shape. use bilinear interpolation
