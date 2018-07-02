@@ -18,7 +18,9 @@ class NormalizeRewardEnv(gym.RewardWrapper):
 
         """
         super().__init__(env)
+        # setup the l infinity reward
         self._l_inf_norm = max([abs(r) for r in env.reward_range])
+        # raise an error if the reward range is infinitely bounded
         if self._l_inf_norm == float('inf'):
             raise ValueError('cant normalize a reward with infinite range')
 
