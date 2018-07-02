@@ -2,6 +2,7 @@
 import os
 import argparse
 from .._registration import make
+from ..wrappers import wrap
 from .play import play_human, play_random
 
 
@@ -21,6 +22,11 @@ def create_argparser() -> argparse.ArgumentParser:
         choices=['human', 'random'],
         help='The execution mode for the emulation.'
     )
+    # add a flag for wrapping the environment
+    parser.add_argument('--wrap', '-W',
+        action='store_true',
+        help='A flag to use the standard wrap while playing.'
+    )
 
     return parser
 
@@ -37,6 +43,9 @@ def main() -> None:
         play = play_random
     # play the game
     env = make(args.env)
+    # wrap the environment if specified
+    if args.wrap:
+        env = wrap(env, agent_history_length=None)
     play(env)
 
 
