@@ -1,5 +1,6 @@
 """A gym wrapper for caching rewards."""
 import gym
+import numpy as np
 
 
 class RewardCacheEnv(gym.Wrapper):
@@ -16,11 +17,25 @@ class RewardCacheEnv(gym.Wrapper):
             None
 
         """
-        gym.Wrapper.__init__(self, env)
+        super().__init__(env)
         self._score = 0
         self.env.unwrapped.episode_rewards = []
 
-    def step(self, action):
+    def step(self, action: any) -> tuple:
+        """
+        Take a step using the given action.
+
+        Args:
+            action: the discrete action to perform.
+
+        Returns:
+            a tuple of:
+            -   the start as a result of the action
+            -   the reward achieved by taking the action
+            -   a flag denoting whether the episode has ended
+            -   a dictionary of extra information
+
+        """
         state, reward, done, info = self.env.step(action)
         self._score += reward
         if done:
@@ -28,8 +43,9 @@ class RewardCacheEnv(gym.Wrapper):
             self._score = 0
         return state, reward, done, info
 
-    def reset(self, **kwargs):
-        return self.env.reset(**kwargs)
+    def reset(self) -> np.ndarray:
+        """Reset the emulator and return the initial state."""
+        return self.env.reset()
 
 
 # explicitly specify the external API of this module
