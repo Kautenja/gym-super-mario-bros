@@ -75,9 +75,8 @@ for version, rom_mode in enumerate([None, 'downsample', 'pixel', 'rectangle']):
             )
 
 
-def make(environment: str) -> gym.Env:
-    """Make the environment and return it. same as `gym.make`."""
-    return gym.make(environment)
+# create an alias to gym.make for ease of access
+make = gym.make
 
 
 # define the outward facing API of this module (none, gym provides the API)
