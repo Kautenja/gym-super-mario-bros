@@ -6,6 +6,7 @@ class DependencyNotFoundError(OSError):
     pass
 
 
+# explicitly define the outward facing API for this module
 __all__ = [
     DependencyNotFoundError.__name__
 ]
