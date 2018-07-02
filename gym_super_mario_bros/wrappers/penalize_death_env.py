@@ -24,14 +24,17 @@ class PenalizeDeathEnv(gym.Wrapper):
     def step(self, action: any) -> tuple:
         """
         Take a step using the given action.
+
         Args:
             action: the discrete action to perform.
+
         Returns:
             a tuple of:
             -   the start as a result of the action
             -   the reward achieved by taking the action
             -   a flag denoting whether the episode has ended
             -   a dictionary of extra information
+
         """
         obs, reward, done, info = self.env.step(action)
         # update the reward based on the done flag
