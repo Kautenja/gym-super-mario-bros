@@ -11,7 +11,7 @@ from .reward_cache_env import RewardCacheEnv
 
 def wrap(env: gym.Env,
     image_size: tuple=(84, 84),
-    death_penalty: int=-10,
+    death_penalty: int=-15,
     clip_rewards: bool=False,
     normalize_rewards: bool=True,
     agent_history_length: int=4
