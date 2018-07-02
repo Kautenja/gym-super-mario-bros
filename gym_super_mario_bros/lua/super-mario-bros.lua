@@ -233,7 +233,7 @@ end
 -- Return a penalty for
 function get_death_penalty()
     if is_dying() or is_dead() then
-        return -10
+        return -15
     end
     return 0
 end
