@@ -1,8 +1,3 @@
-# Ignores specific to this project
-build/
-monitor/
-screen_capture/
-
 # Ignores specific to different operating system files
 
 # MacOS
