@@ -6,6 +6,9 @@ from .nes_env import NESEnv
 class SuperMarioBrosEnv(NESEnv):
     """An environment for playing Super Mario Bros with OpenAI Gym."""
 
+    # the custom reward range defined by the environment
+    reward_range = (-15, 15)
+
     # the list of discrete actions
     actions = [
         '',    # NOP
