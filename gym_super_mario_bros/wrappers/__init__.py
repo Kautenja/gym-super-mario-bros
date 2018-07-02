@@ -4,6 +4,7 @@ from .clip_reward_env import ClipRewardEnv
 from .downsample_env import DownsampleEnv
 from .frame_stack_env import FrameStackEnv
 from .monitor import Monitor
+from .normalize_reward_env import NormalizeRewardEnv
 from .penalize_death_env import PenalizeDeathEnv
 from .reward_cache_env import RewardCacheEnv
 
@@ -12,6 +13,7 @@ def wrap(env: gym.Env,
     image_size: tuple=(84, 84),
     death_penalty: int=-10,
     clip_rewards: bool=False,
+    normalize_rewards: bool=True,
     agent_history_length: int=4
 ) -> gym.Env:
     """
@@ -35,6 +37,9 @@ def wrap(env: gym.Env,
     # apply the death penalty feature if enabled
     if death_penalty is not None:
         env = PenalizeDeathEnv(env, penalty=death_penalty)
+    # normalize the rewards in [-1, 1] if the feature is enabled
+    if normalize_rewards:
+        env = NormalizeRewardEnv(env)
     # clip the rewards in {-1, 0, +1} if the feature is enabled
     if clip_rewards:
         env = ClipRewardEnv(env)
@@ -51,6 +56,7 @@ __all__ = [
     DownsampleEnv.__name__,
     FrameStackEnv.__name__,
     Monitor.__name__,
+    NormalizeRewardEnv.__name__,
     PenalizeDeathEnv.__name__,
     RewardCacheEnv.__name__,
     wrap.__name__,
