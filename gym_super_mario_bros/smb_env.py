@@ -313,10 +313,20 @@ class SuperMarioBrosEnv(NESEnv):
             self._get_death_reward()
         )
 
+    # MARK: Emulation
 
-
-
-
+    def _skip_start_screen(self):
+        # Press start until the game starts
+        while self._get_time() >= self._time_left:
+            self._time_left = self._get_time()
+            # TODO: use a proprietary step command instead?
+            # press the start button
+            self.step(8)
+            # release the start button
+            self.step(0)
+            self._runout_prelevel_timer()
+            # TODO: does another step need to occur?
+            # emu.frameadvance()
 
 
 
