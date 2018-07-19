@@ -87,7 +87,7 @@ class SuperMarioBrosEnv(NESEnv):
     @property
     def _lost_levels(self):
         """Return True if playing Lost Levels, False otherwise."""
-        return self.lost_levels
+        return self._lost_levels
 
     # MARK: Memory access
 
