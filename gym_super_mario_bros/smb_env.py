@@ -1,12 +1,12 @@
 """An OpenAI Gym environment for Super Mario Bros. and Lost Levels."""
 import os
 from nes_py import NESEnv
+from ._rom_mode import RomMode
 
 
 class SuperMarioBrosEnv(NESEnv):
     """An environment for playing Super Mario Bros with OpenAI Gym."""
 
-    # TODO: Enum for rom_mode
     def __init__(self,
         rom_mode=None,
         target_world=None,
@@ -17,24 +17,19 @@ class SuperMarioBrosEnv(NESEnv):
         Initialize a new Super Mario Bros environment.
 
         Args:
-            rom_mode (str): the ROM mode to use when loading ROMs from disk.
-                valid options are:
-                -  None: the standard ROM with no modifications
-                - 'downsample': down-sampled ROM with static artifacts removed
-                - 'pixel': a simpler pixelated version of graphics
-                - 'rectangle': an even simpler rectangular version of graphics
+            rom_mode (RomMode): the ROM mode to use when loading ROMs from disk
             target_world (int): the world to target in the ROM
             target_level (int): the level to target in the given world
             lost_levels (bool): whether to load the ROM with lost levels.
-                False will load the original Super Mario Bros. game.
-                True will  load the Japanese Super Mario Bros. 2 (commonly
-                known as Lost Levels)
+                - False: load original Super Mario Bros.
+                - True: load Super Mario Bros. Lost Levels
 
         Returns:
             None
 
         """
-        # TODO: type and value check
+        if not isinstance(rom_mode, RomMode):
+            raise TypeError('rom_mode must be of type: RomMode')
         self._rom_mode = rom_mode
         # Type and value check the target world parameter
         if not isinstance(target_world, int):
@@ -52,32 +47,27 @@ class SuperMarioBrosEnv(NESEnv):
         self._lost_levels = lost_levels
         # setup the path to the game ROM
         if lost_levels:
-            if rom_mode is None:
-                rom_name = 'roms/super-mario-bros-2.nes'
-            elif rom_mode == 'pixel':
+            if rom_mode == RomMode.VANILLA:
+                rom = 'roms/super-mario-bros-2.nes'
+            elif rom_mode == RomMode.PIXEL:
                 raise ValueError('pixel_rom not supported for Lost Levels')
-            elif rom_mode == 'rectangle':
+            elif rom_mode == RomMode.RECTANGLE:
                 raise ValueError('rectangle_rom not supported for Lost Levels')
-            elif rom_mode == 'downsample':
-                rom_name = 'roms/super-mario-bros-2-downsampled.nes'
-            else:
-                raise ValueError('invalid rom_mode: {}'.format(repr(rom_mode)))
+            elif rom_mode == RomMode.DOWNSAMPLE:
+                rom = 'roms/super-mario-bros-2-downsampled.nes'
         else:
-            if rom_mode is None:
-                rom_name = 'roms/super-mario-bros.nes'
-            elif rom_mode == 'pixel':
-                rom_name = 'roms/super-mario-bros-pixel.nes'
-            elif rom_mode == 'rectangle':
-                rom_name = 'roms/super-mario-bros-rect.nes'
-            elif rom_mode == 'downsample':
-                rom_name = 'roms/super-mario-bros-downsampled.nes'
-            else:
-                raise ValueError('invalid rom_mode: {}'.format(repr(rom_mode)))
+            if rom_mode == RomMode.VANILLA:
+                rom = 'roms/super-mario-bros.nes'
+            elif rom_mode == RomMode.PIXEL:
+                rom = 'roms/super-mario-bros-pixel.nes'
+            elif rom_mode == RomMode.RECTANGLE:
+                rom = 'roms/super-mario-bros-rect.nes'
+            elif rom_mode == RomMode.DOWNSAMPLE:
+                rom = 'roms/super-mario-bros-downsampled.nes'
         # create an absolute path to the specified ROM
-        self_directory = os.path.dirname(os.path.abspath(__file__))
-        rom_file_path = os.path.join(self_directory, rom_name)
+        rom = os.path.join(os.path.dirname(os.path.abspath(__file__)), rom)
         # initialize the super object with the ROM path
-        super(SuperMarioBrosEnv, self).__init__(rom_file_path)
+        super(SuperMarioBrosEnv, self).__init__(rom)
 
     @property
     def rom_mode(self):
