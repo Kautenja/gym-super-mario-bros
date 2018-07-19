@@ -2,7 +2,7 @@
 from setuptools import setup, find_packages
 
 
-def long_description() -> str:
+def README():
     """Return the contents of the read me file for this project."""
     with open('README.md') as readme:
         return readme.read()
@@ -10,13 +10,12 @@ def long_description() -> str:
 
 setup(
     name='gym_super_mario_bros',
-    python_requires='>=3.5',
     setup_requires=[
         'very-good-setuptools-git-version'
     ],
     version_format='{tag}',
     description='Super Mario Bros. for OpenAI Gym',
-    long_description=long_description(),
+    long_description=README(),
     long_description_content_type='text/markdown',
     keywords=' '.join([
         'OpenAI-Gym',
@@ -50,6 +49,7 @@ setup(
     install_requires=[
         'gym>=0.10.5',
         'matplotlib>=2.0.2',
+        'nes-py>=0.2.6',
         'numpy>=1.14.2',
         'opencv-python>=3.4.0.12',
         'pygame>=1.9.3',
