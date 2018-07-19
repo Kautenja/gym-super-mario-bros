@@ -8,7 +8,7 @@ class SuperMarioBrosEnv(NESEnv):
     """An environment for playing Super Mario Bros with OpenAI Gym."""
 
     def __init__(self,
-        rom_mode=None,
+        rom_mode=RomMode.VANILLA,
         target_world=None,
         target_level=None,
         lost_levels=False,
@@ -32,12 +32,12 @@ class SuperMarioBrosEnv(NESEnv):
             raise TypeError('rom_mode must be of type: RomMode')
         self._rom_mode = rom_mode
         # Type and value check the target world parameter
-        if not isinstance(target_world, int):
+        if target_world is not None and not isinstance(target_world, int):
             raise TypeError('target_world must be of type: int')
         # TODO: value check
         self._target_world = target_world
         # Type and value check the target level parameter
-        if not isinstance(target_level, int):
+        if target_level is not None and not isinstance(target_level, int):
             raise TypeError('target_level must be of type: int')
         # TODO: value check
         self._target_level = target_level
@@ -89,7 +89,7 @@ class SuperMarioBrosEnv(NESEnv):
         return self._target_level
 
     @property
-    def _lost_levels(self):
+    def lost_levels(self):
         """Return True if playing Lost Levels, False otherwise."""
         return self._lost_levels
 
