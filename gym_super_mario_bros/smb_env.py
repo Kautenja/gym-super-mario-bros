@@ -197,6 +197,33 @@ class SuperMarioBrosEnv(NESEnv):
         """
         return self.get_player_state() in busy
 
+    # MARK: RAM Hacks
+
+    def runout_prelevel_timer(self):
+        """Force the pre-level timer to 0 to skip frames during a death."""
+        self.write_mem(0x07A0, 0)
+
+    def skip_change_area(self):
+        """Skip change area animations by by running down timers."""
+        change_area_timer = self.read_mem(0x06DE)
+        if change_area_timer > 1 and change_area_timer < 255:
+            self.write_mem(0x06DE, 1)
+
+    def skip_occupied_states(self):
+        """Skip occupied states by running out a timer and skipping frames."""
+        while self.get_is_occupied():
+            self.runout_prelevel_timer()
+            # TODO: use local version of frameadvance (step)
+            # TODO: does NESEnv need a simpler step method to access _LIB methods?
+            # emu.frameadvance()
+
+    def kill_mario(self):
+        """Skip a death animation by forcing Mario to death."""
+        # if there is a specific level specified, ignore the notion of lives
+        if self.target_world is not None and self.target_level is not None:
+            self.write_mem(0x075a, 0)
+        # force Mario's state to dead
+        self.write_mem(0x000e, 0x06)
 
 
 
