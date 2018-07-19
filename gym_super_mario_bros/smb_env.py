@@ -68,6 +68,10 @@ class SuperMarioBrosEnv(NESEnv):
         rom = os.path.join(os.path.dirname(os.path.abspath(__file__)), rom)
         # initialize the super object with the ROM path
         super(SuperMarioBrosEnv, self).__init__(rom)
+        # setup a variable to keep track of remaining time locally
+        self._time_left = 0
+        # setup a variable to keep track of how far into the level Mario is
+        self._x_position = 0
 
     @property
     def rom_mode(self):
@@ -91,51 +95,83 @@ class SuperMarioBrosEnv(NESEnv):
 
     # MARK: Memory access
 
+    def _read_mem_range(self, address, length):
+        """
+        Read a range of bytes where each byte is a 10s place figure.
+
+        Args:
+            address (int): the address to read from as a 16 bit integer
+            length: the number of sequential bytes to read
+
+        Note:
+            this method is specific to Mario where three GUI values are stored
+            in independent memory slots to save processing time
+            - score has 6 10s places
+            - coins has 2 10s places
+            - time has 3 10s places
+
+        Returns:
+            the integer value of this 10s place representation
+
+        """
+        value = 0
+        # iterate over the length of bytes
+        for offset in range(length):
+            # shift the value over by 1 10s place
+            value *= value
+            # add the next 10s place value
+            value += self._read_mem(address + offset)
+
+        return value
+
     def _get_level(self):
         """Return the level of the game."""
-        return self.read_mem(0x075f) * 4 + self.read_mem(0x075c)
+        return self._read_mem(0x075f) * 4 + self._read_mem(0x075c)
 
     def _get_world_number(self):
         """Return the current world number (1 to 8)."""
-        return self.read_mem(0x075f) + 1
+        return self._read_mem(0x075f) + 1
 
     def _get_level_number(self):
         """Return the current level number (1 to 4)."""
-        return self.read_mem(0x075c) + 1
+        return self._read_mem(0x075c) + 1
 
     def _get_area_number(self):
         """Return the current area number (1 to 5)."""
-        return self.read_mem(0x0760) + 1
+        return self._read_mem(0x0760) + 1
 
     def _get_score(self):
         """Return the current player score (0 to 999990)."""
-        return self.read_mem(0x07de, 6)
+        # score is represented as a figure with 6 10s places
+        return self._read_mem_range(0x07de, 6)
 
     def _get_time(self):
         """Return the time left (0 to 999)."""
-        return self.read_mem(0x07f8, 3)
+        # time is represented as a figure with 3 10s places
+        return self._read_mem_range(0x07f8, 3)
 
     def _get_coins(self):
         """Return the number of coins collected (0 to 99)."""
-        return self.read_mem(0x07ed, 2)
+        # coins are represented as a figure with 2 10s places
+        return self._read_mem_range(0x07ed, 2)
 
     def _get_life(self):
         """Return the number of remaining lives."""
-        return self.read_mem(0x075a)
+        return self._read_mem(0x075a)
 
     def _get_x_position(self):
         """Return the current horizontal position."""
         # add the current page 0x6d to the current x
-        return self.read_mem(0x6d) * 0x100 + self.read_mem(0x86)
+        return self._read_mem(0x6d) * 0x100 + self._read_mem(0x86)
 
     def _get_left_x_position(self):
         """Return the number of pixels from the left of the screen."""
         # subtract the left x position 0x071c from the current x 0x86
-        return (self.read_mem(0x86) - self.read_mem(0x071c)) % 256
+        return (self._read_mem(0x86) - self._read_mem(0x071c)) % 256
 
     def _get_y_position(self):
         """Return the current vertical position."""
-        return self.read_mem(0x03b8)
+        return self._read_mem(0x03b8)
 
     def _get_y_viewport(self):
         """
@@ -148,7 +184,7 @@ class SuperMarioBrosEnv(NESEnv):
             up to 5 indicates falling into a hole
 
         """
-        return self.read_mem(0x00b5)
+        return self._read_mem(0x00b5)
 
     def _get_player_status(self):
         """
@@ -160,7 +196,7 @@ class SuperMarioBrosEnv(NESEnv):
             2+ -> fireball Mario
 
         """
-        return self.read_mem(0x0756)
+        return self._read_mem(0x0756)
 
     def _get_player_state(self):
         """
@@ -181,7 +217,7 @@ class SuperMarioBrosEnv(NESEnv):
             0x0C -> Palette cycling, can't move
 
         """
-        return self.read_mem(0x000e)
+        return self._read_mem(0x000e)
 
     def _get_is_dying(self):
         """Return True if Mario is in dying animation, False otherwise."""
@@ -216,7 +252,7 @@ class SuperMarioBrosEnv(NESEnv):
 
     def _skip_change_area(self):
         """Skip change area animations by by running down timers."""
-        change_area_timer = self.read_mem(0x06DE)
+        change_area_timer = self._read_mem(0x06DE)
         if change_area_timer > 1 and change_area_timer < 255:
             self.write_mem(0x06DE, 1)
 
@@ -235,6 +271,53 @@ class SuperMarioBrosEnv(NESEnv):
             self.write_mem(0x075a, 0)
         # force Mario's state to dead
         self.write_mem(0x000e, 0x06)
+
+    # MARK: Reward Calculation
+
+    def _get_x_reward(self):
+        """Return the reward based on left right movement between steps."""
+        _x_position = self._get_x_position()
+        _reward = _x_position - self._x_position
+        self._x_position = _x_position
+        # resolve an issue where after death the x position resets. The x delta
+        # is typically has at most magnitude of 3, 5 is a safe bound
+        if _reward < -5 or _reward > 5:
+            return 0
+
+        return _reward
+
+    def _get_time_reward(self):
+        """Return the reward for the in-game clock ticking."""
+        _time_left = self._get_time()
+        _reward = _time_left - self._time_left
+        self._time_left = _time_left
+        # time can only decrease, a positive reward results from a reset and
+        # should default to 0 reward
+        if _reward > 0:
+            return 0
+
+        return _reward
+
+    def _get_death_reward(self):
+        """Return the reward earned by dying."""
+        if self._get_is_dying() or self._get_is_dead():
+            return -15
+
+        return 0
+
+    def _get_reward(self):
+        """Return the cumulative reward at the current state."""
+        return (
+            self._get_x_reward() +
+            self._get_time_reward() +
+            self._get_death_reward()
+        )
+
+
+
+
+
+
 
 
 
