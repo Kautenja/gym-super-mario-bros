@@ -28,29 +28,12 @@ The preferred installation of `gym-super-mario-bros` is from `pip`:
 pip install gym-super-mario-bros
 ```
 
-## NES Emulator
-
-`gym-super-mario-bros` uses [FCEUX](http://www.fceux.com/web/home.html) to emulate NES games.
-Make sure it's installed and in your `$PATH`.
-
-### Unix
-
-```shell
-sudo apt-get install fceux
-```
-
-### Mac
-
-```shell
-brew install fceux
-```
-
 # Usage
 
 ## Python
 
-You must import `gym_super_mario_bros` before trying to make an environment. This is
-because gym environments are registered at runtime.
+You must import `gym_super_mario_bros` before trying to make an environment.
+This is because gym environments are registered at runtime.
 
 ```python
 import gym_super_mario_bros
