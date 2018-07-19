@@ -1,6 +1,7 @@
 """An enumeration of valid ROM hacks to load into the emulator."""
 import enum
 
+
 enum.unique
 class RomMode(enum.Enum):
     """An enumeration of valid ROM hacks to load into the emulator."""
