@@ -6,28 +6,13 @@ from nes_py import NESEnv
 class SuperMarioBrosEnv(NESEnv):
     """An environment for playing Super Mario Bros with OpenAI Gym."""
 
-    # the custom reward range defined by the environment
-    reward_range = (-15, 15)
-
-    # the list of discrete actions
-    actions = [
-        '',    # NOP
-        'L',   # Left
-        'R',   # Right
-        'LA',  # Left + A
-        'LB',  # Left + B
-        'LAB', # Left + A + B
-        'RA',  # Right + A
-        'RB',  # Right + B
-        'RAB', # Right + A + B
-    ]
-
+    # TODO: Enum for rom_mode
     def __init__(self,
         rom_mode=None,
         target_world=None,
         target_level=None,
         lost_levels=False,
-    ) -> None:
+    ):
         """
         Initialize a new Super Mario Bros environment.
 
@@ -49,8 +34,22 @@ class SuperMarioBrosEnv(NESEnv):
             None
 
         """
-        # load the package directory of this class
-        package_directory = os.path.dirname(os.path.abspath(__file__))
+        # TODO: type and value check
+        self._rom_mode = rom_mode
+        # Type and value check the target world parameter
+        if not isinstance(target_world, int):
+            raise TypeError('target_world must be of type: int')
+        # TODO: value check
+        self._target_world = target_world
+        # Type and value check the target level parameter
+        if not isinstance(target_level, int):
+            raise TypeError('target_level must be of type: int')
+        # TODO: value check
+        self._target_level = target_level
+        # Type and value check the lost levels parameter
+        if not isinstance(lost_levels, bool):
+            raise TypeError('lost_levels must be of type: bool')
+        self._lost_levels = lost_levels
         # setup the path to the game ROM
         if lost_levels:
             if rom_mode is None:
@@ -74,59 +73,81 @@ class SuperMarioBrosEnv(NESEnv):
                 rom_name = 'roms/super-mario-bros-downsampled.nes'
             else:
                 raise ValueError('invalid rom_mode: {}'.format(repr(rom_mode)))
-        # convert the path to an absolute path
-        self.rom_file_path = os.path.join(package_directory, rom_name)
-        super().__init__(self.rom_file_path)
+        # create an absolute path to the specified ROM
+        self_directory = os.path.dirname(os.path.abspath(__file__))
+        rom_file_path = os.path.join(self_directory, rom_name)
+        # initialize the super object with the ROM path
+        super(SuperMarioBrosEnv, self).__init__(rom_file_path)
+
+    @property
+    def rom_mode(self):
+        """Return the type of ROM being used."""
+        return self._rom_mode
+
+    @property
+    def target_world(self):
+        """Return world to target for single level mode."""
+        return self._target_world
+
+    @property
+    def target_level(self):
+        """Return the level to target for single level mode."""
+        return self._target_level
+
+    @property
+    def _lost_levels(self):
+        """Return True if playing Lost Levels, False otherwise."""
+        return self.lost_levels
 
     # MARK: Memory access
 
-    def get_level(self):
+    def _get_level(self):
         """Return the level of the game."""
         return self.read_mem(0x075f) * 4 + self.read_mem(0x075c)
 
-    def get_world_number(self):
+    def _get_world_number(self):
         """Return the current world number (1 to 8)."""
         return self.read_mem(0x075f) + 1
 
-    def get_level_number(self):
+    def _get_level_number(self):
         """Return the current level number (1 to 4)."""
         return self.read_mem(0x075c) + 1
 
-    def get_area_number(self):
+    def _get_area_number(self):
         """Return the current area number (1 to 5)."""
         return self.read_mem(0x0760) + 1
 
-    def get_score(self):
+    def _get_score(self):
         """Return the current player score (0 to 999990)."""
         return self.read_mem(0x07de, 6)
 
-    def get_time(self):
+    def _get_time(self):
         """Return the time left (0 to 999)."""
         return self.read_mem(0x07f8, 3)
 
-    def get_coins(self):
+    def _get_coins(self):
         """Return the number of coins collected (0 to 99)."""
         return self.read_mem(0x07ed, 2)
 
-    def get_life(self):
+    def _get_life(self):
         """Return the number of remaining lives."""
         return self.read_mem(0x075a)
 
-    def get_x_position(self):
+    def _get_x_position(self):
         """Return the current horizontal position."""
         # add the current page 0x6d to the current x
         return self.read_mem(0x6d) * 0x100 + self.read_mem(0x86)
 
-    def get_left_x_position(self):
+    def _get_left_x_position(self):
         """Return the number of pixels from the left of the screen."""
         # subtract the left x position 0x071c from the current x 0x86
         return (self.read_mem(0x86) - self.read_mem(0x071c)) % 256
 
-    def get_y_position(self):
+    def _get_y_position(self):
         """Return the current vertical position."""
         return self.read_mem(0x03b8)
 
-    def get_y_viewport(self):
+    def _get_y_viewport(self):
         """
         Return the current y viewport.
 
@@ -139,19 +160,19 @@ class SuperMarioBrosEnv(NESEnv):
         """
         return self.read_mem(0x00b5)
 
-    def get_player_status(self):
+    def _get_player_status(self):
         """
         Return the player status.
 
         Note:
-            0 #> small Mario
-            1 #> tall Mario
+            0  -> small Mario
+            1  -> tall Mario
             2+ -> fireball Mario
 
         """
         return self.read_mem(0x0756)
 
-    def get_player_state(self):
+    def _get_player_state(self):
         """
         Return the current player state.
 
@@ -172,19 +193,19 @@ class SuperMarioBrosEnv(NESEnv):
         """
         return self.read_mem(0x000e)
 
-    def get_is_dying(self):
-        """Return a boolean determining if Mario is in the dying animation."""
-        return self.get_player_state() == 0x0b or self.get_y_viewport() > 1
+    def _get_is_dying(self):
+        """Return True if Mario is in dying animation, False otherwise."""
+        return self._get_player_state() == 0x0b or self._get_y_viewport() > 1
 
-    def get_is_dead(self):
-        """Return a boolean determining if Mario is in the dead state."""
-        return self.get_player_state() == 0x06
+    def _get_is_dead(self):
+        """Return True if Mario is dead, False otherwise."""
+        return self._get_player_state() == 0x06
 
-    def get_is_game_over(self):
-        """Return 1 if the game has ed or a 0 if it has not."""
-        return self.get_life() == 0xff
+    def _get_is_game_over(self):
+        """Return True if the game has ended, False otherwise."""
+        return self._get_life() == 0xff
 
-    def get_is_occupied(self, busy={0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x07}):
+    def _get_is_occupied(self, busy={0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x07}):
         """
         Return boolean whether Mario is occupied by in-game garbage.
 
@@ -195,29 +216,29 @@ class SuperMarioBrosEnv(NESEnv):
             True if Mario's state is in the `busy` set, False otherwise
 
         """
-        return self.get_player_state() in busy
+        return self._get_player_state() in busy
 
     # MARK: RAM Hacks
 
-    def runout_prelevel_timer(self):
+    def _runout_prelevel_timer(self):
         """Force the pre-level timer to 0 to skip frames during a death."""
         self.write_mem(0x07A0, 0)
 
-    def skip_change_area(self):
+    def _skip_change_area(self):
         """Skip change area animations by by running down timers."""
         change_area_timer = self.read_mem(0x06DE)
         if change_area_timer > 1 and change_area_timer < 255:
             self.write_mem(0x06DE, 1)
 
-    def skip_occupied_states(self):
+    def _skip_occupied_states(self):
         """Skip occupied states by running out a timer and skipping frames."""
         while self.get_is_occupied():
-            self.runout_prelevel_timer()
+            self._runout_prelevel_timer()
             # TODO: use local version of frameadvance (step)
             # TODO: does NESEnv need a simpler step method to access _LIB methods?
             # emu.frameadvance()
 
-    def kill_mario(self):
+    def _kill_mario(self):
         """Skip a death animation by forcing Mario to death."""
         # if there is a specific level specified, ignore the notion of lives
         if self.target_world is not None and self.target_level is not None:
