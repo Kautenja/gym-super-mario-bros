@@ -3,7 +3,7 @@ from .smb_env import SuperMarioBrosEnv
 from ._rom_mode import RomMode
 
 
-class SuperMarioBrosEnvLevel(SuperMarioBrosEnv):
+class SuperMarioBrosLevelEnv(SuperMarioBrosEnv):
     """An environment for playing Super Mario Bros Levels with OpenAI Gym."""
 
     def __init__(self,
@@ -30,7 +30,7 @@ class SuperMarioBrosEnvLevel(SuperMarioBrosEnv):
 
         """
         # initialize the super object
-        super(SuperMarioBrosEnvLevel, self).__init__(
+        super(SuperMarioBrosLevelEnv, self).__init__(
             frameskip=frameskip,
             rom_mode=rom_mode,
             lost_levels=lost_levels
@@ -115,4 +115,4 @@ class SuperMarioBrosEnvLevel(SuperMarioBrosEnv):
 
 
 # explicitly define the outward facing API of this module
-__all__ = [SuperMarioBrosEnvLevel.__name__]
+__all__ = [SuperMarioBrosLevelEnv.__name__]
