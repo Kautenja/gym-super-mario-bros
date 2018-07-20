@@ -321,7 +321,7 @@ class SuperMarioBrosEnv(NESEnv):
 
         return 0
 
-    # MARK: Emulation
+    # MARK: nes-py API calls
 
     @property
     def _reward(self):
@@ -338,19 +338,24 @@ class SuperMarioBrosEnv(NESEnv):
         # left. It goes 2, 1, 0 for the 3 lives of the game
         return self._get_life() == 0xff
 
-    # TODO: delete when 0.4.0 is available
-    def _frame_advance(self, action):
-        """
-        Advance a frame in the emulator with an action.
+    @property
+    def _info(self):
+        """Return the info after a step occurs."""
+        return {}
 
-        Args:
-            action: the action to press on the joypad
+    # # TODO: delete when 0.4.0 is available
+    # def _frame_advance(self, action):
+    #     """
+    #     Advance a frame in the emulator with an action.
 
-        Returns:
-            None
+    #     Args:
+    #         action: the action to press on the joypad
 
-        """
-        _LIB.NESEnv_step(self._env, action)
+    #     Returns:
+    #         None
+
+    #     """
+    #     _LIB.NESEnv_step(self._env, action)
 
     def _will_reset(self):
         """Handle any RAM hacking after a reset occurs."""
@@ -358,48 +363,48 @@ class SuperMarioBrosEnv(NESEnv):
         self._time_left = 0
         self._x_position = 0
 
-    # TODO: delete when 0.4.0 is available
-    def reset(self):
-        # call the before reset callback
-        self._will_reset()
-        # reset the emulator
-        _LIB.NESEnv_reset(self._env)
-        # call the after reset callback
-        self._did_reset_()
-        # copy the screen from the emulator
-        self._copy_screen()
-        # return the screen from the emulator
-        return self.screen
+    # # TODO: delete when 0.4.0 is available
+    # def reset(self):
+    #     # call the before reset callback
+    #     self._will_reset()
+    #     # reset the emulator
+    #     _LIB.NESEnv_reset(self._env)
+    #     # call the after reset callback
+    #     self._did_reset_()
+    #     # copy the screen from the emulator
+    #     self._copy_screen()
+    #     # return the screen from the emulator
+    #     return self.screen
 
     def _did_reset_(self):
         """Handle any RAM hacking after a reset occurs."""
         # skip the start screen and pre-level animation
         self._skip_start_screen()
 
-    # TODO: delete when 0.4.0 goes live
-    def step(self, action):
-        """
-        Run one frame of the NES and return the relevant observation data.
+    # # TODO: delete when 0.4.0 goes live
+    # def step(self, action):
+    #     """
+    #     Run one frame of the NES and return the relevant observation data.
 
-        Args:
-            action (byte): the bitmap determining which buttons to press
+    #     Args:
+    #         action (byte): the bitmap determining which buttons to press
 
-        Returns:
-            a tuple of:
-            - state (np.ndarray): next frame as a result of the given action
-            - reward (float) : amount of reward returned after given action
-            - done (boolean): whether the episode has ended
-            - info (dict): contains auxiliary diagnostic information
+    #     Returns:
+    #         a tuple of:
+    #         - state (np.ndarray): next frame as a result of the given action
+    #         - reward (float) : amount of reward returned after given action
+    #         - done (boolean): whether the episode has ended
+    #         - info (dict): contains auxiliary diagnostic information
 
-        """
-        # pass the action to the emulator as an unsigned byte
-        _LIB.NESEnv_step(self._env, action)
-        # call the after step callback
-        self._did_step()
-        # copy the screen from the emulator
-        self._copy_screen()
-        # return the screen from the emulator and other relevant data
-        return self.screen, self._reward, self._done, {}
+    #     """
+    #     # pass the action to the emulator as an unsigned byte
+    #     _LIB.NESEnv_step(self._env, action)
+    #     # call the after step callback
+    #     self._did_step()
+    #     # copy the screen from the emulator
+    #     self._copy_screen()
+    #     # return the screen from the emulator and other relevant data
+    #     return self.screen, self._reward, self._done, {}
 
     def _did_step(self):
         """Handle any RAM hacking after a step occurs."""
