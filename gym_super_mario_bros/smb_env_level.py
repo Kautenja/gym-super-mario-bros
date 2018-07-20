@@ -12,8 +12,8 @@ class SuperMarioBrosEnvLevel(SuperMarioBrosEnv):
         frameskip=1,
         rom_mode=RomMode.VANILLA,
         lost_levels=False,
-        target_world=1,
-        target_level=1,
+        target_world=4,
+        target_level=2,
     ):
         """
         Initialize a new Super Mario Bros environment.
@@ -110,6 +110,13 @@ class SuperMarioBrosEnvLevel(SuperMarioBrosEnv):
             self._frame_advance(0)
             # run-out the prelevel timer to skip the animation
             self._runout_prelevel_timer()
+
+    def _get_done(self):
+        """Return True if the episode is over, False otherwise."""
+        done = super(SuperMarioBrosEnvLevel, self)._get_done()
+        # if the player state is 4 (auto-walk), Mario has reached the end of
+        # a level
+        return done or self._get_player_state() == 0x04
 
 
 # explicitly define the outward facing API of this module
