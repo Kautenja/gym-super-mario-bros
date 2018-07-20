@@ -88,12 +88,6 @@ class SuperMarioBrosEnvLevel(SuperMarioBrosEnv):
         self._write_mem(0x075c, self._target_level - 1)
         self._write_mem(0x0760, self._target_area - 1)
 
-    def _kill_mario(self):
-        """Skip a death animation by forcing Mario to death."""
-        # ignore the notion of lives. i.e. set the lives to 0
-        self._write_mem(0x075a, 0)
-        super(SuperMarioBrosEnvLevel, self)._kill_mario()
-
     def _skip_start_screen(self):
         # press and release the start button
         self._frame_advance(8)
@@ -113,10 +107,13 @@ class SuperMarioBrosEnvLevel(SuperMarioBrosEnv):
 
     def _get_done(self):
         """Return True if the episode is over, False otherwise."""
-        done = super(SuperMarioBrosEnvLevel, self)._get_done()
-        # if the player state is 4 (auto-walk), Mario has reached the end of
-        # a level
-        return done or self._get_player_state() == 0x04
+        return (
+            # only one life in this env, done if dying or dead
+            self._get_is_dying() or
+            self._get_is_dead() or
+            # player state is 4 (auto-walk) at the end of a level
+            self._get_player_state() == 0x04
+        )
 
 
 # explicitly define the outward facing API of this module
