@@ -1,6 +1,7 @@
 """Super Mario Bros for OpenAI Gym."""
 import os
 import argparse
+from .._registration import make
 from .play import play_human, play_random
 
 
