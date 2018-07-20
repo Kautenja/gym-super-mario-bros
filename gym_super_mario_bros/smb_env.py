@@ -1,6 +1,8 @@
 """An OpenAI Gym environment for Super Mario Bros. and Lost Levels."""
 import os
 from nes_py import NESEnv
+# TODO: delete after improvements implemented
+from nes_py.nes_env import _LIB
 from ._rom_mode import RomMode
 
 
@@ -118,7 +120,7 @@ class SuperMarioBrosEnv(NESEnv):
         # iterate over the length of bytes
         for offset in range(length):
             # shift the value over by 1 10s place
-            value *= value
+            value *= 10
             # add the next 10s place value
             value += self._read_mem(address + offset)
 
@@ -315,20 +317,93 @@ class SuperMarioBrosEnv(NESEnv):
 
     # MARK: Emulation
 
+    def _frame_advance(self, action):
+        """
+        Advance a frame in the emulator with an action.
+
+        Args:
+            action: the action to press on the joypad
+
+        Returns:
+            None
+
+        """
+        _LIB.NESEnv_step(self._env, action)
+
     def _skip_start_screen(self):
+        # press and release the start button
+        self._frame_advance(8)
+        self._frame_advance(0)
         # Press start until the game starts
         while self._get_time() >= self._time_left:
+            # update the local time counter
             self._time_left = self._get_time()
-            # TODO: use a proprietary step command instead?
-            # press the start button
-            self.step(8)
-            # release the start button
-            self.step(0)
+            # press and release the start button
+            self._frame_advance(8)
+            self._frame_advance(0)
+            # run-out the prelevel timer to skip the animation
             self._runout_prelevel_timer()
-            # TODO: does another step need to occur?
-            # emu.frameadvance()
 
 
+
+
+    def _will_reset(self):
+        """Handle any RAM hacking after a reset occurs."""
+        # reset the time left and x position variables
+        self._time_left = 0
+        self._x_position = 0
+
+    def reset(self):
+        # call the before reset callback
+        self._will_reset()
+        # reset the emulator
+        _LIB.NESEnv_reset(self._env)
+        # call the after reset callback
+        self._did_reset_()
+        # copy the screen from the emulator
+        self._copy_screen()
+        # return the screen from the emulator
+        return self.screen
+
+    def _did_reset_(self):
+        """Handle any RAM hacking after a reset occurs."""
+        # skip the start screen and pre-level animation
+        self._skip_start_screen()
+
+
+
+    def _will_step(self):
+        pass
+
+    def step(self, action):
+        """
+        Run one frame of the NES and return the relevant observation data.
+
+        Args:
+            action (byte): the bitmap determining which buttons to press
+
+        Returns:
+            a tuple of:
+            - state (np.ndarray): next frame as a result of the given action
+            - reward (float) : amount of reward returned after given action
+            - done (boolean): whether the episode has ended
+            - info (dict): contains auxiliary diagnostic information
+
+        """
+        self._will_step()
+        # pass the action to the emulator as an unsigned byte
+        _LIB.NESEnv_step(self._env, action)
+
+        self._did_step()
+
+        # copy the screen from the emulator
+        self._copy_screen()
+        # return the screen from the emulator and other relevant data
+        return self.screen, self._reward, self._done, {}
+
+    def _did_step(self):
+        # print(self._get_time())
+        pass
 
 
 
