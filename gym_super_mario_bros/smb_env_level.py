@@ -3,41 +3,57 @@ from .smb_env import SuperMarioBrosEnv
 from ._rom_mode import RomMode
 
 
+# TODO: finishing a level doesn't return to the level, it jumps to the next.
+#       this needs to be fixed somehow and send a true done flag
 class SuperMarioBrosEnvLevel(SuperMarioBrosEnv):
     """An environment for playing Super Mario Bros Levels with OpenAI Gym."""
 
     def __init__(self,
+        frameskip=1,
         rom_mode=RomMode.VANILLA,
+        lost_levels=False,
         target_world=1,
         target_level=1,
-        lost_levels=False,
     ):
         """
         Initialize a new Super Mario Bros environment.
 
         Args:
+            frameskip (int): the number of frames to skip between steps
             rom_mode (RomMode): the ROM mode to use when loading ROMs from disk
-            target_world (int): the world to target in the ROM
-            target_level (int): the level to target in the given world
             lost_levels (bool): whether to load the ROM with lost levels.
                 - False: load original Super Mario Bros.
                 - True: load Super Mario Bros. Lost Levels
+            target_world (int): the world to target in the ROM
+            target_level (int): the level to target in the given world
 
         Returns:
             None
 
         """
         # initialize the super object
-        super(SuperMarioBrosEnvLevel, self).__init__(rom_mode, lost_levels)
+        super(SuperMarioBrosEnvLevel, self).__init__(
+            frameskip=frameskip,
+            rom_mode=rom_mode,
+            lost_levels=lost_levels
+        )
+
         # Type and value check the target world parameter
         if not isinstance(target_world, int):
             raise TypeError('target_world must be of type: int')
-        # TODO: value check _target_world
-
+        if lost_levels:
+            if target_world > 12:
+                worlds = set(range(1, 12 + 1))
+                raise ValueError('target_world')
+        elif target_world > 8:
+            worlds = set(range(1, 8 + 1))
+            raise ValueError('target_world must be in '.format(worlds))
         # Type and value check the target level parameter
         if not isinstance(target_level, int):
             raise TypeError('target_level must be of type: int')
-        # TODO: value check _target_level
+        if target_level > 4:
+            levels = set(range(1, 4 + 1))
+            raise ValueError('target_level must be in '.format(levels))
 
         # setup target area if target world and level are specified
         target_area = target_level
@@ -48,16 +64,18 @@ class SuperMarioBrosEnvLevel(SuperMarioBrosEnv):
                 if target_level >= 2:
                     target_area = target_area + 1
             elif target_world >= 5:
-                msg = 'lost levels worlds 5 6 7 8 9 A B C D not supported'
-                raise ValueError(msg)
                 # TODO: figure out why all worlds greater than 5 fail.
-                target_area = target_area + 1
+                # target_area = target_area + 1
+                # for now just raise a value error
+                worlds = set(range(5, 12 + 1))
+                msg = 'lost levels worlds {} not supported'.format(worlds)
+                raise ValueError(msg)
         else:
             # setup the target area depending on the target world and level
             if target_world in {1, 2, 4, 7}:
                 if target_level >= 2:
                     target_area = target_area + 1
-
+        # copy the values to local instance variables
         self._target_world = target_world
         self._target_level = target_level
         self._target_area = target_area
