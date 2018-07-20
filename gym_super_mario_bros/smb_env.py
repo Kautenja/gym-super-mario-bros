@@ -7,19 +7,12 @@ from ._rom_mode import RomMode
 class SuperMarioBrosEnv(NESEnv):
     """An environment for playing Super Mario Bros with OpenAI Gym."""
 
-    def __init__(self,
-        rom_mode=RomMode.VANILLA,
-        target_world=None,
-        target_level=None,
-        lost_levels=False,
-    ):
+    def __init__(self, rom_mode=RomMode.VANILLA, lost_levels=False):
         """
         Initialize a new Super Mario Bros environment.
 
         Args:
             rom_mode (RomMode): the ROM mode to use when loading ROMs from disk
-            target_world (int): the world to target in the ROM
-            target_level (int): the level to target in the given world
             lost_levels (bool): whether to load the ROM with lost levels.
                 - False: load original Super Mario Bros.
                 - True: load Super Mario Bros. Lost Levels
@@ -30,21 +23,9 @@ class SuperMarioBrosEnv(NESEnv):
         """
         if not isinstance(rom_mode, RomMode):
             raise TypeError('rom_mode must be of type: RomMode')
-        self._rom_mode = rom_mode
-        # Type and value check the target world parameter
-        if target_world is not None and not isinstance(target_world, int):
-            raise TypeError('target_world must be of type: int')
-        # TODO: value check
-        self._target_world = target_world
-        # Type and value check the target level parameter
-        if target_level is not None and not isinstance(target_level, int):
-            raise TypeError('target_level must be of type: int')
-        # TODO: value check
-        self._target_level = target_level
         # Type and value check the lost levels parameter
         if not isinstance(lost_levels, bool):
             raise TypeError('lost_levels must be of type: bool')
-        self._lost_levels = lost_levels
         # setup the path to the game ROM
         if lost_levels:
             if rom_mode == RomMode.VANILLA:
@@ -72,26 +53,6 @@ class SuperMarioBrosEnv(NESEnv):
         self._time_left = 0
         # setup a variable to keep track of how far into the level Mario is
         self._x_position = 0
-
-    @property
-    def rom_mode(self):
-        """Return the type of ROM being used."""
-        return self._rom_mode
-
-    @property
-    def target_world(self):
-        """Return world to target for single level mode."""
-        return self._target_world
-
-    @property
-    def target_level(self):
-        """Return the level to target for single level mode."""
-        return self._target_level
-
-    @property
-    def lost_levels(self):
-        """Return True if playing Lost Levels, False otherwise."""
-        return self._lost_levels
 
     # MARK: Memory access
 
@@ -264,9 +225,6 @@ class SuperMarioBrosEnv(NESEnv):
 
     def _kill_mario(self):
         """Skip a death animation by forcing Mario to death."""
-        # if there is a specific level specified, ignore the notion of lives
-        if self.target_world is not None and self.target_level is not None:
-            self._write_mem(0x075a, 0)
         # force Mario's state to dead
         self._write_mem(0x000e, 0x06)
         # step forward one frame
