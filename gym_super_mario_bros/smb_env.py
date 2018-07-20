@@ -7,11 +7,16 @@ from ._rom_mode import RomMode
 class SuperMarioBrosEnv(NESEnv):
     """An environment for playing Super Mario Bros with OpenAI Gym."""
 
-    def __init__(self, rom_mode=RomMode.VANILLA, lost_levels=False):
+    def __init__(self,
+        frameskip=1,
+        rom_mode=RomMode.VANILLA,
+        lost_levels=False
+    ):
         """
         Initialize a new Super Mario Bros environment.
 
         Args:
+            frameskip (int): the number of frames to skip between steps
             rom_mode (RomMode): the ROM mode to use when loading ROMs from disk
             lost_levels (bool): whether to load the ROM with lost levels.
                 - False: load original Super Mario Bros.
@@ -48,7 +53,7 @@ class SuperMarioBrosEnv(NESEnv):
         # create an absolute path to the specified ROM
         rom = os.path.join(os.path.dirname(os.path.abspath(__file__)), rom)
         # initialize the super object with the ROM path
-        super(SuperMarioBrosEnv, self).__init__(rom)
+        super(SuperMarioBrosEnv, self).__init__(rom, frameskip)
         # setup a variable to keep track of remaining time locally
         self._time_left = 0
         # setup a variable to keep track of how far into the level Mario is
@@ -301,23 +306,20 @@ class SuperMarioBrosEnv(NESEnv):
         # how many lives the player has left
         self._skip_occupied_states()
 
-    @property
-    def _reward(self):
+    def _get_reward(self):
         return (
             self._get_x_reward() +
             self._get_time_reward() +
             self._get_death_reward()
         )
 
-    @property
-    def _done(self):
+    def _get_done(self):
         """Return True if the episode is over, False otherwise."""
         # the life counter will get set to 255 (0xff) when there are no lives
         # left. It goes 2, 1, 0 for the 3 lives of the game
         return self._get_life() == 0xff
 
-    @property
-    def _info(self):
+    def _get_info(self):
         """Return the info after a step occurs."""
         return {}
 
