@@ -260,11 +260,9 @@ class SuperMarioBrosEnv(NESEnv):
 
     def _skip_occupied_states(self):
         """Skip occupied states by running out a timer and skipping frames."""
-        while self.get_is_occupied():
+        while self._get_is_occupied():
             self._runout_prelevel_timer()
-            # TODO: use local version of frameadvance (step)
-            # TODO: does NESEnv need a simpler step method to access _LIB methods?
-            # emu.frameadvance()
+            self._frame_advance(0)
 
     def _kill_mario(self):
         """Skip a death animation by forcing Mario to death."""
@@ -273,6 +271,22 @@ class SuperMarioBrosEnv(NESEnv):
             self._write_mem(0x075a, 0)
         # force Mario's state to dead
         self._write_mem(0x000e, 0x06)
+        # step forward one frame
+        self._frame_advance(0)
+
+    def _skip_start_screen(self):
+        # press and release the start button
+        self._frame_advance(8)
+        self._frame_advance(0)
+        # Press start until the game starts
+        while self._get_time() >= self._time_left:
+            # update the local time counter
+            self._time_left = self._get_time()
+            # press and release the start button
+            self._frame_advance(8)
+            self._frame_advance(0)
+            # run-out the prelevel timer to skip the animation
+            self._runout_prelevel_timer()
 
     # MARK: Reward Calculation
 
@@ -307,21 +321,15 @@ class SuperMarioBrosEnv(NESEnv):
 
         return 0
 
-    def _get_reward(self):
-        """Return the cumulative reward at the current state."""
+    # MARK: Emulation
+
+    @property
+    def _reward(self):
         return (
             self._get_x_reward() +
             self._get_time_reward() +
             self._get_death_reward()
         )
-
-    # MARK: Emulation
-
-    @property
-    def _reward(self):
-        """Return the reward after a step occurs."""
-        # TODO:
-        return 0
 
     @property
     def _done(self):
@@ -343,23 +351,6 @@ class SuperMarioBrosEnv(NESEnv):
 
         """
         _LIB.NESEnv_step(self._env, action)
-
-    def _skip_start_screen(self):
-        # press and release the start button
-        self._frame_advance(8)
-        self._frame_advance(0)
-        # Press start until the game starts
-        while self._get_time() >= self._time_left:
-            # update the local time counter
-            self._time_left = self._get_time()
-            # press and release the start button
-            self._frame_advance(8)
-            self._frame_advance(0)
-            # run-out the prelevel timer to skip the animation
-            self._runout_prelevel_timer()
-
-
-
 
     def _will_reset(self):
         """Handle any RAM hacking after a reset occurs."""
@@ -385,11 +376,6 @@ class SuperMarioBrosEnv(NESEnv):
         # skip the start screen and pre-level animation
         self._skip_start_screen()
 
-
-
-    def _will_step(self):
-        pass
-
     # TODO: delete when 0.4.0 goes live
     def step(self, action):
         """
@@ -406,8 +392,6 @@ class SuperMarioBrosEnv(NESEnv):
             - info (dict): contains auxiliary diagnostic information
 
         """
-        # call the before step callback
-        self._will_step()
         # pass the action to the emulator as an unsigned byte
         _LIB.NESEnv_step(self._env, action)
         # call the after step callback
@@ -418,11 +402,15 @@ class SuperMarioBrosEnv(NESEnv):
         return self.screen, self._reward, self._done, {}
 
     def _did_step(self):
-        # print(self._get_life())
-        pass
-
-
-
+        """Handle any RAM hacking after a step occurs."""
+        # if mario is dying, then cut to the chase and kill hi,
+        if self._get_is_dying():
+            self._kill_mario()
+        # skip area change (i.e. enter pipe, flag get, etc.)
+        self._skip_change_area()
+        # skip occupied states like the black screen between lives that shows
+        # how many lives the player has left
+        self._skip_occupied_states()
 
     # def get_keys_to_action(self):
     #     """Return the dictionary of keyboard keys to actions."""
