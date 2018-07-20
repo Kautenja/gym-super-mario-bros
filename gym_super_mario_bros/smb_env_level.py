@@ -49,7 +49,6 @@ class SuperMarioBrosEnvLevel(SuperMarioBrosEnv):
                     target_area = target_area + 1
             elif target_world >= 5:
                 # TODO: figure out why all worlds greater than 5 fail.
-                # >=6 causes a change for
                 target_area = target_area + 1
         else:
             # setup the target area depending on the target world and level
