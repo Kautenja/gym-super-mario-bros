@@ -1,4 +1,5 @@
 """An OpenAI Gym environment for Super Mario Bros. and Lost Levels."""
+import math
 import os
 from nes_py import NESEnv
 from ._rom_mode import RomMode
@@ -9,6 +10,7 @@ class SuperMarioBrosEnv(NESEnv):
 
     def __init__(self,
         frameskip=1,
+        max_episode_steps=math.inf,
         rom_mode=RomMode.VANILLA,
         lost_levels=False
     ):
@@ -17,6 +19,7 @@ class SuperMarioBrosEnv(NESEnv):
 
         Args:
             frameskip (int): the number of frames to skip between steps
+            max_episode_steps (int): number of steps before an episode ends
             rom_mode (RomMode): the ROM mode to use when loading ROMs from disk
             lost_levels (bool): whether to load the ROM with lost levels.
                 - False: load original Super Mario Bros.
@@ -53,7 +56,10 @@ class SuperMarioBrosEnv(NESEnv):
         # create an absolute path to the specified ROM
         rom = os.path.join(os.path.dirname(os.path.abspath(__file__)), rom)
         # initialize the super object with the ROM path
-        super(SuperMarioBrosEnv, self).__init__(rom, frameskip)
+        super(SuperMarioBrosEnv, self).__init__(rom,
+            frameskip=frameskip,
+            max_episode_steps=max_episode_steps,
+        )
         # setup a variable to keep track of remaining time locally
         self._time_left = 0
         # setup a variable to keep track of how far into the level Mario is

@@ -1,4 +1,5 @@
 """An OpenAI Gym environment for Super Mario Bros. and Lost Levels (levels)."""
+import math
 from .smb_env import SuperMarioBrosEnv
 from ._rom_mode import RomMode
 
@@ -8,6 +9,7 @@ class SuperMarioBrosLevelEnv(SuperMarioBrosEnv):
 
     def __init__(self,
         frameskip=1,
+        max_episode_steps=math.inf,
         rom_mode=RomMode.VANILLA,
         lost_levels=False,
         target_world=1,
@@ -18,6 +20,7 @@ class SuperMarioBrosLevelEnv(SuperMarioBrosEnv):
 
         Args:
             frameskip (int): the number of frames to skip between steps
+            max_episode_steps (int): number of steps before an episode ends
             rom_mode (RomMode): the ROM mode to use when loading ROMs from disk
             lost_levels (bool): whether to load the ROM with lost levels.
                 - False: load original Super Mario Bros.
@@ -32,8 +35,9 @@ class SuperMarioBrosLevelEnv(SuperMarioBrosEnv):
         # initialize the super object
         super(SuperMarioBrosLevelEnv, self).__init__(
             frameskip=frameskip,
+            max_episode_steps=max_episode_steps,
             rom_mode=rom_mode,
-            lost_levels=lost_levels
+            lost_levels=lost_levels,
         )
 
         # Type and value check the target world parameter
@@ -46,6 +50,7 @@ class SuperMarioBrosLevelEnv(SuperMarioBrosEnv):
         elif target_world > 8:
             worlds = set(range(1, 8 + 1))
             raise ValueError('target_world must be in '.format(worlds))
+
         # Type and value check the target level parameter
         if not isinstance(target_level, int):
             raise TypeError('target_level must be of type: int')
