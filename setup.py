@@ -49,7 +49,7 @@ setup(
     install_requires=[
         'gym>=0.10.5',
         'matplotlib>=2.0.2',
-        'nes-py>=0.5.1',
+        'nes-py>=0.6.0',
         'numpy>=1.14.2',
         'opencv-python>=3.4.0.12',
         'pygame>=1.9.3',
