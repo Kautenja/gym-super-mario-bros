@@ -1,9 +1,17 @@
 """Super Mario Bros for OpenAI Gym."""
 import os
 import argparse
+from .play import play_human, play_random
 
 
-def create_argparser() -> argparse.ArgumentParser:
+# The play modes for the system
+_PLAY_MODES = {
+    'human': play_human,
+    'random': play_random
+}
+
+
+def _get_args() -> argparse.ArgumentParser:
     """Create and return an argument parser for this command line interface."""
     parser = argparse.ArgumentParser(description=__doc__)
     # add the argument for the Super Mario Bros environment to run
@@ -25,25 +33,20 @@ def create_argparser() -> argparse.ArgumentParser:
         help='A flag to use the standard wrap while playing.'
     )
 
-    return parser
+    return parser.parse_args()
 
 
 def main() -> None:
     """The main entry point for the command line interface."""
-    # # parse arguments from the command line (argparse validates arguments)
-    # args = create_argparser().parse_args()
-    # # select the method for playing the game
-    # if args.mode == 'human':
-    #     os.environ['HUMAN_PLAY'] = str(True)
-    #     play = play_human
-    # elif args.mode == 'random':
-    #     play = play_random
-    # # play the game
-    # env = make(args.env)
-    # # wrap the environment if specified
-    # if args.wrap:
-    #     env = wrap(env, agent_history_length=None)
-    # play(env)
+    # parse arguments from the command line (argparse validates arguments)
+    args = _get_args()
+    # build the environment with the given ID
+    env = make(args.env)
+    # wrap the environment if specified
+    if args.wrap:
+        env = wrap(env, agent_history_length=None)
+    # play the environment with the given mode
+    _PLAY_MODES[args.mode](env)
 
 
 # explicitly define the outward facing API of this module
