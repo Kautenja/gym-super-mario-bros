@@ -317,6 +317,20 @@ class SuperMarioBrosEnv(NESEnv):
 
     # MARK: Emulation
 
+    @property
+    def _reward(self):
+        """Return the reward after a step occurs."""
+        # TODO:
+        return 0
+
+    @property
+    def _done(self):
+        """Return True if the episode is over, False otherwise."""
+        # the life counter will get set to 255 (0xff) when there are no lives
+        # left. It goes 2, 1, 0 for the 3 lives of the game
+        return self._get_life() == 0xff
+
+    # TODO: delete when 0.4.0 is available
     def _frame_advance(self, action):
         """
         Advance a frame in the emulator with an action.
@@ -353,6 +367,7 @@ class SuperMarioBrosEnv(NESEnv):
         self._time_left = 0
         self._x_position = 0
 
+    # TODO: delete when 0.4.0 is available
     def reset(self):
         # call the before reset callback
         self._will_reset()
@@ -375,6 +390,7 @@ class SuperMarioBrosEnv(NESEnv):
     def _will_step(self):
         pass
 
+    # TODO: delete when 0.4.0 goes live
     def step(self, action):
         """
         Run one frame of the NES and return the relevant observation data.
@@ -390,19 +406,19 @@ class SuperMarioBrosEnv(NESEnv):
             - info (dict): contains auxiliary diagnostic information
 
         """
+        # call the before step callback
         self._will_step()
         # pass the action to the emulator as an unsigned byte
         _LIB.NESEnv_step(self._env, action)
-
+        # call the after step callback
         self._did_step()
-
         # copy the screen from the emulator
         self._copy_screen()
         # return the screen from the emulator and other relevant data
         return self.screen, self._reward, self._done, {}
 
     def _did_step(self):
-        # print(self._get_time())
+        # print(self._get_life())
         pass
 
 
