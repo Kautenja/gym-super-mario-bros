@@ -3,8 +3,6 @@ from .smb_env import SuperMarioBrosEnv
 from ._rom_mode import RomMode
 
 
-# TODO: finishing a level doesn't return to the level, it jumps to the next.
-#       this needs to be fixed somehow and send a true done flag
 class SuperMarioBrosEnvLevel(SuperMarioBrosEnv):
     """An environment for playing Super Mario Bros Levels with OpenAI Gym."""
 
