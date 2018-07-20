@@ -48,6 +48,8 @@ class SuperMarioBrosEnvLevel(SuperMarioBrosEnv):
                 if target_level >= 2:
                     target_area = target_area + 1
             elif target_world >= 5:
+                msg = 'lost levels worlds 5 6 7 8 9 A B C D not supported'
+                raise ValueError(msg)
                 # TODO: figure out why all worlds greater than 5 fail.
                 target_area = target_area + 1
         else:
