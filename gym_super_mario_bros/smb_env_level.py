@@ -12,8 +12,8 @@ class SuperMarioBrosEnvLevel(SuperMarioBrosEnv):
         frameskip=1,
         rom_mode=RomMode.VANILLA,
         lost_levels=False,
-        target_world=4,
-        target_level=2,
+        target_world=1,
+        target_level=1,
     ):
         """
         Initialize a new Super Mario Bros environment.
