@@ -8,6 +8,9 @@ from ._rom_mode import RomMode
 class SuperMarioBrosEnv(NESEnv):
     """An environment for playing Super Mario Bros with OpenAI Gym."""
 
+    # the legal range of rewards for each step
+    reward_range = (-15, 15)
+
     def __init__(self,
         frameskip=1,
         max_episode_steps=math.inf,
@@ -284,7 +287,7 @@ class SuperMarioBrosEnv(NESEnv):
     def _get_death_reward(self):
         """Return the reward earned by dying."""
         if self._get_is_dying() or self._get_is_dead():
-            return -15
+            return -25
 
         return 0
 
@@ -313,6 +316,7 @@ class SuperMarioBrosEnv(NESEnv):
         self._skip_occupied_states()
 
     def _get_reward(self):
+        """Return the reward after a step occurs."""
         return (
             self._get_x_reward() +
             self._get_time_reward() +
