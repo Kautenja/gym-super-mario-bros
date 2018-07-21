@@ -2,8 +2,6 @@
 import math
 import gym
 from ._rom_mode import RomMode
-from .smb_env import SuperMarioBrosEnv
-from .smb_level_env import SuperMarioBrosLevelEnv
 
 
 def _register_mario_env(id: str, **kwargs: dict) -> None:
@@ -24,7 +22,7 @@ def _register_mario_env(id: str, **kwargs: dict) -> None:
         entry_point='gym_super_mario_bros:SuperMarioBrosEnv',
         max_episode_steps=9999999,
         reward_threshold=32000,
-        kwargs={ 'max_episode_steps': math.inf, **kwargs },
+        kwargs={ 'max_episode_steps': 100, **kwargs },
         nondeterministic=True,
     )
 
