@@ -95,9 +95,7 @@ class SuperMarioBrosLevelEnv(SuperMarioBrosEnv):
         self._frame_advance(8)
         self._frame_advance(0)
         # Press start until the game starts
-        while self._get_time() >= self._time_left:
-            # update the local time counter
-            self._time_left = self._get_time()
+        while self._get_time() == 0:
             # press the start button
             self._frame_advance(8)
             # force overwrite the level that is set to load
