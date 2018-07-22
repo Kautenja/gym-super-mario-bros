@@ -3,13 +3,13 @@ import gym
 from ._rom_mode import RomMode
 
 
-def _register_mario_env(id: str, **kwargs: dict) -> None:
+def _register_mario_env(id, **kwargs):
     """
     Register a Super Mario Bros. (1/2) environment with OpenAI Gym.
 
     Args:
-        id: id for the env to register
-        kwargs: keyword arguments for the SuperMarioBrosEnv initializer
+        id (str): id for the env to register
+        kwargs (dict): keyword arguments for the SuperMarioBrosEnv initializer
 
     Returns:
         None
@@ -50,13 +50,13 @@ _register_mario_env('SuperMarioBros2NoFrameskip-v0', lost_levels=True, frameskip
 _register_mario_env('SuperMarioBros2NoFrameskip-v1', lost_levels=True, frameskip=1, rom_mode=RomMode.DOWNSAMPLE)
 
 
-def _register_mario_level_env(id: str, **kwargs: dict) -> None:
+def _register_mario_level_env(id, **kwargs):
     """
     Register a Super Mario Bros. (1/2) Level environment with OpenAI Gym.
 
     Args:
-        id: id for the env to register
-        kwargs: keyword arguments for the SuperMarioBrosLevelEnv initializer
+        id (str): id for the env to register
+        kwargs (dict): keyword arguments for the SuperMarioBrosLevelEnv initializer
 
     Returns:
         None
