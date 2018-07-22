@@ -38,12 +38,11 @@ def play_random(env):
     """
     try:
         done = True
-        progress = tqdm(range(500))
+        progress = tqdm(range(1000))
         for _ in progress:
             if done:
                 _ = env.reset()
-            # action = env.action_space.sample()
-            action = 128
+            action = env.action_space.sample()
             _, reward, done, _ = env.step(action)
             progress.set_postfix(reward=reward)
             env.render()
