@@ -244,18 +244,22 @@ class SuperMarioBrosEnv(NESEnv):
         self._frame_advance(0)
 
     def _skip_start_screen(self):
+        """Press and release start to skip the start screen."""
         # press and release the start button
         self._frame_advance(8)
         self._frame_advance(0)
         # Press start until the game starts
-        while self._get_time() >= self._time_left:
-            # update the local time counter
-            self._time_left = self._get_time()
+        while self._get_time() == 0:
             # press and release the start button
             self._frame_advance(8)
             self._frame_advance(0)
             # run-out the prelevel timer to skip the animation
             self._runout_prelevel_timer()
+        # after the start screen idle to skip some extra frames
+        while self._get_time() >= self._time_left:
+            self._time_left = self._get_time()
+            self._frame_advance(8)
+            self._frame_advance(0)
 
     # MARK: Reward Calculation
 
@@ -293,15 +297,16 @@ class SuperMarioBrosEnv(NESEnv):
     # MARK: nes-py API calls
 
     def _will_reset(self):
-        """Handle any RAM hacking after a reset occurs."""
-        # reset the time left and x position variables
+        """Handle and RAM hacking before a reset occurs."""
         self._time_left = 0
         self._x_position = 0
 
-    def _did_reset_(self):
+    def _did_reset(self):
         """Handle any RAM hacking after a reset occurs."""
         # skip the start screen and pre-level animation
         self._skip_start_screen()
+        self._time_left = self._get_time()
+        self._x_position = self._get_x_position()
 
     def _did_step(self):
         """Handle any RAM hacking after a step occurs."""

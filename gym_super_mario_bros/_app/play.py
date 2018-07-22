@@ -21,7 +21,6 @@ def play_human(env):
     except KeyboardInterrupt:
         pass
     # reset and close the environment
-    env.reset()
     env.close()
 
 
@@ -38,18 +37,17 @@ def play_random(env):
     """
     try:
         done = True
-        progress = tqdm(range(500))
+        progress = tqdm(range(5000))
         for _ in progress:
             if done:
-                _ = env.reset()
+                state = env.reset()
             action = env.action_space.sample()
-            _, reward, done, _ = env.step(action)
+            state, reward, done, _ = env.step(action)
             progress.set_postfix(reward=reward)
             env.render()
     except KeyboardInterrupt:
         pass
     # reset and close the environment
-    env.reset()
     env.close()
 
 
