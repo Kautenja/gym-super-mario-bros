@@ -1,6 +1,5 @@
 """A method to play gym environments using human IO inputs."""
 import os
-from typing import Callable
 import gym
 import pygame
 import numpy as np
