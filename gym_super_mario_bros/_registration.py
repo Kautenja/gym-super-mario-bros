@@ -15,13 +15,14 @@ def _register_mario_env(id, **kwargs):
         None
 
     """
+    kwargs['max_episode_steps'] = float('inf')
     # register the environment
     gym.envs.registration.register(
         id=id,
         entry_point='gym_super_mario_bros:SuperMarioBrosEnv',
         max_episode_steps=9999999,
         reward_threshold=32000,
-        kwargs={ 'max_episode_steps': float('inf'), **kwargs },
+        kwargs=kwargs,
         nondeterministic=True,
     )
 
@@ -62,13 +63,14 @@ def _register_mario_level_env(id, **kwargs):
         None
 
     """
+    kwargs['max_episode_steps'] = float('inf')
     # register the environment
     gym.envs.registration.register(
         id=id,
         entry_point='gym_super_mario_bros:SuperMarioBrosLevelEnv',
         max_episode_steps=9999999,
         reward_threshold=32000,
-        kwargs={ 'max_episode_steps': float('inf'), **kwargs },
+        kwargs=kwargs,
         nondeterministic=True,
     )
 
