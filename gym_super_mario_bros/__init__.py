@@ -1,12 +1,12 @@
 """Registration code of Gym environments in this package."""
-from ._registration import make
 from .smb_env import SuperMarioBrosEnv
-from .wrappers import wrap
+from .smb_level_env import SuperMarioBrosLevelEnv
+from ._registration import make
 
 
 # define the outward facing API of this package
 __all__ = [
     make.__name__,
     SuperMarioBrosEnv.__name__,
-    wrap.__name__,
+    SuperMarioBrosLevelEnv.__name__,
 ]
