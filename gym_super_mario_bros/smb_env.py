@@ -165,9 +165,9 @@ class SuperMarioBrosEnv(NESEnv):
         Return the player status.
 
         Note:
-            0  -> small Mario
-            1  -> tall Mario
-            2+ -> fireball Mario
+            0  : small Mario
+            1  : tall Mario
+            2+ : fireball Mario
 
         """
         return self._read_mem(0x0756)
@@ -177,18 +177,18 @@ class SuperMarioBrosEnv(NESEnv):
         Return the current player state.
 
         Note:
-            0x00 -> Leftmost of screen
-            0x01 -> Climbing vine
-            0x02 -> Entering reversed-L pipe
-            0x03 -> Going down a pipe
-            0x04 -> Auto-walk
-            0x05 -> Auto-walk
-            0x06 -> Dead
-            0x07 -> Entering area
-            0x08 -> Normal
-            0x09 -> Cannot move
-            0x0B -> Dying
-            0x0C -> Palette cycling, can't move
+            0x00 : Leftmost of screen
+            0x01 : Climbing vine
+            0x02 : Entering reversed-L pipe
+            0x03 : Going down a pipe
+            0x04 : Auto-walk
+            0x05 : Auto-walk
+            0x06 : Dead
+            0x07 : Entering area
+            0x08 : Normal
+            0x09 : Cannot move
+            0x0B : Dying
+            0x0C : Palette cycling, can't move
 
         """
         return self._read_mem(0x000e)
