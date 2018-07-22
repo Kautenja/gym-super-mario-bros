@@ -21,7 +21,6 @@ def play_human(env):
     except KeyboardInterrupt:
         pass
     # reset and close the environment
-    env.reset()
     env.close()
 
 
@@ -49,7 +48,6 @@ def play_random(env):
     except KeyboardInterrupt:
         pass
     # reset and close the environment
-    env.reset()
     env.close()
 
 
