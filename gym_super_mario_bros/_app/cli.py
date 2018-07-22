@@ -1,6 +1,7 @@
 """Super Mario Bros for OpenAI Gym."""
 import os
 import argparse
+from nes_py.wrappers import wrap
 from .._registration import make
 from .play import play_human, play_random
 
@@ -37,7 +38,7 @@ def _get_args() -> argparse.ArgumentParser:
     return parser.parse_args()
 
 
-def main() -> None:
+def main():
     """The main entry point for the command line interface."""
     # parse arguments from the command line (argparse validates arguments)
     args = _get_args()
