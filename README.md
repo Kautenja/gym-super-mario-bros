@@ -37,7 +37,9 @@ This is because gym environments are registered at runtime. By default,
 `gym_super_mario_bros` environments use the full NES action space of 256
 discrete actions. To contstrain this, `gym_super_mario_bros.actions` provides
 three actions lists (`RIGHT_ONLY`, `SIMPLE_MOVEMENT`, and `COMPLEX_MOVEMENT`)
-for the `nes_py.wrappers.BinarySpaceToDiscreteSpaceEnv` wrapper.
+for the `nes_py.wrappers.BinarySpaceToDiscreteSpaceEnv` wrapper. See 
+[gym_super_mario_bros/actions.py](gym_super_mario_bros/actions.py) for a 
+breakdown of the legal actions in each of these three lists.
 
 ```python
 from nes_py.wrappers import BinarySpaceToDiscreteSpaceEnv
