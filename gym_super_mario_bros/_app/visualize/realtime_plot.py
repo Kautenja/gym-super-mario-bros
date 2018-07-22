@@ -6,12 +6,12 @@ from matplotlib.ticker import MaxNLocator
 class RealtimePlot(object):
     """A simple realtime plot to show the value of a discrete line."""
 
-    def __init__(self, figsize: tuple=(4, 4)) -> None:
+    def __init__(self, figsize=(4, 4)):
         """
         Initialize a new realtime plot.
 
         Args:
-            figsize: the size of the figure to draw
+            figsize (tuple): the size of the figure to draw
 
         Returns:
             None
@@ -34,12 +34,12 @@ class RealtimePlot(object):
         # create the line
         self.line, = self.ax.plot(self.data)
 
-    def __call__(self, datum: float) -> None:
+    def __call__(self, datum):
         """
         Update the plot with a new piece of datum.
 
         Args:
-            datum: the number to add to the plot
+            datum (float): the number to add to the plot
 
         Returns:
             None
