@@ -42,7 +42,8 @@ def play_random(env):
         for _ in progress:
             if done:
                 _ = env.reset()
-            action = env.action_space.sample()
+            # action = env.action_space.sample()
+            action = 128
             _, reward, done, _ = env.step(action)
             progress.set_postfix(reward=reward)
             env.render()
