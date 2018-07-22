@@ -244,6 +244,7 @@ class SuperMarioBrosEnv(NESEnv):
         self._frame_advance(0)
 
     def _skip_start_screen(self):
+        """Press and release start to skip the start screen."""
         # press and release the start button
         self._frame_advance(8)
         self._frame_advance(0)
