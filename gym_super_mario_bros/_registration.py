@@ -68,25 +68,25 @@ def _register_mario_level_env(id, **kwargs):
         entry_point='gym_super_mario_bros:SuperMarioBrosLevelEnv',
         max_episode_steps=9999999,
         reward_threshold=32000,
-        kwargs={ 'max_episode_steps': math.inf, **kwargs },
+        kwargs={ 'max_episode_steps': float('inf'), **kwargs },
         nondeterministic=True,
     )
 
 
 # a template for making individual level environments
-id_template = 'SuperMarioBros{}-{}-{}-v{}'
+_ID_TEMPLATE = 'SuperMarioBros{}-{}-{}-v{}'
 # iterate over all the rom modes, worlds (1-8), and levels (1-4)
-rom_modes = [
+_ROM_MODES = [
     RomMode.VANILLA,
     RomMode.DOWNSAMPLE,
     RomMode.PIXEL,
     RomMode.RECTANGLE
 ]
-for version, rom_mode in enumerate(rom_modes):
+for version, rom_mode in enumerate(_ROM_MODES):
     for world in range(1, 9):
         for level in range(1, 5):
             # setup the frame-skipping environment
-            env_id = id_template.format('', world, level, version)
+            env_id = _ID_TEMPLATE.format('', world, level, version)
             _register_mario_level_env(env_id,
                 frameskip=4,
                 rom_mode=rom_mode,
@@ -94,7 +94,7 @@ for version, rom_mode in enumerate(rom_modes):
                 target_level=level
             )
             # setup the no frame-skipping environment
-            env_id = id_template.format('NoFrameskip', world, level, version)
+            env_id = _ID_TEMPLATE.format('NoFrameskip', world, level, version)
             _register_mario_level_env(env_id,
                 frameskip=1,
                 rom_mode=rom_mode,
