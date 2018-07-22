@@ -10,7 +10,7 @@ def README():
 
 setup(
     name='gym_super_mario_bros',
-    version='2.3.1',
+    version='3.0.0',
     description='Super Mario Bros. for OpenAI Gym',
     long_description=README(),
     long_description_content_type='text/markdown',
@@ -23,7 +23,7 @@ setup(
     ]),
     classifiers=[
         'License :: OSI Approved :: MIT License',
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
         'Intended Audience :: Science/Research',
         'Operating System :: MacOS :: MacOS X',
