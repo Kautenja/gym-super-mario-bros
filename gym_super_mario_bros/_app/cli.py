@@ -13,8 +13,8 @@ _PLAY_MODES = {
 }
 
 
-def _get_args() -> argparse.ArgumentParser:
-    """Create and return an argument parser for this command line interface."""
+def _get_args():
+    """Parse command line arguments and return them."""
     parser = argparse.ArgumentParser(description=__doc__)
     # add the argument for the Super Mario Bros environment to run
     parser.add_argument('--env', '-e',
@@ -34,7 +34,7 @@ def _get_args() -> argparse.ArgumentParser:
         action='store_true',
         help='A flag to use the standard wrap while playing.'
     )
-
+    # parse arguments and return them
     return parser.parse_args()
 
 
