@@ -66,6 +66,15 @@ class SuperMarioBrosEnv(NESEnv):
         self._time_left = 0
         # setup a variable to keep track of how far into the level Mario is
         self._x_position = 0
+        # MARK: Game setup
+        # reset the emulator
+        self.reset()
+        # skip the start screen
+        self._skip_start_screen()
+        # stall for a frame
+        self.step(0)
+        # create a backup state to restore from on subsequent calls to reset
+        self._backup()
 
     # MARK: Memory access
 
@@ -303,8 +312,6 @@ class SuperMarioBrosEnv(NESEnv):
 
     def _did_reset(self):
         """Handle any RAM hacking after a reset occurs."""
-        # skip the start screen and pre-level animation
-        self._skip_start_screen()
         self._time_left = self._get_time()
         self._x_position = self._get_x_position()
 
