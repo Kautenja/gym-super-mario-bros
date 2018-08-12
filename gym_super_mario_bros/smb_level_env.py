@@ -31,14 +31,6 @@ class SuperMarioBrosLevelEnv(SuperMarioBrosEnv):
             None
 
         """
-        # initialize the super object
-        super(SuperMarioBrosLevelEnv, self).__init__(
-            frameskip=frameskip,
-            max_episode_steps=max_episode_steps,
-            rom_mode=rom_mode,
-            lost_levels=lost_levels,
-        )
-
         # Type and value check the target world parameter
         if not isinstance(target_world, int):
             raise TypeError('target_world must be of type: int')
@@ -77,10 +69,19 @@ class SuperMarioBrosLevelEnv(SuperMarioBrosEnv):
             if target_world in {1, 2, 4, 7}:
                 if target_level >= 2:
                     target_area = target_area + 1
+
         # copy the values to local instance variables
         self._target_world = target_world
         self._target_level = target_level
         self._target_area = target_area
+
+        # initialize the super object
+        super(SuperMarioBrosLevelEnv, self).__init__(
+            frameskip=frameskip,
+            max_episode_steps=max_episode_steps,
+            rom_mode=rom_mode,
+            lost_levels=lost_levels,
+        )
 
     # MARK: RAM Hacks
 
