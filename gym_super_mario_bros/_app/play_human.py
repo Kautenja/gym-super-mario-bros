@@ -81,7 +81,7 @@ def play(env, transpose=True, fps=30, callback=None, nop_=0):
     # disable the SDL video driver so FCEUX wont open a window
     os.environ['SDL_VIDEODRIVER'] = 'dummy'
     clock = pygame.time.Clock()
-    plot = RealtimePlot()
+    # plot = RealtimePlot()
     # start the main game loop
     while running:
         if env_done:
@@ -91,7 +91,7 @@ def play(env, transpose=True, fps=30, callback=None, nop_=0):
             action = keys_to_action.get(tuple(sorted(pressed_keys)), nop_)
             prev_obs = obs
             obs, rew, env_done, info = env.step(action)
-            plot(rew)
+            # plot(rew)
             if callback is not None:
                 callback(prev_obs, obs, action, rew, env_done, info)
         if obs is not None:
