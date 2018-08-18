@@ -47,7 +47,7 @@ def _get_args():
     # add the argument for adjusting the action space
     parser.add_argument('--actionspace', '-a',
         type=str,
-        default=None,
+        default='nes',
         choices=['nes', 'right', 'simple', 'complex'],
         help='the action space wrapper to use'
     )
@@ -63,6 +63,7 @@ def main():
     env = make(args.env)
     # wrap the environment with an action space if specified
     if args.actionspace != 'nes':
+        print(args.actionspace)
         # unwrap the actions list by key
         actions = _ACTION_SPACES[args.actionspace]
         # wrap the environment with the new action space
