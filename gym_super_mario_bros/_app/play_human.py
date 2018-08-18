@@ -3,7 +3,7 @@ import os
 import gym
 import pygame
 import numpy as np
-from .visualize.realtime_plot import RealtimePlot
+from nes_py._app.visualize.realtime_plot import RealtimePlot
 
 
 def display_arr(screen, arr, video_size, transpose):
