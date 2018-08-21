@@ -114,11 +114,10 @@ class SuperMarioBrosLevelEnv(SuperMarioBrosEnv):
     def _get_done(self):
         """Return True if the episode is over, False otherwise."""
         return (
-            # only one life in this env, done if dying or dead
             self._get_is_dying() or
             self._get_is_dead() or
-            # player state is 4 (auto-walk) at the end of a level
-            self._get_player_state() == 0x04
+            self._get_is_world_over() or
+            self._get_is_level_over()
         )
 
 
