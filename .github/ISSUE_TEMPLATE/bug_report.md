@@ -11,8 +11,9 @@ A clear and concise description of what the bug is.
 ### To Reproduce
 
 Steps to reproduce the behavior:
-1. foo
-2. bar
+
+1.  foo
+2.  bar
 
 ### Expected behavior
 
@@ -24,10 +25,10 @@ If applicable, add screenshots to help explain your problem.
 
 ### Environment
 
- - Operating System:
- - Python version:
- - `gym-super-mario-bros` version:
- - `nes-py` version:
+-   Operating System:
+-   Python version:
+-   `gym-super-mario-bros` version:
+-   `nes-gym` version:
 
 ### Additional context
 
