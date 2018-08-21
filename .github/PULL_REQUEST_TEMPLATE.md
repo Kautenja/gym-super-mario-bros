@@ -6,7 +6,7 @@ Please include a summary of the change and which issue is fixed. Please also inc
 
 ### Type of change
 
-Please delete options that are not relevant.
+Please select all relevant options:
 
 - [ ] Bug fix (non-breaking change which fixes an issue)
 - [ ] New feature (non-breaking change which adds functionality)
