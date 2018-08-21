@@ -227,6 +227,19 @@ class SuperMarioBrosEnv(NESEnv):
         """
         return self._get_player_state() in busy
 
+    def _get_is_world_over(self):
+        """Return a boolean determining if the world is over."""
+        # 0x0770 contains GamePlay mode:
+        # 0 => Demo
+        # 1 => Standard
+        # 2 => End of world
+        return self._read_mem(0x0770) == 2
+
+    def _get_is_level_over(self):
+        """Return a boolean determining if the level is over."""
+        # player float state set to 3 when sliding down flag pole
+        return self._read_mem(0x001D) == 3
+
     # MARK: RAM Hacks
 
     def _runout_prelevel_timer(self):
@@ -241,7 +254,7 @@ class SuperMarioBrosEnv(NESEnv):
 
     def _skip_occupied_states(self):
         """Skip occupied states by running out a timer and skipping frames."""
-        while self._get_is_occupied():
+        while self._get_is_occupied() or self._get_is_world_over():
             self._runout_prelevel_timer()
             self._frame_advance(0)
 
@@ -315,8 +328,20 @@ class SuperMarioBrosEnv(NESEnv):
         self._time_left = self._get_time()
         self._x_position = self._get_x_position()
 
-    def _did_step(self):
-        """Handle any RAM hacking after a step occurs."""
+    def _did_step(self, done):
+        """
+        Handle any RAM hacking after a step occurs.
+
+        Args:
+            done: whether the done flag is set to true
+
+        Returns:
+            None
+
+        """
+        # if done flag is set a reset is incoming anyway, ignore any hacking
+        if done:
+            return
         # if mario is dying, then cut to the chase and kill hi,
         if self._get_is_dying():
             self._kill_mario()
@@ -339,10 +364,6 @@ class SuperMarioBrosEnv(NESEnv):
         # the life counter will get set to 255 (0xff) when there are no lives
         # left. It goes 2, 1, 0 for the 3 lives of the game
         return self._get_life() == 0xff
-
-    def _get_info(self):
-        """Return the info after a step occurs."""
-        return {}
 
 
 # explicitly define the outward facing API of this module
