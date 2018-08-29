@@ -22,7 +22,7 @@ setup(
         'Reinforcement-Learning-Environment',
     ]),
     classifiers=[
-        'License :: OSI Approved :: MIT License',
+        'License :: Free For Educational Use',
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
         'Intended Audience :: Science/Research',
