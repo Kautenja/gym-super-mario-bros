@@ -139,26 +139,26 @@ Info about the rewards and info returned by the `step` method.
 ### Reward Function
 
 The reward function assumes the objective of the game is to move as far right
-as possible (increase the agent's x value), as fast as possible, without
+as possible (increase the agent's _x_ value), as fast as possible, without
 dying. To model this game, three separate variables compose the reward:
 
-1.  `v`: the difference in agent x values between states
+1.  _v_: the difference in agent _x_ values between states
     -   in this case this is instantaneous velocity for the given step
-    -   moving right ⇔ `v` > 0
-    -   moving left ⇔ `v` < 0
-    -   no movement ⇔ `v` = 0
-2.  `c`: the difference in the game clock between frames
+    -   moving right ⇔ _v > 0_
+    -   moving left ⇔ _v < 0_
+    -   no movement ⇔ _v = 0_
+2.  _c_: the difference in the game clock between frames
     -   this penalty encourages the agent to move quickly
-    -   no clock change ⇔ `c` = 0
-    -   clock decrease ⇔ `c` < 0
-3.  `d`: a death penalty that penalizes the agent for dying in a state
+    -   no clock change ⇔ _c = 0_
+    -   clock decrease ⇔ _c < 0_
+3.  _d_: a death penalty that penalizes the agent for dying in a state
     -   this penalty encourages the agent to avoid death
-    -   no clock change ⇔ `d` = 0
-    -   death ⇔ `d` = 15
+    -   no clock change ⇔ _d = 0_
+    -   death ⇔ _d = 15_
 
-`r = v + c + d`
+_r = v + c + d_
 
-The reward is clipped into the range `(-15, 15)`.
+The reward is clipped into the range _(-15, 15)_.
 
 ### `info` dictionary
 
