@@ -154,7 +154,7 @@ dying. To model this game, three separate variables compose the reward:
 3.  _d_: a death penalty that penalizes the agent for dying in a state
     -   this penalty encourages the agent to avoid death
     -   no clock change ⇔ _d = 0_
-    -   death ⇔ _d = 15_
+    -   death ⇔ _d = -15_
 
 _r = v + c + d_
 
