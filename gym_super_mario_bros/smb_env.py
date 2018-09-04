@@ -365,6 +365,12 @@ class SuperMarioBrosEnv(NESEnv):
         # left. It goes 2, 1, 0 for the 3 lives of the game
         return self._get_life() == 0xff
 
+    def _get_info(self):
+        """Return the info after a step occurs"""
+        return {
+            'flag_get': self._get_is_world_over() or self._get_is_level_over()
+        }
+
 
 # explicitly define the outward facing API of this module
 __all__ = [SuperMarioBrosEnv.__name__]
