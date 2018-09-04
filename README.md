@@ -21,7 +21,7 @@ Super Mario Bros. & Super Mario Bros. 2 (Lost Levels) on The Nintendo
 Entertainment System (NES) using
 [the nes-py emulator](https://github.com/Kautenja/nes-py).
 
-# Installation
+## Installation
 
 The preferred installation of `gym-super-mario-bros` is from `pip`:
 
@@ -29,9 +29,9 @@ The preferred installation of `gym-super-mario-bros` is from `pip`:
 pip install gym-super-mario-bros
 ```
 
-# Usage
+## Usage
 
-## Python
+### Python
 
 You must import `gym_super_mario_bros` before trying to make an environment.
 This is because gym environments are registered at runtime. By default,
@@ -65,7 +65,7 @@ convenience.
 **NOTE:** remove calls to `render` in training code for a nontrivial
 speedup.
 
-## Command Line
+### Command Line
 
 `gym_super_mario_bros` feature a command line interface for playing
 environments using either the keyboard, or uniform random movement.
@@ -77,7 +77,7 @@ gym_super_mario_bros -e <the environment ID to play> -m <`human` or `random`>
 **NOTE:** by default, `-e` is set to `SuperMarioBros-v0` and `-m` is set to
 `human`.
 
-# Environments
+## Environments
 
 These environments allow 3 attempts (lives) to make it through the 32 levels
 of the game. The environments only send reward-able game-play frames to
@@ -108,7 +108,7 @@ will lock the Python process until the emulator is ready for the next action.
 [2-v0]: https://user-images.githubusercontent.com/2184469/40948822-3d3b8412-6830-11e8-860b-af3802f5373f.png
 [2-v1]: https://user-images.githubusercontent.com/2184469/40948821-3d2d61a2-6830-11e8-8789-a92e750aa9a8.png
 
-## Individual Levels
+### Individual Levels
 
 These environments allow a single attempt (life) to make it through a single
 level of the game.
@@ -132,7 +132,11 @@ For example, to play 4-2 on the downsampled ROM, you would use the environment
 id `SuperMarioBros-4-2-v1`. To disable frame skip you would use
 `SuperMarioBrosNoFrameskip-4-2-v1`.
 
-# Reward Function
+## Step
+
+Info about the rewards and info returned by the `step` method.
+
+### Reward Function
 
 The reward function assumes the objective of the game is to move as far right
 as possible (increase the agent's x value), as fast as possible, without
@@ -156,7 +160,7 @@ dying. To model this game, three separate variables compose the reward:
 
 The reward is clipped into the range `(-15, 15)`.
 
-# `info` dictionary
+### `info` dictionary
 
 The `info` dictionary returned by the `step` method contains the following
 keys:
@@ -165,7 +169,7 @@ keys:
 |:-----------|:-------|:------------------------------------|
 | `flag_get` | `bool` | True if Mario reached a flag or ax  |
 
-# Citation
+## Citation
 
 Please cite `gym-super-mario-bros` if you use it in your research.
 
