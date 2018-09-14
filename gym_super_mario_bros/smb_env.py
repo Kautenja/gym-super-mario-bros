@@ -31,8 +31,6 @@ class SuperMarioBrosEnv(NESEnv):
             None
 
         """
-        if not isinstance(rom_mode, RomMode):
-            raise TypeError('rom_mode must be of type: RomMode')
         # Type and value check the lost levels parameter
         if not isinstance(lost_levels, bool):
             raise TypeError('lost_levels must be of type: bool')
@@ -46,6 +44,8 @@ class SuperMarioBrosEnv(NESEnv):
                 raise ValueError('rectangle_rom not supported for Lost Levels')
             elif rom_mode == RomMode.DOWNSAMPLE:
                 rom = 'roms/super-mario-bros-2-downsampled.nes'
+            else:
+                raise ValueError('rom_mode received invalid value')
         else:
             if rom_mode == RomMode.VANILLA:
                 rom = 'roms/super-mario-bros.nes'
@@ -55,6 +55,8 @@ class SuperMarioBrosEnv(NESEnv):
                 rom = 'roms/super-mario-bros-rect.nes'
             elif rom_mode == RomMode.DOWNSAMPLE:
                 rom = 'roms/super-mario-bros-downsampled.nes'
+            else:
+                raise ValueError('rom_mode received invalid value')
         # create an absolute path to the specified ROM
         rom = os.path.join(os.path.dirname(os.path.abspath(__file__)), rom)
         # initialize the super object with the ROM path

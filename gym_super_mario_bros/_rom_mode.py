@@ -1,9 +1,7 @@
 """An enumeration of valid ROM hacks to load into the emulator."""
-import enum
 
 
-@enum.unique
-class RomMode(enum.Enum):
+class RomMode():
     """An enumeration of valid ROM hacks to load into the emulator."""
     # the standard ROM with no modifications
     VANILLA = 0
