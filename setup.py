@@ -10,7 +10,7 @@ def README():
 
 setup(
     name='gym_super_mario_bros',
-    version='3.1.2',
+    version='4.0.0',
     description='Super Mario Bros. for OpenAI Gym',
     long_description=README(),
     long_description_content_type='text/markdown',
