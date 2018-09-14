@@ -144,17 +144,23 @@ dying. To model this game, three separate variables compose the reward:
 
 1.  _v_: the difference in agent _x_ values between states
     -   in this case this is instantaneous velocity for the given step
+    -   _v = x1 - x0_
+        -   _x0_ is the x position before the step
+        -   _x1_ is the x position after the step
     -   moving right ⇔ _v > 0_
     -   moving left ⇔ _v < 0_
-    -   no movement ⇔ _v = 0_
+    -   not moving ⇔ _v = 0_
 2.  _c_: the difference in the game clock between frames
-    -   this penalty encourages the agent to move quickly
-    -   no clock change ⇔ _c = 0_
-    -   clock decrease ⇔ _c < 0_
+    -   the penalty prevents the agent from standing still
+    -   _c = c0 - c1_
+        -   _c0_ is the clock reading before the step
+        -   _c1_ is the clock reading after the step
+    -   no clock tick ⇔ _c = 0_
+    -   clock tick ⇔ _c < 0_
 3.  _d_: a death penalty that penalizes the agent for dying in a state
     -   this penalty encourages the agent to avoid death
-    -   no clock change ⇔ _d = 0_
-    -   death ⇔ _d = -15_
+    -   alive ⇔ _d = 0_
+    -   dead ⇔ _d = -15_
 
 _r = v + c + d_
 
