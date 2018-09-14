@@ -1,11 +1,14 @@
 # gym-super-mario-bros
 
+[![BuildStatus][build-status]][ci-server]
 [![PackageVersion][pypi-version]][pypi-home]
 [![PythonVersion][python-version]][python-home]
 [![Stable][pypi-status]][pypi-home]
 [![Format][pypi-format]][pypi-home]
 [![License][pypi-license]](LICENSE)
 
+[build-status]: https://travis-ci.com/Kautenja/gym-super-mario-bros.svg?branch=master
+[ci-server]: https://travis-ci.com/Kautenja/gym-super-mario-bros
 [pypi-version]: https://badge.fury.io/py/gym-super-mario-bros.svg
 [pypi-license]: https://img.shields.io/pypi/l/gym-super-mario-bros.svg
 [pypi-status]: https://img.shields.io/pypi/status/gym-super-mario-bros.svg
@@ -67,7 +70,7 @@ speedup.
 
 ### Command Line
 
-`gym_super_mario_bros` feature a command line interface for playing
+`gym_super_mario_bros` features a command line interface for playing
 environments using either the keyboard, or uniform random movement.
 
 ```shell
@@ -79,10 +82,10 @@ gym_super_mario_bros -e <the environment ID to play> -m <`human` or `random`>
 
 ## Environments
 
-These environments allow 3 attempts (lives) to make it through the 32 levels
-of the game. The environments only send reward-able game-play frames to
+These environments allow 3 attempts (lives) to make it through the 32 stages
+in the game. The environments only send reward-able game-play frames to
 agents; No cut-scenes, loading screens, etc. are sent from the NES emulator
-to an agent nor can an agent perform actions during these occurrences. If a
+to an agent nor can an agent perform actions during these instances. If a
 cut-scene is not able to be skipped by hacking the NES's RAM, the environment
 will lock the Python process until the emulator is ready for the next action.
 
@@ -108,19 +111,19 @@ will lock the Python process until the emulator is ready for the next action.
 [2-v0]: https://user-images.githubusercontent.com/2184469/40948822-3d3b8412-6830-11e8-860b-af3802f5373f.png
 [2-v1]: https://user-images.githubusercontent.com/2184469/40948821-3d2d61a2-6830-11e8-8789-a92e750aa9a8.png
 
-### Individual Levels
+### Individual Stages
 
 These environments allow a single attempt (life) to make it through a single
-level of the game.
+stage of the game.
 
 Use the template
 
-    SuperMarioBros-<world>-<level>-v<version>
+    SuperMarioBros-<world>-<stage>-v<version>
 
 where:
 
 -   `<world>` is a number in {1, 2, 3, 4, 5, 6, 7, 8} indicating the world
--   `<level>` is a number in {1, 2, 3, 4} indicating the level within a world
+-   `<stage>` is a number in {1, 2, 3, 4} indicating the stage within a world
 -   `<version>` is a number in {0, 1, 2, 3} specifying the ROM mode to use
     - 0: standard ROM
     - 1: downsampled ROM
@@ -171,9 +174,16 @@ The reward is clipped into the range _(-15, 15)_.
 The `info` dictionary returned by the `step` method contains the following
 keys:
 
-| Key        | Type   | Description                         |
-|:-----------|:-------|:------------------------------------|
-| `flag_get` | `bool` | True if Mario reached a flag or ax  |
+| Key        | Type   | Description                            |
+|:-----------|:-------|:---------------------------------------|
+| `coins   ` | `int`  | The number of collected coins          |
+| `flag_get` | `bool` | True if Mario reached a flag or ax     |
+| `life`     | `int`  | The current life (i.e., {3, 2, 1})     |
+| `score`    | `int`  | The cumulative in-game score           |
+| `stage`    | `int`  | The current stage (i.e., {1, ..., 4})  |
+| `time`     | `int`  | The time left on the clock             |
+| `world`    | `int`  | The current world (i.e., {1, ..., 8})  |
+| `x_pos`    | `int`  | Mario's x position in the stage        |
 
 ## Citation
 
