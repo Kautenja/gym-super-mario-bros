@@ -62,11 +62,10 @@ class SuperMarioBrosEnv(NESEnv):
             frameskip=frameskip,
             max_episode_steps=max_episode_steps,
         )
-        # setup a variable to keep track of remaining time locally
+        # setup a variable to keep track of the last frames time
         self._time_last = 0
-        # setup a variable to keep track of how far into the level Mario is
+        # setup a variable to keep track of the last frames x position
         self._x_position_last = 0
-        # MARK: Game setup
         # reset the emulator
         self.reset()
         # skip the start screen
@@ -310,12 +309,14 @@ class SuperMarioBrosEnv(NESEnv):
             self._frame_advance(8)
             self._frame_advance(0)
 
-    # MARK: Reward Calculation
+    # MARK: Reward Function
 
-    def _get_x_reward(self):
+    @property
+    def _x_reward(self):
         """Return the reward based on left right movement between steps."""
         _reward = self._x_position - self._x_position_last
         self._x_position_last = self._x_position
+        # TODO: check whether this is still necessary
         # resolve an issue where after death the x position resets. The x delta
         # is typically has at most magnitude of 3, 5 is a safe bound
         if _reward < -5 or _reward > 5:
@@ -323,7 +324,8 @@ class SuperMarioBrosEnv(NESEnv):
 
         return _reward
 
-    def _time_reward(self):
+    @property
+    def _time_penalty(self):
         """Return the reward for the in-game clock ticking."""
         _reward = self._time - self._time_last
         self._time_last = self._time
@@ -334,7 +336,8 @@ class SuperMarioBrosEnv(NESEnv):
 
         return _reward
 
-    def _get_death_reward(self):
+    @property
+    def _death_penalty(self):
         """Return the reward earned by dying."""
         if self._is_dying or self._is_dead:
             return -25
@@ -378,11 +381,7 @@ class SuperMarioBrosEnv(NESEnv):
 
     def _get_reward(self):
         """Return the reward after a step occurs."""
-        return (
-            self._get_x_reward() +
-            self._time_reward() +
-            self._get_death_reward()
-        )
+        return self._x_reward + self._time_penalty + self._death_penalty
 
     def _get_done(self):
         """Return True if the episode is over, False otherwise."""
