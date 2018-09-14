@@ -106,18 +106,14 @@ class SuperMarioBrosStageEnv(SuperMarioBrosEnv):
             # run-out the prelevel timer to skip the animation
             self._runout_prelevel_timer()
         # after the start screen idle to skip some extra frames
-        while self._get_time() >= self._time_left:
-            self._time_left = self._get_time()
+        while self._get_time() >= self._time:
+            self._time = self._get_time()
             self._frame_advance(8)
             self._frame_advance(0)
 
     def _get_done(self):
         """Return True if the episode is over, False otherwise."""
-        return (
-            self._get_is_dying() or
-            self._get_is_dead() or
-            self._flag_get()
-        )
+        return self._is_dying or self._is_dead or self._flag_get
 
 
 # explicitly define the outward facing API of this module
