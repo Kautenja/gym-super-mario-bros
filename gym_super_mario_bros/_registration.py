@@ -51,13 +51,13 @@ _register_mario_env('SuperMarioBros2NoFrameskip-v0', lost_levels=True, frameskip
 _register_mario_env('SuperMarioBros2NoFrameskip-v1', lost_levels=True, frameskip=1, rom_mode=RomMode.DOWNSAMPLE)
 
 
-def _register_mario_level_env(id, **kwargs):
+def _register_mario_stage_env(id, **kwargs):
     """
-    Register a Super Mario Bros. (1/2) Level environment with OpenAI Gym.
+    Register a Super Mario Bros. (1/2) stage environment with OpenAI Gym.
 
     Args:
         id (str): id for the env to register
-        kwargs (dict): keyword arguments for the SuperMarioBrosLevelEnv initializer
+        kwargs (dict): keyword arguments for the SuperMarioBrosStageEnv initializer
 
     Returns:
         None
@@ -67,7 +67,7 @@ def _register_mario_level_env(id, **kwargs):
     # register the environment
     gym.envs.registration.register(
         id=id,
-        entry_point='gym_super_mario_bros:SuperMarioBrosLevelEnv',
+        entry_point='gym_super_mario_bros:SuperMarioBrosStageEnv',
         max_episode_steps=9999999,
         reward_threshold=32000,
         kwargs=kwargs,
@@ -75,9 +75,9 @@ def _register_mario_level_env(id, **kwargs):
     )
 
 
-# a template for making individual level environments
+# a template for making individual stage environments
 _ID_TEMPLATE = 'SuperMarioBros{}-{}-{}-v{}'
-# iterate over all the rom modes, worlds (1-8), and levels (1-4)
+# iterate over all the rom modes, worlds (1-8), and stages (1-4)
 _ROM_MODES = [
     RomMode.VANILLA,
     RomMode.DOWNSAMPLE,
@@ -86,22 +86,22 @@ _ROM_MODES = [
 ]
 for version, rom_mode in enumerate(_ROM_MODES):
     for world in range(1, 9):
-        for level in range(1, 5):
+        for stage in range(1, 5):
             # setup the frame-skipping environment
-            env_id = _ID_TEMPLATE.format('', world, level, version)
-            _register_mario_level_env(env_id,
+            env_id = _ID_TEMPLATE.format('', world, stage, version)
+            _register_mario_stage_env(env_id,
                 frameskip=4,
                 rom_mode=rom_mode,
                 target_world=world,
-                target_level=level
+                target_stage=stage
             )
             # setup the no frame-skipping environment
-            env_id = _ID_TEMPLATE.format('NoFrameskip', world, level, version)
-            _register_mario_level_env(env_id,
+            env_id = _ID_TEMPLATE.format('NoFrameskip', world, stage, version)
+            _register_mario_stage_env(env_id,
                 frameskip=1,
                 rom_mode=rom_mode,
                 target_world=world,
-                target_level=level
+                target_stage=stage
             )
 
 

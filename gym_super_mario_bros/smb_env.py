@@ -111,15 +111,15 @@ class SuperMarioBrosEnv(NESEnv):
         """Return the level of the game."""
         return self._read_mem(0x075f) * 4 + self._read_mem(0x075c)
 
-    def _get_world_number(self):
-        """Return the current world number (1 to 8)."""
+    def _get_world(self):
+        """Return the current world (1 to 8)."""
         return self._read_mem(0x075f) + 1
 
-    def _get_level_number(self):
-        """Return the current level number (1 to 4)."""
+    def _get_stage(self):
+        """Return the current stage (1 to 4)."""
         return self._read_mem(0x075c) + 1
 
-    def _get_area_number(self):
+    def _get_area(self):
         """Return the current area number (1 to 5)."""
         return self._read_mem(0x0760) + 1
 
@@ -235,10 +235,14 @@ class SuperMarioBrosEnv(NESEnv):
         # 2 => End of world
         return self._read_mem(0x0770) == 2
 
-    def _get_is_level_over(self):
+    def _get_is_stage_over(self):
         """Return a boolean determining if the level is over."""
         # player float state set to 3 when sliding down flag pole
         return self._read_mem(0x001D) == 3
+
+    def _flag_get(self):
+        """Return a boolean determining if the agent reached a flag."""
+        return self._get_is_world_over() or self._get_is_stage_over()
 
     # MARK: RAM Hacks
 
@@ -368,7 +372,11 @@ class SuperMarioBrosEnv(NESEnv):
     def _get_info(self):
         """Return the info after a step occurs"""
         return {
-            'flag_get': self._get_is_world_over() or self._get_is_level_over()
+            'flag_get': self._flag_get(),
+            'stage': self._get_stage(),
+            'time': self._get_time(),
+            'world': self._get_world(),
+            'x_pos': self._get_x_position(),
         }
 
 
