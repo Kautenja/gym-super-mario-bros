@@ -1,0 +1,12 @@
+sudo: required
+language: python
+python:
+- '2.7'
+- '3.5'
+- '3.6'
+os: linux
+script:
+- python -m unittest discover .
+- python setup.py sdist bdist_wheel --universal
+notifications:
+  email: false
