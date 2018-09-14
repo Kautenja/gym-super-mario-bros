@@ -96,7 +96,7 @@ class SuperMarioBrosStageEnv(SuperMarioBrosEnv):
         self._frame_advance(8)
         self._frame_advance(0)
         # Press start until the game starts
-        while self._get_time() == 0:
+        while self._time == 0:
             # press the start button
             self._frame_advance(8)
             # force overwrite the stage that is set to load
@@ -106,8 +106,8 @@ class SuperMarioBrosStageEnv(SuperMarioBrosEnv):
             # run-out the prelevel timer to skip the animation
             self._runout_prelevel_timer()
         # after the start screen idle to skip some extra frames
-        while self._get_time() >= self._time:
-            self._time = self._get_time()
+        while self._time >= self._time_last:
+            self._time_last = self._time
             self._frame_advance(8)
             self._frame_advance(0)
 

@@ -63,9 +63,9 @@ class SuperMarioBrosEnv(NESEnv):
             max_episode_steps=max_episode_steps,
         )
         # setup a variable to keep track of remaining time locally
-        self._time = 0
+        self._time_last = 0
         # setup a variable to keep track of how far into the level Mario is
-        self._x_position = 0
+        self._x_position_last = 0
         # MARK: Game setup
         # reset the emulator
         self.reset()
@@ -133,8 +133,8 @@ class SuperMarioBrosEnv(NESEnv):
         # score is represented as a figure with 6 10s places
         return self._read_mem_range(0x07de, 6)
 
-    # TODO: _time is being used, refactor
-    def _get_time(self):
+    @property
+    def _time(self):
         """Return the time left (0 to 999)."""
         # time is represented as a figure with 3 10s places
         return self._read_mem_range(0x07f8, 3)
@@ -150,8 +150,8 @@ class SuperMarioBrosEnv(NESEnv):
         """Return the number of remaining lives."""
         return self._read_mem(0x075a)
 
-    # TODO: _x_position is being used, refactor
-    def _get_x_position(self):
+    @property
+    def _x_position(self):
         """Return the current horizontal position."""
         # add the current page 0x6d to the current x
         return self._read_mem(0x6d) * 0x100 + self._read_mem(0x86)
@@ -298,15 +298,15 @@ class SuperMarioBrosEnv(NESEnv):
         self._frame_advance(8)
         self._frame_advance(0)
         # Press start until the game starts
-        while self._get_time() == 0:
+        while self._time == 0:
             # press and release the start button
             self._frame_advance(8)
             self._frame_advance(0)
             # run-out the prelevel timer to skip the animation
             self._runout_prelevel_timer()
         # after the start screen idle to skip some extra frames
-        while self._get_time() >= self._time:
-            self._time = self._get_time()
+        while self._time >= self._time_last:
+            self._time_last = self._time
             self._frame_advance(8)
             self._frame_advance(0)
 
@@ -314,9 +314,8 @@ class SuperMarioBrosEnv(NESEnv):
 
     def _get_x_reward(self):
         """Return the reward based on left right movement between steps."""
-        _x_position = self._get_x_position()
-        _reward = _x_position - self._x_position
-        self._x_position = _x_position
+        _reward = self._x_position - self._x_position_last
+        self._x_position_last = self._x_position
         # resolve an issue where after death the x position resets. The x delta
         # is typically has at most magnitude of 3, 5 is a safe bound
         if _reward < -5 or _reward > 5:
@@ -324,11 +323,10 @@ class SuperMarioBrosEnv(NESEnv):
 
         return _reward
 
-    def _get_time_reward(self):
+    def _time_reward(self):
         """Return the reward for the in-game clock ticking."""
-        _time_left = self._get_time()
-        _reward = _time_left - self._time
-        self._time = _time_left
+        _reward = self._time - self._time_last
+        self._time_last = self._time
         # time can only decrease, a positive reward results from a reset and
         # should default to 0 reward
         if _reward > 0:
@@ -347,13 +345,13 @@ class SuperMarioBrosEnv(NESEnv):
 
     def _will_reset(self):
         """Handle and RAM hacking before a reset occurs."""
-        self._time = 0
-        self._x_position = 0
+        self._time_last = 0
+        self._x_position_last = 0
 
     def _did_reset(self):
         """Handle any RAM hacking after a reset occurs."""
-        self._time = self._get_time()
-        self._x_position = self._get_x_position()
+        self._time_last = self._time
+        self._x_position_last = self._x_position
 
     def _did_step(self, done):
         """
@@ -382,7 +380,7 @@ class SuperMarioBrosEnv(NESEnv):
         """Return the reward after a step occurs."""
         return (
             self._get_x_reward() +
-            self._get_time_reward() +
+            self._time_reward() +
             self._get_death_reward()
         )
 
@@ -395,9 +393,9 @@ class SuperMarioBrosEnv(NESEnv):
         return {
             'flag_get': self._flag_get,
             'stage': self._stage,
-            'time': self._get_time(),
+            'time': self._time,
             'world': self._world,
-            'x_pos': self._get_x_position(),
+            'x_pos': self._x_position,
         }
 
 
