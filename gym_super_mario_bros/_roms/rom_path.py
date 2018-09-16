@@ -1,6 +1,5 @@
 """A method to load a ROM path."""
 import os
-from .rom_mode import RomMode
 
 
 def rom_path(lost_levels, rom_mode):
@@ -19,24 +18,24 @@ def rom_path(lost_levels, rom_mode):
     if not isinstance(lost_levels, bool):
         raise TypeError('lost_levels must be of type: bool')
     if lost_levels:
-        if rom_mode == RomMode.VANILLA:
+        if rom_mode == 'vanilla':
             rom = 'super-mario-bros-2.nes'
-        elif rom_mode == RomMode.PIXEL:
+        elif rom_mode == 'pixel':
             raise ValueError('pixel_rom not supported for Lost Levels')
-        elif rom_mode == RomMode.RECTANGLE:
+        elif rom_mode == 'rectangle':
             raise ValueError('rectangle_rom not supported for Lost Levels')
-        elif rom_mode == RomMode.DOWNSAMPLE:
+        elif rom_mode == 'downsample':
             rom = 'super-mario-bros-2-downsampled.nes'
         else:
             raise ValueError('rom_mode received invalid value')
     else:
-        if rom_mode == RomMode.VANILLA:
+        if rom_mode == 'vanilla':
             rom = 'super-mario-bros.nes'
-        elif rom_mode == RomMode.PIXEL:
+        elif rom_mode == 'pixel':
             rom = 'super-mario-bros-pixel.nes'
-        elif rom_mode == RomMode.RECTANGLE:
+        elif rom_mode == 'rectangle':
             rom = 'super-mario-bros-rect.nes'
-        elif rom_mode == RomMode.DOWNSAMPLE:
+        elif rom_mode == 'downsample':
             rom = 'super-mario-bros-downsampled.nes'
         else:
             raise ValueError('rom_mode received invalid value')

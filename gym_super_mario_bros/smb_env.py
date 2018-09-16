@@ -2,7 +2,6 @@
 from nes_py import NESEnv
 from ._roms import decode_target
 from ._roms import rom_path
-from ._roms import RomMode
 
 
 class SuperMarioBrosEnv(NESEnv):
@@ -14,7 +13,7 @@ class SuperMarioBrosEnv(NESEnv):
     def __init__(self,
         frameskip=1,
         max_episode_steps=float('inf'),
-        rom_mode=RomMode.VANILLA,
+        rom_mode='vanilla',
         lost_levels=False,
         target=None,
     ):

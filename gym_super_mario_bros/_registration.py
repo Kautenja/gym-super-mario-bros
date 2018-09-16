@@ -1,6 +1,5 @@
 """Registration code of Gym environments in this package."""
 import gym
-from ._roms import RomMode
 
 
 def _register_mario_env(id, **kwargs):
@@ -28,27 +27,27 @@ def _register_mario_env(id, **kwargs):
 
 
 # Super Mario Bros. with standard frame skip
-_register_mario_env('SuperMarioBros-v0', frameskip=4, rom_mode=RomMode.VANILLA)
-_register_mario_env('SuperMarioBros-v1', frameskip=4, rom_mode=RomMode.DOWNSAMPLE)
-_register_mario_env('SuperMarioBros-v2', frameskip=4, rom_mode=RomMode.PIXEL)
-_register_mario_env('SuperMarioBros-v3', frameskip=4, rom_mode=RomMode.RECTANGLE)
+_register_mario_env('SuperMarioBros-v0', frameskip=4, rom_mode='vanilla')
+_register_mario_env('SuperMarioBros-v1', frameskip=4, rom_mode='downsample')
+_register_mario_env('SuperMarioBros-v2', frameskip=4, rom_mode='pixel')
+_register_mario_env('SuperMarioBros-v3', frameskip=4, rom_mode='rectangle')
 
 
 # Super Mario Bros. with no frame skip
-_register_mario_env('SuperMarioBrosNoFrameskip-v0', frameskip=1, rom_mode=RomMode.VANILLA)
-_register_mario_env('SuperMarioBrosNoFrameskip-v1', frameskip=1, rom_mode=RomMode.DOWNSAMPLE)
-_register_mario_env('SuperMarioBrosNoFrameskip-v2', frameskip=1, rom_mode=RomMode.PIXEL)
-_register_mario_env('SuperMarioBrosNoFrameskip-v3', frameskip=1, rom_mode=RomMode.RECTANGLE)
+_register_mario_env('SuperMarioBrosNoFrameskip-v0', frameskip=1, rom_mode='vanilla')
+_register_mario_env('SuperMarioBrosNoFrameskip-v1', frameskip=1, rom_mode='downsample')
+_register_mario_env('SuperMarioBrosNoFrameskip-v2', frameskip=1, rom_mode='pixel')
+_register_mario_env('SuperMarioBrosNoFrameskip-v3', frameskip=1, rom_mode='rectangle')
 
 
 # Super Mario Bros. 2 (Lost Levels) with standard frame skip
-_register_mario_env('SuperMarioBros2-v0', lost_levels=True, frameskip=4, rom_mode=RomMode.VANILLA)
-_register_mario_env('SuperMarioBros2-v1', lost_levels=True, frameskip=4, rom_mode=RomMode.DOWNSAMPLE)
+_register_mario_env('SuperMarioBros2-v0', lost_levels=True, frameskip=4, rom_mode='vanilla')
+_register_mario_env('SuperMarioBros2-v1', lost_levels=True, frameskip=4, rom_mode='downsample')
 
 
 # Super Mario Bros. 2 (Lost Levels) with no frame skip
-_register_mario_env('SuperMarioBros2NoFrameskip-v0', lost_levels=True, frameskip=1, rom_mode=RomMode.VANILLA)
-_register_mario_env('SuperMarioBros2NoFrameskip-v1', lost_levels=True, frameskip=1, rom_mode=RomMode.DOWNSAMPLE)
+_register_mario_env('SuperMarioBros2NoFrameskip-v0', lost_levels=True, frameskip=1, rom_mode='vanilla')
+_register_mario_env('SuperMarioBros2NoFrameskip-v1', lost_levels=True, frameskip=1, rom_mode='downsample')
 
 
 def _register_mario_stage_env(id, **kwargs):
@@ -79,10 +78,10 @@ def _register_mario_stage_env(id, **kwargs):
 _ID_TEMPLATE = 'SuperMarioBros{}-{}-{}-v{}'
 # iterate over all the rom modes, worlds (1-8), and stages (1-4)
 _ROM_MODES = [
-    RomMode.VANILLA,
-    RomMode.DOWNSAMPLE,
-    RomMode.PIXEL,
-    RomMode.RECTANGLE
+    'vanilla',
+    'downsample',
+    'pixel',
+    'rectangle'
 ]
 for version, rom_mode in enumerate(_ROM_MODES):
     for world in range(1, 9):
