@@ -1,8 +1,8 @@
 """An OpenAI Gym environment for Super Mario Bros. and Lost Levels."""
 from nes_py import NESEnv
-from .roms import decode_target
-from .roms import rom_path
-from .roms import RomMode
+from ._roms import decode_target
+from ._roms import rom_path
+from ._roms import RomMode
 
 
 class SuperMarioBrosEnv(NESEnv):
@@ -58,7 +58,8 @@ class SuperMarioBrosEnv(NESEnv):
         self._backup()
 
     @property
-    def is_level_env(self):
+    def is_single_stage_env(self):
+        """Return True if this environment is a stage environment."""
         return self._target_world is not None and self._target_area is not None
 
     # MARK: Memory access
@@ -292,7 +293,7 @@ class SuperMarioBrosEnv(NESEnv):
         while self._time == 0:
             # press and release the start button
             self._frame_advance(8)
-            if self.is_level_env:
+            if self.is_single_stage_env:
                 self._write_stage()
             self._frame_advance(0)
             # run-out the prelevel timer to skip the animation
@@ -379,7 +380,7 @@ class SuperMarioBrosEnv(NESEnv):
 
     def _get_done(self):
         """Return True if the episode is over, False otherwise."""
-        if self.is_level_env:
+        if self.is_single_stage_env:
             return self._is_dying or self._is_dead or self._flag_get
         return self._is_game_over
 

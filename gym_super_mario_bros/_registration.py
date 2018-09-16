@@ -1,6 +1,6 @@
 """Registration code of Gym environments in this package."""
 import gym
-from .roms import RomMode
+from ._roms import RomMode
 
 
 def _register_mario_env(id, **kwargs):
