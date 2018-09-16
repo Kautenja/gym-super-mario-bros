@@ -276,13 +276,6 @@ class SuperMarioBrosEnv(NESEnv):
             self._runout_prelevel_timer()
             self._frame_advance(0)
 
-    def _kill_mario(self):
-        """Skip a death animation by forcing Mario to death."""
-        # force Mario's state to dead
-        self._write_mem(0x000e, 0x06)
-        # step forward one frame
-        self._frame_advance(0)
-
     def _skip_start_screen(self):
         """Press and release start to skip the start screen."""
         # press and release the start button
@@ -303,6 +296,23 @@ class SuperMarioBrosEnv(NESEnv):
             self._time_last = self._time
             self._frame_advance(8)
             self._frame_advance(0)
+
+    def _skip_end_of_world(self):
+        """Skip the cutscene that plays at the end of a world."""
+        if self._is_world_over:
+            # get the current game time to reference
+            time = self._time
+            # loop until the time is different
+            while self._time == time:
+                # frame advance with NOP
+                self._frame_advance(0)
+
+    def _kill_mario(self):
+        """Skip a death animation by forcing Mario to death."""
+        # force Mario's state to dead
+        self._write_mem(0x000e, 0x06)
+        # step forward one frame
+        self._frame_advance(0)
 
     # MARK: Reward Function
 
@@ -368,6 +378,9 @@ class SuperMarioBrosEnv(NESEnv):
         # if mario is dying, then cut to the chase and kill hi,
         if self._is_dying:
             self._kill_mario()
+        # skip world change scenes (must call before other skip methods)
+        if not self.is_single_stage_env:
+            self._skip_end_of_world()
         # skip area change (i.e. enter pipe, flag get, etc.)
         self._skip_change_area()
         # skip occupied states like the black screen between lives that shows
