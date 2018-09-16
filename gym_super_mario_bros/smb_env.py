@@ -1,7 +1,8 @@
 """An OpenAI Gym environment for Super Mario Bros. and Lost Levels."""
-import os
 from nes_py import NESEnv
-from ._rom_mode import RomMode
+from .roms import decode_target
+from .roms import rom_path
+from .roms import RomMode
 
 
 class SuperMarioBrosEnv(NESEnv):
@@ -14,7 +15,8 @@ class SuperMarioBrosEnv(NESEnv):
         frameskip=1,
         max_episode_steps=float('inf'),
         rom_mode=RomMode.VANILLA,
-        lost_levels=False
+        lost_levels=False,
+        target=None,
     ):
         """
         Initialize a new Super Mario Bros environment.
@@ -26,44 +28,21 @@ class SuperMarioBrosEnv(NESEnv):
             lost_levels (bool): whether to load the ROM with lost levels.
                 - False: load original Super Mario Bros.
                 - True: load Super Mario Bros. Lost Levels
+            target (tuple): a tuple of the (world, stage) to play as a level
 
         Returns:
             None
 
         """
-        # Type and value check the lost levels parameter
-        if not isinstance(lost_levels, bool):
-            raise TypeError('lost_levels must be of type: bool')
-        # setup the path to the game ROM
-        if lost_levels:
-            if rom_mode == RomMode.VANILLA:
-                rom = 'roms/super-mario-bros-2.nes'
-            elif rom_mode == RomMode.PIXEL:
-                raise ValueError('pixel_rom not supported for Lost Levels')
-            elif rom_mode == RomMode.RECTANGLE:
-                raise ValueError('rectangle_rom not supported for Lost Levels')
-            elif rom_mode == RomMode.DOWNSAMPLE:
-                rom = 'roms/super-mario-bros-2-downsampled.nes'
-            else:
-                raise ValueError('rom_mode received invalid value')
-        else:
-            if rom_mode == RomMode.VANILLA:
-                rom = 'roms/super-mario-bros.nes'
-            elif rom_mode == RomMode.PIXEL:
-                rom = 'roms/super-mario-bros-pixel.nes'
-            elif rom_mode == RomMode.RECTANGLE:
-                rom = 'roms/super-mario-bros-rect.nes'
-            elif rom_mode == RomMode.DOWNSAMPLE:
-                rom = 'roms/super-mario-bros-downsampled.nes'
-            else:
-                raise ValueError('rom_mode received invalid value')
-        # create an absolute path to the specified ROM
-        rom = os.path.join(os.path.dirname(os.path.abspath(__file__)), rom)
+        rom = rom_path(lost_levels, rom_mode)
         # initialize the super object with the ROM path
         super(SuperMarioBrosEnv, self).__init__(rom,
             frameskip=frameskip,
             max_episode_steps=max_episode_steps,
         )
+        # set the target world, stage, and area variables
+        target = decode_target(target, lost_levels)
+        self._target_world, self._target_stage, self._target_area = target
         # setup a variable to keep track of the last frames time
         self._time_last = 0
         # setup a variable to keep track of the last frames x position
@@ -76,6 +55,10 @@ class SuperMarioBrosEnv(NESEnv):
         self.step(0)
         # create a backup state to restore from on subsequent calls to reset
         self._backup()
+
+    @property
+    def is_level_env(self):
+        return self._target_world is not None and self._target_area is not None
 
     # MARK: Memory access
 
@@ -270,6 +253,12 @@ class SuperMarioBrosEnv(NESEnv):
 
     # MARK: RAM Hacks
 
+    def _write_stage(self):
+        """Write the stage data to RAM to overwrite loading the next stage."""
+        self._write_mem(0x075f, self._target_world - 1)
+        self._write_mem(0x075c, self._target_stage - 1)
+        self._write_mem(0x0760, self._target_area - 1)
+
     def _runout_prelevel_timer(self):
         """Force the pre-level timer to 0 to skip frames during a death."""
         self._write_mem(0x07A0, 0)
@@ -302,6 +291,8 @@ class SuperMarioBrosEnv(NESEnv):
         while self._time == 0:
             # press and release the start button
             self._frame_advance(8)
+            if self.is_level_env:
+                self._write_stage()
             self._frame_advance(0)
             # run-out the prelevel timer to skip the animation
             self._runout_prelevel_timer()
@@ -387,6 +378,8 @@ class SuperMarioBrosEnv(NESEnv):
 
     def _get_done(self):
         """Return True if the episode is over, False otherwise."""
+        if self.is_level_env:
+            return self._is_dying or self._is_dead or self._flag_get
         return self._is_game_over
 
     def _get_info(self):

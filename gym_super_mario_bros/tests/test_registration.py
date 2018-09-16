@@ -18,6 +18,7 @@ class ShouldMakeSuperMarioBros_v0(TestCase):
         self.assertEqual(40, i['x_pos'])
         env.close()
 
+
 class ShouldMakeSuperMarioBros_4_2_v0(TestCase):
     def test(self):
         env = make('SuperMarioBros-4-2-v0')

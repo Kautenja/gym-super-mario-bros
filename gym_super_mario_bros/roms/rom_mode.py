@@ -1,7 +1,7 @@
 """An enumeration of valid ROM hacks to load into the emulator."""
 
 
-class RomMode():
+class RomMode:
     """An enumeration of valid ROM hacks to load into the emulator."""
     # the standard ROM with no modifications
     VANILLA = 0

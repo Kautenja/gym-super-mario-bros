@@ -1,6 +1,6 @@
 """Registration code of Gym environments in this package."""
 import gym
-from ._rom_mode import RomMode
+from .roms import RomMode
 
 
 def _register_mario_env(id, **kwargs):
@@ -57,7 +57,7 @@ def _register_mario_stage_env(id, **kwargs):
 
     Args:
         id (str): id for the env to register
-        kwargs (dict): keyword arguments for the SuperMarioBrosStageEnv initializer
+        kwargs (dict): keyword arguments for the SuperMarioBrosEnv initializer
 
     Returns:
         None
@@ -67,7 +67,7 @@ def _register_mario_stage_env(id, **kwargs):
     # register the environment
     gym.envs.registration.register(
         id=id,
-        entry_point='gym_super_mario_bros:SuperMarioBrosStageEnv',
+        entry_point='gym_super_mario_bros:SuperMarioBrosEnv',
         max_episode_steps=9999999,
         reward_threshold=32000,
         kwargs=kwargs,
@@ -92,16 +92,14 @@ for version, rom_mode in enumerate(_ROM_MODES):
             _register_mario_stage_env(env_id,
                 frameskip=4,
                 rom_mode=rom_mode,
-                target_world=world,
-                target_stage=stage
+                target=(world, stage),
             )
             # setup the no frame-skipping environment
             env_id = _ID_TEMPLATE.format('NoFrameskip', world, stage, version)
             _register_mario_stage_env(env_id,
                 frameskip=1,
                 rom_mode=rom_mode,
-                target_world=world,
-                target_stage=stage
+                target=(world, stage),
             )
 
 
