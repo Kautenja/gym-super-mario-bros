@@ -10,7 +10,7 @@ def README():
 
 setup(
     name='gym_super_mario_bros',
-    version='4.0.0',
+    version='4.0.1',
     description='Super Mario Bros. for OpenAI Gym',
     long_description=README(),
     long_description_content_type='text/markdown',
@@ -46,7 +46,7 @@ setup(
     install_requires=[
         'gym>=0.10.5',
         'matplotlib>=2.0.2',
-        'nes-py>=1.1.0',
+        'nes-py>=2.0.0',
         'numpy>=1.14.2',
         'opencv-python>=3.4.0.12',
         'pygame>=1.9.3',
