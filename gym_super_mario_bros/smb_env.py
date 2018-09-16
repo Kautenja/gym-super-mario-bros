@@ -34,6 +34,7 @@ class SuperMarioBrosEnv(NESEnv):
             None
 
         """
+        # decode the ROM path based on mode and lost levels flag
         rom = rom_path(lost_levels, rom_mode)
         # initialize the super object with the ROM path
         super(SuperMarioBrosEnv, self).__init__(rom,
