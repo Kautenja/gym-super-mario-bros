@@ -8,5 +8,7 @@ os: linux
 script:
 - python -m unittest discover .
 - python setup.py sdist bdist_wheel --universal
+- python setup.py install
+- gym_super_mario_bros -e SuperMarioBros-v0 -m random
 notifications:
   email: false
