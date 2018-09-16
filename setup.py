@@ -10,7 +10,7 @@ def README():
 
 setup(
     name='gym_super_mario_bros',
-    version='4.0.1',
+    version='4.0.2',
     description='Super Mario Bros. for OpenAI Gym',
     long_description=README(),
     long_description_content_type='text/markdown',
@@ -41,7 +41,7 @@ setup(
     license='Proprietary',
     packages=find_packages(),
     package_data={
-        'gym_super_mario_bros': ['lua/*.lua', 'roms/*.nes']
+        'gym_super_mario_bros': ['_roms/*.nes']
     },
     install_requires=[
         'gym>=0.10.5',
