@@ -11,7 +11,7 @@ class SuperMarioBrosEnv(NESEnv):
     reward_range = (-15, 15)
 
     def __init__(self,
-        frameskip=1,
+        frames_per_step=1,
         max_episode_steps=float('inf'),
         rom_mode='vanilla',
         lost_levels=False,
@@ -21,7 +21,7 @@ class SuperMarioBrosEnv(NESEnv):
         Initialize a new Super Mario Bros environment.
 
         Args:
-            frameskip (int): the number of frames to skip between steps
+            frames_per_step (int): the number of frames between steps
             max_episode_steps (float): number of steps before an episode ends
             rom_mode (str): the ROM mode to use when loading ROMs from disk
             lost_levels (bool): whether to load the ROM with lost levels.
@@ -37,7 +37,7 @@ class SuperMarioBrosEnv(NESEnv):
         rom = rom_path(lost_levels, rom_mode)
         # initialize the super object with the ROM path
         super(SuperMarioBrosEnv, self).__init__(rom,
-            frameskip=frameskip,
+            frames_per_step=frames_per_step,
             max_episode_steps=max_episode_steps,
         )
         # set the target world, stage, and area variables
