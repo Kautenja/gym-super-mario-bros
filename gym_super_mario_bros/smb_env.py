@@ -23,7 +23,7 @@ class SuperMarioBrosEnv(NESEnv):
         Args:
             frameskip (int): the number of frames to skip between steps
             max_episode_steps (float): number of steps before an episode ends
-            rom_mode (RomMode): the ROM mode to use when loading ROMs from disk
+            rom_mode (str): the ROM mode to use when loading ROMs from disk
             lost_levels (bool): whether to load the ROM with lost levels.
                 - False: load original Super Mario Bros.
                 - True: load Super Mario Bros. Lost Levels
@@ -65,7 +65,7 @@ class SuperMarioBrosEnv(NESEnv):
 
     def _read_mem_range(self, address, length):
         """
-        Read a range of bytes where each byte is a 10s place figure.
+        Read a range of bytes where each byte is a 10's place figure.
 
         Args:
             address (int): the address to read from as a 16 bit integer
@@ -74,18 +74,18 @@ class SuperMarioBrosEnv(NESEnv):
         Note:
             this method is specific to Mario where three GUI values are stored
             in independent memory slots to save processing time
-            - score has 6 10s places
-            - coins has 2 10s places
-            - time has 3 10s places
+            - score has 6 10's places
+            - coins has 2 10's places
+            - time has 3 10's places
 
         Returns:
-            the integer value of this 10s place representation
+            the integer value of this 10's place representation
 
         """
         value = 0
         # iterate over the length of bytes
         for offset in range(length):
-            # shift the value over by 1 10s place
+            # shift the value over by 1 10's place
             value *= 10
             # add the next 10s place value
             value += self._read_mem(address + offset)
@@ -115,19 +115,19 @@ class SuperMarioBrosEnv(NESEnv):
     @property
     def _score(self):
         """Return the current player score (0 to 999990)."""
-        # score is represented as a figure with 6 10s places
+        # score is represented as a figure with 6 10's places
         return self._read_mem_range(0x07de, 6)
 
     @property
     def _time(self):
         """Return the time left (0 to 999)."""
-        # time is represented as a figure with 3 10s places
+        # time is represented as a figure with 3 10's places
         return self._read_mem_range(0x07f8, 3)
 
     @property
     def _coins(self):
         """Return the number of coins collected (0 to 99)."""
-        # coins are represented as a figure with 2 10s places
+        # coins are represented as a figure with 2 10's places
         return self._read_mem_range(0x07ed, 2)
 
     @property
@@ -292,6 +292,7 @@ class SuperMarioBrosEnv(NESEnv):
         while self._time == 0:
             # press and release the start button
             self._frame_advance(8)
+            # if we're in the single stage, environment, write the stage data
             if self.is_single_stage_env:
                 self._write_stage()
             self._frame_advance(0)
