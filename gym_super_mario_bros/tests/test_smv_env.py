@@ -53,6 +53,10 @@ class ShouldRaiseErrorOnAboveBoundsStage(TestCase):
 class ShouldStepGameEnv(TestCase):
     def test(self):
         env = SuperMarioBrosEnv()
+        self.assertFalse(env.unwrapped.is_single_stage_env)
+        self.assertIsNone(env.unwrapped._target_world)
+        self.assertIsNone(env.unwrapped._target_stage)
+        self.assertIsNone(env.unwrapped._target_area)
         env.reset()
         s, r, d, i = env.step(0)
         self.assertEqual(0, i['coins'])
@@ -69,6 +73,10 @@ class ShouldStepGameEnv(TestCase):
 class ShouldStepStageEnv(TestCase):
     def test(self):
         env = SuperMarioBrosEnv(target=(4, 2))
+        self.assertTrue(env.unwrapped.is_single_stage_env)
+        self.assertIsInstance(env.unwrapped._target_world, int)
+        self.assertIsInstance(env.unwrapped._target_stage, int)
+        self.assertIsInstance(env.unwrapped._target_area, int)
         env.reset()
         s, r, d, i = env.step(0)
         self.assertEqual(0, i['coins'])
