@@ -41,7 +41,7 @@ setup(
     license='Proprietary',
     packages=find_packages(),
     package_data={
-        'gym_super_mario_bros': ['lua/*.lua', 'roms/*.nes']
+        'gym_super_mario_bros': ['_roms/*.nes']
     },
     install_requires=[
         'gym>=0.10.5',
