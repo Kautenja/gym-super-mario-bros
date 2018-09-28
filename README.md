@@ -178,12 +178,12 @@ keys:
 |:-----------|:-------|:------------------------------------------------------|
 | `coins   ` | `int`  | The number of collected coins                         |
 | `flag_get` | `bool` | True if Mario reached a flag or ax                    |
-| `life`     | `int`  | The current life (i.e., _{3, 2, 1}_)                  |
+| `life`     | `int`  | The current life, i.e., _{3, 2, 1}_                   |
 | `score`    | `int`  | The cumulative in-game score                          |
-| `stage`    | `int`  | The current stage (i.e., _{1, ..., 4}_)               |
-| `status`   | `str`  | Mario's status _{`'small'`, `'tall'`, `'fireball'`}_  |
+| `stage`    | `int`  | The current stage, i.e., _{1, ..., 4}_                |
+| `status`   | `str`  | Mario's status, i.e., _{'small', 'tall', 'fireball'}_ |
 | `time`     | `int`  | The time left on the clock                            |
-| `world`    | `int`  | The current world (i.e., _{1, ..., 8}_)               |
+| `world`    | `int`  | The current world, i.e., _{1, ..., 8}_                |
 | `x_pos`    | `int`  | Mario's _x_ position in the stage                     |
 
 ## Citation
