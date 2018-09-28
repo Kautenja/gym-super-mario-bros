@@ -174,16 +174,17 @@ The reward is clipped into the range _(-15, 15)_.
 The `info` dictionary returned by the `step` method contains the following
 keys:
 
-| Key        | Type   | Description                            |
-|:-----------|:-------|:---------------------------------------|
-| `coins   ` | `int`  | The number of collected coins          |
-| `flag_get` | `bool` | True if Mario reached a flag or ax     |
-| `life`     | `int`  | The current life (i.e., {3, 2, 1})     |
-| `score`    | `int`  | The cumulative in-game score           |
-| `stage`    | `int`  | The current stage (i.e., {1, ..., 4})  |
-| `time`     | `int`  | The time left on the clock             |
-| `world`    | `int`  | The current world (i.e., {1, ..., 8})  |
-| `x_pos`    | `int`  | Mario's x position in the stage        |
+| Key        | Type   | Description                                           |
+|:-----------|:-------|:------------------------------------------------------|
+| `coins   ` | `int`  | The number of collected coins                         |
+| `flag_get` | `bool` | True if Mario reached a flag or ax                    |
+| `life`     | `int`  | The current life (i.e., _{3, 2, 1}_)                  |
+| `score`    | `int`  | The cumulative in-game score                          |
+| `stage`    | `int`  | The current stage (i.e., _{1, ..., 4}_)               |
+| `status`   | `str`  | Mario's status _{`'small'`, `'tall'`, `'fireball'`}_  |
+| `time`     | `int`  | The time left on the clock                            |
+| `world`    | `int`  | The current world (i.e., _{1, ..., 8}_)               |
+| `x_pos`    | `int`  | Mario's _x_ position in the stage                     |
 
 ## Citation
 
