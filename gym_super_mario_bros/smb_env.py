@@ -168,16 +168,17 @@ class SuperMarioBrosEnv(NESEnv):
 
     @property
     def _player_status(self):
-        """
-        Return the player status.
-
-        Note:
-            0  : small Mario
-            1  : tall Mario
-            2+ : fireball Mario
-
-        """
-        return self._read_mem(0x0756)
+        """Return the player status as a string."""
+        # get the numeric status from memory
+        status = self._read_mem(0x0756)
+        # 0 indicates small Mario
+        if status == 0:
+            return 'small'
+        # 1 indicates tall Mario (mushroom)
+        if status == 1:
+            return 'tall'
+        # 2 indicates fireball Mario (fire flower)
+        return 'fireball'
 
     @property
     def _player_state(self):
@@ -405,6 +406,7 @@ class SuperMarioBrosEnv(NESEnv):
             'life': self._life + 1,
             'score': self._score,
             'stage': self._stage,
+            'status': self._player_status,
             'time': self._time,
             'world': self._world,
             'x_pos': self._x_position,
