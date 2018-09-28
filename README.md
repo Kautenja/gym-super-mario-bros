@@ -178,7 +178,7 @@ keys:
 |:-----------|:-------|:------------------------------------------------------|
 | `coins   ` | `int`  | The number of collected coins                         |
 | `flag_get` | `bool` | True if Mario reached a flag or ax                    |
-| `life`     | `int`  | The current life, i.e., _{3, 2, 1}_                   |
+| `life`     | `int`  | The number of lives left, i.e., _{3, 2, 1}_           |
 | `score`    | `int`  | The cumulative in-game score                          |
 | `stage`    | `int`  | The current stage, i.e., _{1, ..., 4}_                |
 | `status`   | `str`  | Mario's status, i.e., _{'small', 'tall', 'fireball'}_ |
