@@ -28,7 +28,7 @@ If applicable, add screenshots to help explain your problem.
 -   Operating System:
 -   Python version:
 -   `gym-super-mario-bros` version:
--   `nes-gym` version:
+-   `nes-py` version:
 
 ### Additional context
 
