@@ -254,6 +254,8 @@ class SuperMarioBrosEnv(NESEnv):
                 # player float state set to 3 when sliding down flag pole
                 return self._read_mem(0x001D) == 3
 
+        return False
+
     @property
     def _flag_get(self):
         """Return a boolean determining if the agent reached a flag."""
