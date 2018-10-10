@@ -245,8 +245,14 @@ class SuperMarioBrosEnv(NESEnv):
     @property
     def _is_stage_over(self):
         """Return a boolean determining if the level is over."""
-        # player float state set to 3 when sliding down flag pole
-        return self._read_mem(0x001D) == 3
+        # iterate over the memory addresses that hold enemy types
+        for address in [0x0016, 0x0017, 0x0018, 0x0019, 0x001A]:
+            # check if the byte is either Bowser (0x2D) or a flag (0x31)
+            # this is to prevent returning true when Mario is using a vine
+            # which will set the byte at 0x001D to 3
+            if self._read_mem(address) in {0x2D, 0x31}:
+                # player float state set to 3 when sliding down flag pole
+                return self._read_mem(0x001D) == 3
 
     @property
     def _flag_get(self):
