@@ -6,7 +6,6 @@ python:
 - '3.6'
 os: linux
 script:
-- python -m unittest discover .
-- python setup.py sdist bdist_wheel --universal
+- make
 notifications:
   email: false
