@@ -1,10 +1,3 @@
-#
-# MARK: Globals
-#
-
-# the path to the python interpreter
-PYTHON=python3
-
 # build the LaiNES code, test the Python interface, and build
 # the deployment package
 all: test deployment
@@ -15,7 +8,7 @@ all: test deployment
 
 # run the Python test suite
 test:
-	${PYTHON} -m unittest discover .
+	python -m unittest discover .
 
 #
 # MARK: Deployment
@@ -27,7 +20,7 @@ clean:
 
 # build the deployment package
 deployment: clean
-	python3 setup.py sdist bdist_wheel --universal
+	python setup.py sdist bdist_wheel --universal
 
 # ship the deployment package to PyPi
 ship: deployment
