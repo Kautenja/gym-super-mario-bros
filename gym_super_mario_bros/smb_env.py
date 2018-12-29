@@ -47,14 +47,6 @@ class SuperMarioBrosEnv(NESEnv):
         self._time_last = 0
         # setup a variable to keep track of the last frames x position
         self._x_position_last = 0
-        # reset the emulator
-        self.reset()
-        # skip the start screen
-        self._skip_start_screen()
-        # stall for a frame
-        self.step(0)
-        # create a backup state to restore from on subsequent calls to reset
-        self._backup()
 
     @property
     def is_single_stage_env(self):
@@ -305,6 +297,8 @@ class SuperMarioBrosEnv(NESEnv):
             self._time_last = self._time
             self._frame_advance(8)
             self._frame_advance(0)
+        # stall for a frame
+        self._frame_advance(0)
 
     def _skip_end_of_world(self):
         """Skip the cutscene that plays at the end of a world."""
@@ -369,6 +363,8 @@ class SuperMarioBrosEnv(NESEnv):
         """Handle any RAM hacking after a reset occurs."""
         self._time_last = self._time
         self._x_position_last = self._x_position
+        # skip the start screen
+        self._skip_start_screen()
 
     def _did_step(self, done):
         """
