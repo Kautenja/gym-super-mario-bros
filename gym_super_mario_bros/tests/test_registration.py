@@ -10,7 +10,7 @@ class ShouldMakeEnv:
     # whether flag get is thrown
     flag_get = False
     # the number of lives left
-    life = 3
+    life = 2
     # the current world
     world = 1
     # the current score
