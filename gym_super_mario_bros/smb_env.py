@@ -292,13 +292,13 @@ class SuperMarioBrosEnv(NESEnv):
             self._frame_advance(0)
             # run-out the prelevel timer to skip the animation
             self._runout_prelevel_timer()
+        # set the last time to now
+        self._time_last = self._time
         # after the start screen idle to skip some extra frames
         while self._time >= self._time_last:
             self._time_last = self._time
             self._frame_advance(8)
             self._frame_advance(0)
-        # stall for a frame
-        self._frame_advance(0)
 
     def _skip_end_of_world(self):
         """Skip the cutscene that plays at the end of a world."""
