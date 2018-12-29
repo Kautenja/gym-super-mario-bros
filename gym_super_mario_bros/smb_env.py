@@ -404,17 +404,17 @@ class SuperMarioBrosEnv(NESEnv):
 
     def _get_info(self):
         """Return the info after a step occurs"""
-        return {
-            'coins': self._coins,
-            'flag_get': self._flag_get,
-            'life': self._life + 1,
-            'score': self._score,
-            'stage': self._stage,
-            'status': self._player_status,
-            'time': self._time,
-            'world': self._world,
-            'x_pos': self._x_position,
-        }
+        return dict(
+            coins=self._coins,
+            flag_get=self._flag_get,
+            life=self._life,
+            score=self._score,
+            stage=self._stage,
+            status=self._player_status,
+            time=self._time,
+            world=self._world,
+            x_pos=self._x_position,
+        )
 
 
 # explicitly define the outward facing API of this module
