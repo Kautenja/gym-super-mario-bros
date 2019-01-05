@@ -39,7 +39,7 @@ setup(
     author='Christian Kauten',
     author_email='kautencreations@gmail.com',
     license='Proprietary',
-    packages=find_packages(),
+    packages=find_packages(exclude=['tests', '*.tests', '*.tests.*']),
     package_data={
         'gym_super_mario_bros': ['_roms/*.nes']
     },
