@@ -74,35 +74,27 @@ class SuperMarioBrosEnv(NESEnv):
             the integer value of this 10's place representation
 
         """
-        value = 0
-        # iterate over the length of bytes
-        for offset in range(length):
-            # shift the value over by 1 10's place
-            value *= 10
-            # add the next 10s place value
-            value += self._read_mem(address + offset)
-
-        return value
+        return int(''.join(map(str, self.ram[address:address + length])))
 
     @property
     def _level(self):
         """Return the level of the game."""
-        return self._read_mem(0x075f) * 4 + self._read_mem(0x075c)
+        return self.ram[0x075f] * 4 + self.ram[0x075c]
 
     @property
     def _world(self):
         """Return the current world (1 to 8)."""
-        return self._read_mem(0x075f) + 1
+        return self.ram[0x075f] + 1
 
     @property
     def _stage(self):
         """Return the current stage (1 to 4)."""
-        return self._read_mem(0x075c) + 1
+        return self.ram[0x075c] + 1
 
     @property
     def _area(self):
         """Return the current area number (1 to 5)."""
-        return self._read_mem(0x0760) + 1
+        return self.ram[0x0760] + 1
 
     @property
     def _score(self):
@@ -125,24 +117,24 @@ class SuperMarioBrosEnv(NESEnv):
     @property
     def _life(self):
         """Return the number of remaining lives."""
-        return self._read_mem(0x075a)
+        return self.ram[0x075a]
 
     @property
     def _x_position(self):
         """Return the current horizontal position."""
         # add the current page 0x6d to the current x
-        return self._read_mem(0x6d) * 0x100 + self._read_mem(0x86)
+        return self.ram[0x6d] * 0x100 + self.ram[0x86]
 
     @property
     def _left_x_position(self):
         """Return the number of pixels from the left of the screen."""
         # subtract the left x position 0x071c from the current x 0x86
-        return (self._read_mem(0x86) - self._read_mem(0x071c)) % 256
+        return (self.ram[0x86] - self.ram[0x071c]) % 256
 
     @property
     def _y_position(self):
         """Return the current vertical position."""
-        return self._read_mem(0x03b8)
+        return self.ram[0x03b8]
 
     @property
     def _y_viewport(self):
@@ -156,13 +148,13 @@ class SuperMarioBrosEnv(NESEnv):
             up to 5 indicates falling into a hole
 
         """
-        return self._read_mem(0x00b5)
+        return self.ram[0x00b5]
 
     @property
     def _player_status(self):
         """Return the player status as a string."""
         # get the numeric status from memory
-        status = self._read_mem(0x0756)
+        status = self.ram[0x0756]
         # 0 indicates small Mario
         if status == 0:
             return 'small'
@@ -192,7 +184,7 @@ class SuperMarioBrosEnv(NESEnv):
             0x0C : Palette cycling, can't move
 
         """
-        return self._read_mem(0x000e)
+        return self.ram[0x000e]
 
     @property
     def _is_dying(self):
@@ -232,7 +224,7 @@ class SuperMarioBrosEnv(NESEnv):
         # 0 => Demo
         # 1 => Standard
         # 2 => End of world
-        return self._read_mem(0x0770) == 2
+        return self.ram[0x0770] == 2
 
     @property
     def _is_stage_over(self):
@@ -242,9 +234,9 @@ class SuperMarioBrosEnv(NESEnv):
             # check if the byte is either Bowser (0x2D) or a flag (0x31)
             # this is to prevent returning true when Mario is using a vine
             # which will set the byte at 0x001D to 3
-            if self._read_mem(address) in {0x2D, 0x31}:
+            if self.ram[address] in {0x2D, 0x31}:
                 # player float state set to 3 when sliding down flag pole
-                return self._read_mem(0x001D) == 3
+                return self.ram[0x001D] == 3
 
         return False
 
@@ -257,19 +249,19 @@ class SuperMarioBrosEnv(NESEnv):
 
     def _write_stage(self):
         """Write the stage data to RAM to overwrite loading the next stage."""
-        self._write_mem(0x075f, self._target_world - 1)
-        self._write_mem(0x075c, self._target_stage - 1)
-        self._write_mem(0x0760, self._target_area - 1)
+        self.ram[0x075f] = self._target_world - 1
+        self.ram[0x075c] = self._target_stage - 1
+        self.ram[0x0760] = self._target_area - 1
 
     def _runout_prelevel_timer(self):
         """Force the pre-level timer to 0 to skip frames during a death."""
-        self._write_mem(0x07A0, 0)
+        self.ram[0x07A0] = 0
 
     def _skip_change_area(self):
         """Skip change area animations by by running down timers."""
-        change_area_timer = self._read_mem(0x06DE)
+        change_area_timer = self.ram[0x06DE]
         if change_area_timer > 1 and change_area_timer < 255:
-            self._write_mem(0x06DE, 1)
+            self.ram[0x06DE] = 1
 
     def _skip_occupied_states(self):
         """Skip occupied states by running out a timer and skipping frames."""
@@ -313,7 +305,7 @@ class SuperMarioBrosEnv(NESEnv):
     def _kill_mario(self):
         """Skip a death animation by forcing Mario to death."""
         # force Mario's state to dead
-        self._write_mem(0x000e, 0x06)
+        self.ram[0x000e] = 0x06
         # step forward one frame
         self._frame_advance(0)
 
