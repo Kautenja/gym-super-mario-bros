@@ -45,7 +45,7 @@ setup(
     },
     install_requires=[
         'matplotlib>=2.0.2',
-        'nes-py>=3.0.0',
+        'nes-py>=4.0.0',
         'numpy>=1.14.2',
         'opencv-python>=3.4.0.12',
         'pygame>=1.9.3',
