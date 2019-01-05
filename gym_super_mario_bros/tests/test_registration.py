@@ -63,14 +63,14 @@ class ShouldMakeSuperMarioBrosNoFrameskip(ShouldMakeEnv, TestCase):
 
 class ShouldMakeSuperMarioBrosLostLevels(ShouldMakeEnv, TestCase):
     # the amount of time left
-    time = 290
+    time = 400
     # the environments ID for all versions of Super Mario Bros
     env_id = ['SuperMarioBros2-v{}'.format(v) for v in range(2)]
 
 
 class ShouldMakeSuperMarioBrosLostLevelsNoFrameskip(ShouldMakeEnv, TestCase):
     # the amount of time left
-    time = 290
+    time = 400
     # the number of frames per step
     frames_per_step = 1
     # the environments ID for all versions of Super Mario Bros
