@@ -89,20 +89,14 @@ to an agent nor can an agent perform actions during these instances. If a
 cut-scene is not able to be skipped by hacking the NES's RAM, the environment
 will lock the Python process until the emulator is ready for the next action.
 
-| Environment                     | Game | Frameskip | ROM           | Screenshot |
-|:--------------------------------|:-----|:----------|:--------------|:-----------|
-| `SuperMarioBros-v0`             | SMB  | 4         | standard      | ![][v0]    |
-| `SuperMarioBros-v1`             | SMB  | 4         | downsample    | ![][v1]    |
-| `SuperMarioBros-v2`             | SMB  | 4         | pixel         | ![][v2]    |
-| `SuperMarioBros-v3`             | SMB  | 4         | rectangle     | ![][v3]    |
-| `SuperMarioBrosNoFrameskip-v0`  | SMB  | 1         | standard      | ![][v0]    |
-| `SuperMarioBrosNoFrameskip-v1`  | SMB  | 1         | downsample    | ![][v1]    |
-| `SuperMarioBrosNoFrameskip-v2`  | SMB  | 1         | pixel         | ![][v2]    |
-| `SuperMarioBrosNoFrameskip-v3`  | SMB  | 1         | rectangle     | ![][v3]    |
-| `SuperMarioBros2-v0`            | SMB2 | 4         | standard      | ![][2-v0]  |
-| `SuperMarioBros2-v1`            | SMB2 | 4         | downsample    | ![][2-v1]  |
-| `SuperMarioBros2NoFrameskip-v0` | SMB2 | 1         | standard      | ![][2-v0]  |
-| `SuperMarioBros2NoFrameskip-v1` | SMB2 | 1         | downsample    | ![][2-v1]  |
+| Environment                     | Game | ROM           | Screenshot |
+|:--------------------------------|:-----|:--------------|:-----------|
+| `SuperMarioBros-v0`             | SMB  | standard      | ![][v0]    |
+| `SuperMarioBros-v1`             | SMB  | downsample    | ![][v1]    |
+| `SuperMarioBros-v2`             | SMB  | pixel         | ![][v2]    |
+| `SuperMarioBros-v3`             | SMB  | rectangle     | ![][v3]    |
+| `SuperMarioBros2-v0`            | SMB2 | standard      | ![][2-v0]  |
+| `SuperMarioBros2-v1`            | SMB2 | downsample    | ![][2-v1]  |
 
 [v0]: https://user-images.githubusercontent.com/2184469/40948820-3d15e5c2-6830-11e8-81d4-ecfaffee0a14.png
 [v1]: https://user-images.githubusercontent.com/2184469/40948819-3cff6c48-6830-11e8-8373-8fad1665ac72.png
@@ -129,11 +123,9 @@ where:
     - 1: downsampled ROM
     - 2: pixel ROM
     - 3: rectangle ROM
--   `NoFrameskip` can be added before the first hyphen to disable frame skip
 
 For example, to play 4-2 on the downsampled ROM, you would use the environment
-id `SuperMarioBros-4-2-v1`. To disable frame skip you would use
-`SuperMarioBrosNoFrameskip-4-2-v1`.
+id `SuperMarioBros-4-2-v1`.
 
 ## Step
 
