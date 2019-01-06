@@ -40,8 +40,6 @@ class SuperMarioBrosEnv(NESEnv):
         self.reset()
         # skip the start screen
         self._skip_start_screen()
-        # stall for a frame
-        self.step(0)
         # create a backup state to restore from on subsequent calls to reset
         self._backup()
 
