@@ -28,5 +28,5 @@ deployment: clean
 	${PYTHON} setup.py sdist bdist_wheel --universal
 
 # ship the deployment package to PyPi
-ship: deployment
+ship: test deployment
 	twine upload dist/*
