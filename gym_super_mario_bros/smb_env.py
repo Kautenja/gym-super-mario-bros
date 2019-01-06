@@ -10,19 +10,11 @@ class SuperMarioBrosEnv(NESEnv):
     # the legal range of rewards for each step
     reward_range = (-15, 15)
 
-    def __init__(self,
-        frames_per_step=1,
-        max_episode_steps=float('inf'),
-        rom_mode='vanilla',
-        lost_levels=False,
-        target=None,
-    ):
+    def __init__(self, rom_mode='vanilla', lost_levels=False, target=None):
         """
         Initialize a new Super Mario Bros environment.
 
         Args:
-            frames_per_step (int): the number of frames between steps
-            max_episode_steps (float): number of steps before an episode ends
             rom_mode (str): the ROM mode to use when loading ROMs from disk
             lost_levels (bool): whether to load the ROM with lost levels.
                 - False: load original Super Mario Bros.
@@ -36,10 +28,7 @@ class SuperMarioBrosEnv(NESEnv):
         # decode the ROM path based on mode and lost levels flag
         rom = rom_path(lost_levels, rom_mode)
         # initialize the super object with the ROM path
-        super(SuperMarioBrosEnv, self).__init__(rom,
-            frames_per_step=frames_per_step,
-            max_episode_steps=max_episode_steps,
-        )
+        super(SuperMarioBrosEnv, self).__init__(rom)
         # set the target world, stage, and area variables
         target = decode_target(target, lost_levels)
         self._target_world, self._target_stage, self._target_area = target
