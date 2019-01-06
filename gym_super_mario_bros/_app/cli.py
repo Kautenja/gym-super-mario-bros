@@ -1,10 +1,10 @@
 """Super Mario Bros for OpenAI Gym."""
 import argparse
+import gym
 from nes_py.wrappers import wrap
 from nes_py.wrappers import BinarySpaceToDiscreteSpaceEnv
 from nes_py.app.play_human import play_human
 from nes_py.app.play_random import play_random
-from .._registration import make
 from ..actions import RIGHT_ONLY, SIMPLE_MOVEMENT, COMPLEX_MOVEMENT
 
 
@@ -59,7 +59,7 @@ def main():
     # parse arguments from the command line (argparse validates arguments)
     args = _get_args()
     # build the environment with the given ID
-    env = make(args.env)
+    env = gym.make(args.env)
     # wrap the environment with an action space if specified
     if args.actionspace != 'nes':
         print(args.actionspace)
