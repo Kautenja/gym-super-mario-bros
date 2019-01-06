@@ -14,40 +14,27 @@ def _register_mario_env(id, **kwargs):
         None
 
     """
-    kwargs['max_episode_steps'] = float('inf')
     # register the environment
     gym.envs.registration.register(
         id=id,
         entry_point='gym_super_mario_bros:SuperMarioBrosEnv',
         max_episode_steps=9999999,
-        reward_threshold=32000,
+        reward_threshold=9999999,
         kwargs=kwargs,
         nondeterministic=True,
     )
 
 
-# Super Mario Bros. with standard frame skip
-_register_mario_env('SuperMarioBros-v0', frames_per_step=4, rom_mode='vanilla')
-_register_mario_env('SuperMarioBros-v1', frames_per_step=4, rom_mode='downsample')
-_register_mario_env('SuperMarioBros-v2', frames_per_step=4, rom_mode='pixel')
-_register_mario_env('SuperMarioBros-v3', frames_per_step=4, rom_mode='rectangle')
+# Super Mario Bros.
+_register_mario_env('SuperMarioBros-v0', rom_mode='vanilla')
+_register_mario_env('SuperMarioBros-v1', rom_mode='downsample')
+_register_mario_env('SuperMarioBros-v2', rom_mode='pixel')
+_register_mario_env('SuperMarioBros-v3', rom_mode='rectangle')
 
 
-# Super Mario Bros. with no frame skip
-_register_mario_env('SuperMarioBrosNoFrameskip-v0', frames_per_step=1, rom_mode='vanilla')
-_register_mario_env('SuperMarioBrosNoFrameskip-v1', frames_per_step=1, rom_mode='downsample')
-_register_mario_env('SuperMarioBrosNoFrameskip-v2', frames_per_step=1, rom_mode='pixel')
-_register_mario_env('SuperMarioBrosNoFrameskip-v3', frames_per_step=1, rom_mode='rectangle')
-
-
-# Super Mario Bros. 2 (Lost Levels) with standard frame skip
-_register_mario_env('SuperMarioBros2-v0', lost_levels=True, frames_per_step=4, rom_mode='vanilla')
-_register_mario_env('SuperMarioBros2-v1', lost_levels=True, frames_per_step=4, rom_mode='downsample')
-
-
-# Super Mario Bros. 2 (Lost Levels) with no frame skip
-_register_mario_env('SuperMarioBros2NoFrameskip-v0', lost_levels=True, frames_per_step=1, rom_mode='vanilla')
-_register_mario_env('SuperMarioBros2NoFrameskip-v1', lost_levels=True, frames_per_step=1, rom_mode='downsample')
+# Super Mario Bros. 2 (Lost Levels)
+_register_mario_env('SuperMarioBros2-v0', lost_levels=True, rom_mode='vanilla')
+_register_mario_env('SuperMarioBros2-v1', lost_levels=True, rom_mode='downsample')
 
 
 def _register_mario_stage_env(id, **kwargs):
@@ -62,13 +49,12 @@ def _register_mario_stage_env(id, **kwargs):
         None
 
     """
-    kwargs['max_episode_steps'] = float('inf')
     # register the environment
     gym.envs.registration.register(
         id=id,
         entry_point='gym_super_mario_bros:SuperMarioBrosEnv',
         max_episode_steps=9999999,
-        reward_threshold=32000,
+        reward_threshold=9999999,
         kwargs=kwargs,
         nondeterministic=True,
     )
@@ -76,30 +62,24 @@ def _register_mario_stage_env(id, **kwargs):
 
 # a template for making individual stage environments
 _ID_TEMPLATE = 'SuperMarioBros{}-{}-{}-v{}'
-# iterate over all the rom modes, worlds (1-8), and stages (1-4)
+# A list of ROM modes for each level environment
 _ROM_MODES = [
     'vanilla',
     'downsample',
     'pixel',
     'rectangle'
 ]
+
+
+# iterate over all the rom modes, worlds (1-8), and stages (1-4)
 for version, rom_mode in enumerate(_ROM_MODES):
     for world in range(1, 9):
         for stage in range(1, 5):
+            # create the target
+            target = (world, stage)
             # setup the frame-skipping environment
             env_id = _ID_TEMPLATE.format('', world, stage, version)
-            _register_mario_stage_env(env_id,
-                frames_per_step=4,
-                rom_mode=rom_mode,
-                target=(world, stage),
-            )
-            # setup the no frame-skipping environment
-            env_id = _ID_TEMPLATE.format('NoFrameskip', world, stage, version)
-            _register_mario_stage_env(env_id,
-                frames_per_step=1,
-                rom_mode=rom_mode,
-                target=(world, stage),
-            )
+            _register_mario_stage_env(env_id, rom_mode=rom_mode, target=target)
 
 
 # create an alias to gym.make for ease of access
