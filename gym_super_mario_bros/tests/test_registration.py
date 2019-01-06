@@ -21,8 +21,6 @@ class ShouldMakeEnv:
     time = 400
     # the x position of Mario
     x_pos = 40
-    # the number of frames per step
-    frames_per_step = 4
     # the environments ID
     env_id = None
 
@@ -38,7 +36,6 @@ class ShouldMakeEnv:
         self.assertEqual(self.stage, i['stage'])
         self.assertEqual(self.time, i['time'])
         self.assertEqual(self.x_pos, i['x_pos'])
-        self.assertEqual(self.frames_per_step, env.unwrapped._frames_per_step)
         env.close()
 
     def test(self):
@@ -54,27 +51,11 @@ class ShouldMakeSuperMarioBros(ShouldMakeEnv, TestCase):
     env_id = ['SuperMarioBros-v{}'.format(v) for v in range(4)]
 
 
-class ShouldMakeSuperMarioBrosNoFrameskip(ShouldMakeEnv, TestCase):
-    # the number of frames per step
-    frames_per_step = 1
-    # the environments ID for all versions of Super Mario Bros
-    env_id = ['SuperMarioBrosNoFrameskip-v{}'.format(v) for v in range(4)]
-
-
 class ShouldMakeSuperMarioBrosLostLevels(ShouldMakeEnv, TestCase):
     # the amount of time left
     time = 400
     # the environments ID for all versions of Super Mario Bros
     env_id = ['SuperMarioBros2-v{}'.format(v) for v in range(2)]
-
-
-class ShouldMakeSuperMarioBrosLostLevelsNoFrameskip(ShouldMakeEnv, TestCase):
-    # the amount of time left
-    time = 400
-    # the number of frames per step
-    frames_per_step = 1
-    # the environments ID for all versions of Super Mario Bros
-    env_id = ['SuperMarioBros2NoFrameskip-v{}'.format(v) for v in range(2)]
 
 
 class ShouldMakeSuperMarioBros_1_1(ShouldMakeEnv, TestCase):

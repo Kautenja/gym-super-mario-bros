@@ -1,18 +1,11 @@
 """Super Mario Bros for OpenAI Gym."""
-import os
 import argparse
 from nes_py.wrappers import wrap
 from nes_py.wrappers import BinarySpaceToDiscreteSpaceEnv
-from nes_py._app.play import play_human, play_random
+from nes_py.app.play_human import play_human
+from nes_py.app.play_random import play_random
 from .._registration import make
 from ..actions import RIGHT_ONLY, SIMPLE_MOVEMENT, COMPLEX_MOVEMENT
-
-
-# The play modes for the system
-_PLAY_MODES = {
-    'human': play_human,
-    'random': play_random
-}
 
 
 # a key mapping of action spaces to wrap with
@@ -51,6 +44,12 @@ def _get_args():
         choices=['nes', 'right', 'simple', 'complex'],
         help='the action space wrapper to use'
     )
+    # add the argument for the number of steps to take in random mode
+    parser.add_argument('--steps', '-s',
+        type=int,
+        default=500,
+        help='The number of random steps to take.',
+    )
     # parse arguments and return them
     return parser.parse_args()
 
@@ -72,7 +71,10 @@ def main():
     if args.wrap:
         env = wrap(env, agent_history_length=None)
     # play the environment with the given mode
-    _PLAY_MODES[args.mode](env)
+    if args.mode == 'human':
+        play_human(env)
+    else:
+        play_random(env, args.steps)
 
 
 # explicitly define the outward facing API of this module
