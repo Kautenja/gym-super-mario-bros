@@ -1,6 +1,6 @@
 """An OpenAI Gym Super Mario Bros. environment that randomly selects levels."""
 import gym
-import numpy as np
+from numpy.random import RandomState
 from nes_py.nes_env import SCREEN_HEIGHT, SCREEN_WIDTH
 from .smb_env import SuperMarioBrosEnv
 
@@ -31,6 +31,8 @@ class SuperMarioBrosRandomLevelsEnv(gym.Env):
             None
 
         """
+        # create a dedicated random number generator for the environment
+        self._rng = RandomState()
         # setup the environments
         self.envs = []
         # iterate over the worlds in the game, i.e., {1, ..., 8}
@@ -50,7 +52,7 @@ class SuperMarioBrosRandomLevelsEnv(gym.Env):
 
     def _select_random_level(self):
         """Select a random level to use."""
-        self.env = self.envs[np.random.randint(1, 9) - 1][np.random.randint(1, 5) - 1]
+        self.env = self.envs[self._rng.randint(1, 9) - 1][self._rng.randint(1, 5) - 1]
 
     def seed(self, seed=None):
         """
@@ -68,7 +70,7 @@ class SuperMarioBrosRandomLevelsEnv(gym.Env):
         if seed is None:
             return []
         # set the random number seed for the NumPy random number generator
-        np.random.seed(seed)
+        self._rng.seed(seed)
         # return the list of seeds used by RNG(s) in the environment
         return [seed]
 
