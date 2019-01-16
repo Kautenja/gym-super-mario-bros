@@ -18,7 +18,7 @@ def _register_mario_env(id, is_random=False, **kwargs):
     # if the is random flag is set
     if is_random:
         # set the entry point to the random level environment
-        entry_point = 'gym_super_mario_bros:SuperMarioBrosRandomLevelsEnv'
+        entry_point = 'gym_super_mario_bros:SuperMarioBrosRandomStagesEnv'
     else:
         # set the entry point to the standard Super Mario Bros. environment
         entry_point = 'gym_super_mario_bros:SuperMarioBrosEnv'
@@ -41,10 +41,10 @@ _register_mario_env('SuperMarioBros-v3', rom_mode='rectangle')
 
 
 # Super Mario Bros. Random Levels
-_register_mario_env('SuperMarioBrosRandomLevels-v0', is_random=True, rom_mode='vanilla')
-_register_mario_env('SuperMarioBrosRandomLevels-v1', is_random=True, rom_mode='downsample')
-_register_mario_env('SuperMarioBrosRandomLevels-v2', is_random=True, rom_mode='pixel')
-_register_mario_env('SuperMarioBrosRandomLevels-v3', is_random=True, rom_mode='rectangle')
+_register_mario_env('SuperMarioBrosRandomStages-v0', is_random=True, rom_mode='vanilla')
+_register_mario_env('SuperMarioBrosRandomStages-v1', is_random=True, rom_mode='downsample')
+_register_mario_env('SuperMarioBrosRandomStages-v2', is_random=True, rom_mode='pixel')
+_register_mario_env('SuperMarioBrosRandomStages-v3', is_random=True, rom_mode='rectangle')
 
 
 # Super Mario Bros. 2 (Lost Levels)

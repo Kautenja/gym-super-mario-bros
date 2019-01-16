@@ -5,7 +5,7 @@ from nes_py.nes_env import SCREEN_HEIGHT, SCREEN_WIDTH
 from .smb_env import SuperMarioBrosEnv
 
 
-class SuperMarioBrosRandomLevelsEnv(gym.Env):
+class SuperMarioBrosRandomStagesEnv(gym.Env):
     """A Super Mario Bros. environment that randomly selects levels."""
 
     # relevant meta-data about the environment
@@ -162,4 +162,4 @@ class SuperMarioBrosRandomLevelsEnv(gym.Env):
 
 
 # explicitly define the outward facing API of this module
-__all__ = [SuperMarioBrosRandomLevelsEnv.__name__]
+__all__ = [SuperMarioBrosRandomStagesEnv.__name__]

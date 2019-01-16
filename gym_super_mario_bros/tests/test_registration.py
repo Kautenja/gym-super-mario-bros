@@ -55,7 +55,7 @@ class ShouldMakeSuperMarioBros(ShouldMakeEnv, TestCase):
     env_id = ['SuperMarioBros-v{}'.format(v) for v in range(4)]
 
 
-class ShouldMakeSuperMarioBrosRandomLevels(ShouldMakeEnv, TestCase):
+class ShouldMakeSuperMarioBrosRandomStages(ShouldMakeEnv, TestCase):
     # the random number seed for this environment
     seed = 1
     # the amount of time left
@@ -65,7 +65,7 @@ class ShouldMakeSuperMarioBrosRandomLevels(ShouldMakeEnv, TestCase):
     # the current stage
     stage = 4
     # the environments ID for all versions of Super Mario Bros
-    env_id = ['SuperMarioBrosRandomLevels-v{}'.format(v) for v in range(4)]
+    env_id = ['SuperMarioBrosRandomStages-v{}'.format(v) for v in range(4)]
 
 
 class ShouldMakeSuperMarioBrosLostLevels(ShouldMakeEnv, TestCase):
