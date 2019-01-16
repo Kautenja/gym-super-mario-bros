@@ -2,17 +2,16 @@
 from setuptools import setup, find_packages
 
 
-def README():
-    """Return the contents of the read me file for this project."""
-    with open('README.md') as readme:
-        return readme.read()
+# read the contents of the README
+with open('README.md') as README_md:
+    README = README_md.read()
 
 
 setup(
     name='gym_super_mario_bros',
     version='7.1.0',
     description='Super Mario Bros. for OpenAI Gym',
-    long_description=README(),
+    long_description=README,
     long_description_content_type='text/markdown',
     keywords=' '.join([
         'OpenAI-Gym',
@@ -40,9 +39,7 @@ setup(
     author_email='kautencreations@gmail.com',
     license='Proprietary',
     packages=find_packages(exclude=['tests', '*.tests', '*.tests.*']),
-    package_data={
-        'gym_super_mario_bros': ['_roms/*.nes']
-    },
+    package_data={ 'gym_super_mario_bros': ['_roms/*.nes'] },
     install_requires=[
         'matplotlib>=2.0.2',
         'nes-py>=5.0.0',
