@@ -127,6 +127,17 @@ where:
 For example, to play 4-2 on the downsampled ROM, you would use the environment
 id `SuperMarioBros-4-2-v1`.
 
+### Random Stage Selection
+
+The random stage selection environment randomly selects a stage and allows a
+single attempt to clear it. Upon a death and subsequent call to `reset`, the
+environment randomly selects a new stage.  This is only available for the
+standard Super Mario Bros. game, _not_ Lost Levels (at the moment). To use
+these environments, append `RandomLevels` to the `SuperMarioBros` id. For
+example, to use the standard ROM with random stage selection use
+`SuperMarioBrosRandomLevels-v0`. To seed the random stage selection use the
+`seed` method of the env, i.e., `env.seed(1)`, before any calls to `reset`.
+
 ## Step
 
 Info about the rewards and info returned by the `step` method.

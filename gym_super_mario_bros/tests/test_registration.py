@@ -23,9 +23,13 @@ class ShouldMakeEnv:
     x_pos = 40
     # the environments ID
     env_id = None
+    # the random seed to apply
+    seed = None
 
     def _test_env(self, env_id):
         env = make(env_id)
+        if self.seed is not None:
+            env.seed(self.seed)
         env.reset()
         s, r, d, i = env.step(0)
         self.assertEqual(self.coins, i['coins'])
@@ -49,6 +53,19 @@ class ShouldMakeEnv:
 class ShouldMakeSuperMarioBros(ShouldMakeEnv, TestCase):
     # the environments ID for all versions of Super Mario Bros
     env_id = ['SuperMarioBros-v{}'.format(v) for v in range(4)]
+
+
+class ShouldMakeSuperMarioBrosRandomLevels(ShouldMakeEnv, TestCase):
+    # the random number seed for this environment
+    seed = 1
+    # the amount of time left
+    time = 300
+    # the current world
+    world = 6
+    # the current stage
+    stage = 4
+    # the environments ID for all versions of Super Mario Bros
+    env_id = ['SuperMarioBrosRandomLevels-v{}'.format(v) for v in range(4)]
 
 
 class ShouldMakeSuperMarioBrosLostLevels(ShouldMakeEnv, TestCase):
