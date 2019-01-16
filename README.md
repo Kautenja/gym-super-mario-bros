@@ -105,6 +105,15 @@ will lock the Python process until the emulator is ready for the next action.
 [2-v0]: https://user-images.githubusercontent.com/2184469/40948822-3d3b8412-6830-11e8-860b-af3802f5373f.png
 [2-v1]: https://user-images.githubusercontent.com/2184469/40948821-3d2d61a2-6830-11e8-8789-a92e750aa9a8.png
 
+### Random Stage Selection
+
+The random stage selection environment randomly selects a new stage (1-32)
+every time Mario dies (i.e., on each call to `reset`). This is only available
+for the standard Super Mario Bros. game, _not_ Lost Levels (at the moment).
+To use these environments, append `RandomLevels` to the `SuperMarioBros` id.
+For example, to use the standard ROM with random stage selection use
+`SuperMarioBrosRandomLevels-v0`.
+
 ### Individual Stages
 
 These environments allow a single attempt (life) to make it through a single
