@@ -1,7 +1,6 @@
 """Super Mario Bros for OpenAI Gym."""
 import argparse
 import gym
-from nes_py.wrappers import wrap
 from nes_py.wrappers import BinarySpaceToDiscreteSpaceEnv
 from nes_py.app.play_human import play_human
 from nes_py.app.play_random import play_random
@@ -31,11 +30,6 @@ def _get_args():
         default='human',
         choices=['human', 'random'],
         help='The execution mode for the emulation'
-    )
-    # add a flag for wrapping the environment
-    parser.add_argument('--wrap', '-W',
-        action='store_true',
-        help='A flag to use the standard wrap while playing'
     )
     # add the argument for adjusting the action space
     parser.add_argument('--actionspace', '-a',
@@ -67,9 +61,6 @@ def main():
         actions = _ACTION_SPACES[args.actionspace]
         # wrap the environment with the new action space
         env = BinarySpaceToDiscreteSpaceEnv(env, actions)
-    # wrap the environment if specified
-    if args.wrap:
-        env = wrap(env, agent_history_length=None)
     # play the environment with the given mode
     if args.mode == 'human':
         play_human(env)
