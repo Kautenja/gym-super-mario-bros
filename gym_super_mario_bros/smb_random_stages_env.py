@@ -1,5 +1,6 @@
 """An OpenAI Gym Super Mario Bros. environment that randomly selects levels."""
 import gym
+import numpy as np
 from nes_py.nes_env import SCREEN_HEIGHT, SCREEN_WIDTH
 from .smb_env import SuperMarioBrosEnv
 
@@ -30,6 +31,8 @@ class SuperMarioBrosRandomStagesEnv(gym.Env):
             None
 
         """
+        # create a dedicated random number generator for the environment
+        self.np_random = np.random.RandomState()
         # setup the environments
         self.envs = []
         # iterate over the worlds in the game, i.e., {1, ..., 8}
@@ -38,8 +41,10 @@ class SuperMarioBrosRandomStagesEnv(gym.Env):
             self.envs.append([])
             # iterate over the stages in the world, i.e., {1, ..., 4}
             for stage in range(1, 5):
+                # create the target as a tuple of the world and stage
+                target = (world, stage)
                 # create the environment with the given ROM mode
-                env = SuperMarioBrosEnv(rom_mode=rom_mode, target=(world, stage))
+                env = SuperMarioBrosEnv(rom_mode=rom_mode, target=target)
                 # add the environment to the stage list for this world
                 self.envs[-1].append(env)
         # create a placeholder for the current environment
@@ -49,7 +54,29 @@ class SuperMarioBrosRandomStagesEnv(gym.Env):
 
     def _select_random_level(self):
         """Select a random level to use."""
-        self.env = self.envs[self._rng.randint(1, 9) - 1][self._rng.randint(1, 5) - 1]
+        world = self.np_random.randint(1, 9) - 1
+        stage = self.np_random.randint(1, 5) - 1
+        self.env = self.envs[world][stage]
+
+    def seed(self, seed=None):
+        """
+        Set the seed for this environment's random number generator.
+
+        Returns:
+            list<bigint>: Returns the list of seeds used in this env's random
+              number generators. The first value in the list should be the
+              "main" seed, or the value which a reproducer should pass to
+              'seed'. Often, the main seed equals the provided 'seed', but
+              this won't be true if seed=None, for example.
+
+        """
+        # if there is no seed, return an empty list
+        if seed is None:
+            return []
+        # set the random number seed for the NumPy random number generator
+        self.np_random.seed(seed)
+        # return the list of seeds used by RNG(s) in the environment
+        return [seed]
 
     def reset(self):
         """
