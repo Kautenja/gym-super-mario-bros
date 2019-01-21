@@ -3,7 +3,7 @@
 
 # actions for the simple run right environment
 RIGHT_ONLY = [
-    ['NOP'],
+    ['NOOP'],
     ['right'],
     ['right', 'A'],
     ['right', 'B'],
@@ -13,7 +13,7 @@ RIGHT_ONLY = [
 
 # actions for very simple movement
 SIMPLE_MOVEMENT = [
-    ['NOP'],
+    ['NOOP'],
     ['right'],
     ['right', 'A'],
     ['right', 'B'],
@@ -25,7 +25,7 @@ SIMPLE_MOVEMENT = [
 
 # actions for more complex movement
 COMPLEX_MOVEMENT = [
-    ['NOP'],
+    ['NOOP'],
     ['right'],
     ['right', 'A'],
     ['right', 'B'],

@@ -42,7 +42,7 @@ setup(
     package_data={ 'gym_super_mario_bros': ['_roms/*.nes'] },
     install_requires=[
         'matplotlib>=2.0.2',
-        'nes-py>=5.0.0',
+        'nes-py>=6.1.0',
         'numpy>=1.14.2',
         'opencv-python>=3.4.0.12',
         'pygame>=1.9.3',
