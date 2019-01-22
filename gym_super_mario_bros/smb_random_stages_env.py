@@ -164,6 +164,10 @@ class SuperMarioBrosRandomStagesEnv(gym.Env):
         """Return the dictionary of keyboard keys to actions."""
         return self.env.get_keys_to_action()
 
+    def get_action_meanings(self):
+        """Return the list of strings describing the action space actions."""
+        return self.env.get_action_meanings()
+
 
 # explicitly define the outward facing API of this module
 __all__ = [SuperMarioBrosRandomStagesEnv.__name__]
