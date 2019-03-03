@@ -8,12 +8,17 @@ about: Create a report to help us improve
 
 A clear and concise description of what the bug is.
 
-### To Reproduce
+### Reproduction Script
 
-Steps to reproduce the behavior:
+Provide a script to reproduce the error using the following template, 
+replacing `<YOUR SCRIPT>` with your script:
 
-1.  foo
-2.  bar
+```python
+import pkg_resources
+print(pkg_resources.get_distribution("nes-py").version)
+print(pkg_resources.get_distribution("gym-super-mario-bros").version)
+<YOUR SCRIPT>
+```
 
 ### Expected behavior
 
