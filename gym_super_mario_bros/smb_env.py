@@ -399,7 +399,6 @@ class SuperMarioBrosEnv(NESEnv):
 
     def _get_info(self):
         """Return the info after a step occurs"""
-        print(self._y_position)
         return dict(
             coins=self._coins,
             flag_get=self._flag_get,
