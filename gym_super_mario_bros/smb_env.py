@@ -9,6 +9,10 @@ from ._roms import rom_path
 _STATUS_MAP = defaultdict(lambda: 'fireball', {0:'small', 1: 'tall'})
 
 
+# a set of state values indicating that Mario is "busy"
+_BUSY_STATES = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x07}
+
+
 class SuperMarioBrosEnv(NESEnv):
     """An environment for playing Super Mario Bros with OpenAI Gym."""
 
@@ -205,18 +209,9 @@ class SuperMarioBrosEnv(NESEnv):
         return self._life == 0xff
 
     @property
-    def _is_busy(self, busy={0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x07}):
-        """
-        Return boolean whether Mario is busy with in-game garbage.
-
-        Args:
-            busy: the value of states that determine if Mario is busy
-
-        Returns:
-            True if Mario's state is in the `busy` set, False otherwise
-
-        """
-        return self._player_state in busy
+    def _is_busy(self):
+        """Return boolean whether Mario is busy with in-game garbage."""
+        return self._player_state in _BUSY_STATES
 
     @property
     def _is_world_over(self):
