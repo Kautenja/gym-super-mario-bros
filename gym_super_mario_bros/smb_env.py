@@ -1,6 +1,7 @@
 """An OpenAI Gym environment for Super Mario Bros. and Lost Levels."""
 from collections import defaultdict
 from nes_py import NESEnv
+import numpy as np
 from ._roms import decode_target
 from ._roms import rom_path
 
@@ -10,7 +11,18 @@ _STATUS_MAP = defaultdict(lambda: 'fireball', {0:'small', 1: 'tall'})
 
 
 # a set of state values indicating that Mario is "busy"
-_BUSY_STATES = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x07}
+_BUSY_STATES = [0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x07]
+
+
+# RAM addresses for enemy types on the screen
+_ENEMY_TYPE_ADDRESSES = [0x0016, 0x0017, 0x0018, 0x0019, 0x001A]
+
+
+# enemies whose context indicate that a stage change will occur (opposed to an
+# enemy that implies a stage change wont occur -- i.e., a vine)
+# Bowser = 0x2D
+# Flagpole = 0x31
+_STAGE_OVER_ENEMIES = np.array([0x2D, 0x31])
 
 
 class SuperMarioBrosEnv(NESEnv):
@@ -225,14 +237,12 @@ class SuperMarioBrosEnv(NESEnv):
     @property
     def _is_stage_over(self):
         """Return a boolean determining if the level is over."""
-        # iterate over the memory addresses that hold enemy types
-        for address in [0x0016, 0x0017, 0x0018, 0x0019, 0x001A]:
-            # check if the byte is either Bowser (0x2D) or a flag (0x31)
-            # this is to prevent returning true when Mario is using a vine
-            # which will set the byte at 0x001D to 3
-            if self.ram[address] in {0x2D, 0x31}:
-                # player float state set to 3 when sliding down flag pole
-                return self.ram[0x001D] == 3
+        # check if Bowser of Flagpole enemy types are loaded into RAM to
+        # prevent accidental stage change detection when Mario is using a vine
+        # (because 0x001D will get set to 3 in this case)
+        if np.isin(self.ram[_ENEMY_TYPE_ADDRESSES], _STAGE_OVER_ENEMIES).any():
+            # check if the "float state" of the agent is 3
+            return self.ram[0x001D] == 3
 
         return False
 
