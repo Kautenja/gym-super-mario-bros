@@ -1,7 +1,12 @@
 """An OpenAI Gym environment for Super Mario Bros. and Lost Levels."""
+from collections import defaultdict
 from nes_py import NESEnv
 from ._roms import decode_target
 from ._roms import rom_path
+
+
+# create a dictionary mapping value of status register to string names
+_STATUS_MAP = defaultdict(lambda: 'fireball', {0:'small', 1: 'tall'})
 
 
 class SuperMarioBrosEnv(NESEnv):
@@ -158,16 +163,7 @@ class SuperMarioBrosEnv(NESEnv):
     @property
     def _player_status(self):
         """Return the player status as a string."""
-        # get the numeric status from memory
-        status = self.ram[0x0756]
-        # 0 indicates small Mario
-        if status == 0:
-            return 'small'
-        # 1 indicates tall Mario (mushroom)
-        if status == 1:
-            return 'tall'
-        # 2 indicates fireball Mario (fire flower)
-        return 'fireball'
+        return _STATUS_MAP[self.ram[0x0756]]
 
     @property
     def _player_state(self):
