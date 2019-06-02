@@ -237,12 +237,14 @@ class SuperMarioBrosEnv(NESEnv):
     @property
     def _is_stage_over(self):
         """Return a boolean determining if the level is over."""
-        # check if Bowser of Flagpole enemy types are loaded into RAM to
-        # prevent accidental stage change detection when Mario is using a vine
-        # (because 0x001D will get set to 3 in this case)
-        if np.isin(self.ram[_ENEMY_TYPE_ADDRESSES], _STAGE_OVER_ENEMIES).any():
-            # check if the "float state" of the agent is 3
-            return self.ram[0x001D] == 3
+        # iterate over the memory addresses that hold enemy types
+        for address in _ENEMY_TYPE_ADDRESSES:
+            # check if the byte is either Bowser (0x2D) or a flag (0x31)
+            # this is to prevent returning true when Mario is using a vine
+            # which will set the byte at 0x001D to 3
+            if self.ram[address] in _STAGE_OVER_ENEMIES:
+                # player float state set to 3 when sliding down flag pole
+                return self.ram[0x001D] == 3
 
         return False
 
