@@ -9,7 +9,7 @@ with open('README.md') as README_md:
 
 setup(
     name='gym_super_mario_bros',
-    version='7.2.1',
+    version='7.2.2',
     description='Super Mario Bros. for OpenAI Gym',
     long_description=README,
     long_description_content_type='text/markdown',
@@ -40,15 +40,7 @@ setup(
     license='Proprietary',
     packages=find_packages(exclude=['tests', '*.tests', '*.tests.*']),
     package_data={ 'gym_super_mario_bros': ['_roms/*.nes'] },
-    install_requires=[
-        'matplotlib>=2.0.2',
-        'nes-py>=6.2.1',
-        'numpy>=1.14.2',
-        'opencv-python>=3.4.0.12',
-        'pygame>=1.9.3',
-        'pyglet>=1.3.2',
-        'tqdm>=4.19.5',
-    ],
+    install_requires=['nes-py>=8.0.0'],
     entry_points={
         'console_scripts': [
             'gym_super_mario_bros = gym_super_mario_bros._app.cli:main',
