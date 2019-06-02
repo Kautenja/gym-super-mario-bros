@@ -1,7 +1,7 @@
 """Super Mario Bros for OpenAI Gym."""
 import argparse
 import gym
-from nes_py.wrappers import BinarySpaceToDiscreteSpaceEnv
+from nes_py.wrappers import JoypadSpace
 from nes_py.app.play_human import play_human
 from nes_py.app.play_random import play_random
 from ..actions import RIGHT_ONLY, SIMPLE_MOVEMENT, COMPLEX_MOVEMENT
@@ -60,7 +60,7 @@ def main():
         # unwrap the actions list by key
         actions = _ACTION_SPACES[args.actionspace]
         # wrap the environment with the new action space
-        env = BinarySpaceToDiscreteSpaceEnv(env, actions)
+        env = JoypadSpace(env, actions)
     # play the environment with the given mode
     if args.mode == 'human':
         play_human(env)
