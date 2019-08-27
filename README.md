@@ -197,9 +197,9 @@ Please cite `gym-super-mario-bros` if you use it in your research.
 ```tex
 @misc{gym-super-mario-bros,
   author = {Christian Kauten},
+  howpublished = {GitHub},
   title = {{S}uper {M}ario {B}ros for {O}pen{AI} {G}ym},
+  URL = {https://github.com/Kautenja/gym-super-mario-bros},
   year = {2018},
-  publisher = {GitHub},
-  howpublished = {\url{https://github.com/Kautenja/gym-super-mario-bros}},
 }
 ```
