@@ -142,7 +142,7 @@ class SuperMarioBrosEnv(NESEnv):
         return self.ram[0x6d] * 0x100 + self.ram[0x86]
 
     @property
-    def _left_x_position(self):
+    def _x_position_screen(self):
         """Return the number of pixels from the left of the screen."""
         # subtract the left x position 0x071c from the current x 0x86
         return (self.ram[0x86] - self.ram[0x071c]) % 256
@@ -412,6 +412,7 @@ class SuperMarioBrosEnv(NESEnv):
             time=self._time,
             world=self._world,
             x_pos=self._x_position,
+            x_pos_screen=self._x_position_screen,
             y_pos=self._y_position,
         )
 
