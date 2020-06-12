@@ -1,5 +1,5 @@
 # an alias to the python command
-PYTHON=python
+PYTHON=python3
 
 # build the LaiNES code, test the Python interface, and build
 # the deployment package
