@@ -25,7 +25,7 @@ clean:
 
 # build the deployment package
 deployment: clean
-	${PYTHON} setup.py sdist bdist_wheel --universal
+	${PYTHON} setup.py sdist bdist_wheel
 
 # ship the deployment package to PyPi
 ship: test deployment
