@@ -1,21 +1,9 @@
-# an alias to the python command
-PYTHON=python3
-
-# build the LaiNES code, test the Python interface, and build
-# the deployment package
+# build everything
 all: test deployment
-
-#
-# MARK: Development
-#
 
 # run the Python test suite
 test:
-	${PYTHON} -m unittest discover .
-
-#
-# MARK: Deployment
-#
+	python3 -m unittest discover .
 
 # clean the build directory
 clean:
@@ -25,7 +13,7 @@ clean:
 
 # build the deployment package
 deployment: clean
-	${PYTHON} setup.py sdist bdist_wheel
+	python3 setup.py sdist bdist_wheel
 
 # ship the deployment package to PyPi
 ship: test deployment
