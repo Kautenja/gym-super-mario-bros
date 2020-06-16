@@ -2,23 +2,50 @@
 language: python # this works for Linux but is an error on macOS or Windows
 matrix:
   include:
+    - name: "Python 3.5 on Ubuntu 14.04"
+      python: 3.5
+      dist: trusty
+    - name: "Python 3.6 on Ubuntu 14.04"
+      python: 3.6
+      dist: trusty
+    - name: "Python 3.7 on Ubuntu 14.04"
+      python: 3.7
+      dist: trusty
+    - name: "Python 3.8 on Ubuntu 14.04"
+      python: 3.8
+      dist: trusty
     - name: "Python 3.5 on Ubuntu 16.04"
       python: 3.5
       dist: xenial
-      before_install: pip3 install scons
     - name: "Python 3.6 on Ubuntu 16.04"
       python: 3.6
       dist: xenial
-      before_install: pip3 install scons
     - name: "Python 3.7 on Ubuntu 16.04"
       python: 3.7
       dist: xenial
-      before_install: pip3 install scons
-    - name: "Python 3.7 on macOS 10.14 (Xcode 10.2)"
+    - name: "Python 3.8 on Ubuntu 16.04"
+      python: 3.8
+      dist: xenial
+    - name: "Python 3.5 on Ubuntu 18.04"
+      python: 3.5
+      dist: bionic
+    - name: "Python 3.6 on Ubuntu 18.04"
+      python: 3.6
+      dist: bionic
+    - name: "Python 3.7 on Ubuntu 18.04"
+      python: 3.7
+      dist: bionic
+    - name: "Python 3.8 on Ubuntu 18.04"
+      python: 3.8
+      dist: bionic
+    - name: "Python 3.8 on macOS 10.14 (Xcode 10.2)"
       os: osx
       osx_image: xcode10.2
       language: shell
-      before_install: brew install scons
+    - name: "Python 3.8 on macOS 10.15 (Xcode 11.4)"
+      os: osx
+      osx_image: xcode11.4
+      language: shell
 install:
   - pip3 install -r requirements.txt
 script:
