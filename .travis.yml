@@ -1,11 +1,26 @@
 ---
-sudo: required
-language: python
-python:
-  - '3.5'
-  - '3.6'
-  - '3.7'
-os: linux
+language: python # this works for Linux but is an error on macOS or Windows
+matrix:
+  include:
+    - name: "Python 3.5 on Ubuntu 16.04"
+      python: 3.5
+      dist: xenial
+      before_install: pip3 install scons
+    - name: "Python 3.6 on Ubuntu 16.04"
+      python: 3.6
+      dist: xenial
+      before_install: pip3 install scons
+    - name: "Python 3.7 on Ubuntu 16.04"
+      python: 3.7
+      dist: xenial
+      before_install: pip3 install scons
+    - name: "Python 3.7 on macOS 10.14 (Xcode 10.2)"
+      os: osx
+      osx_image: xcode10.2
+      language: shell
+      before_install: brew install scons
+install:
+  - pip3 install -r requirements.txt
 script:
   - make
 notifications:
