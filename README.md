@@ -7,8 +7,8 @@
 [![Format][pypi-format]][pypi-home]
 [![License][pypi-license]](LICENSE)
 
-[build-status]: https://travis-ci.com/Kautenja/gym-super-mario-bros.svg?branch=master
-[ci-server]: https://travis-ci.com/Kautenja/gym-super-mario-bros
+[build-status]: https://travis-ci.org/Kautenja/gym-super-mario-bros.svg?branch=master
+[ci-server]: https://travis-ci.org/Kautenja/gym-super-mario-bros
 [pypi-version]: https://badge.fury.io/py/gym-super-mario-bros.svg
 [pypi-license]: https://img.shields.io/pypi/l/gym-super-mario-bros.svg
 [pypi-status]: https://img.shields.io/pypi/status/gym-super-mario-bros.svg
