@@ -1,13 +1,13 @@
 """An OpenAI Gym environment for Super Mario Bros. and Lost Levels."""
 from collections import defaultdict
-from typing import DefaultDict, Optional, Union, Tuple, List
+from typing import Optional, Union, Tuple, List, Dict
 from nes_py import NESEnv
 import numpy as np
 from ._roms import decode_target
 from ._roms import rom_path
 
 # create a dictionary mapping value of status register to string names
-_STATUS_MAP: DefaultDict = defaultdict(lambda: 'fireball', {0: 'small', 1: 'tall'})
+_STATUS_MAP = defaultdict(lambda: 'fireball', {0: 'small', 1: 'tall'})
 
 # a set of state values indicating that Mario is "busy"
 _BUSY_STATES: List[int] = [0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x07]
@@ -419,7 +419,7 @@ class SuperMarioBrosEnv(NESEnv):
             return self._is_dying or self._is_dead or self._flag_get
         return self._is_game_over
 
-    def _get_info(self) -> dict[str, Union[int, np.ndarray]]:
+    def _get_info(self) -> Dict[str, Union[int, np.ndarray]]:
         """Return the info after a step occurs"""
         return dict(
             coins=self._coins,
