@@ -1,7 +1,6 @@
 """A method to load a ROM path."""
 import os
 
-
 # a dictionary mapping ROM paths first by lost levels, then by ROM hack mode
 _ROM_PATHS = {
     # the dictionary of lost level ROM paths
@@ -19,7 +18,7 @@ _ROM_PATHS = {
 }
 
 
-def rom_path(lost_levels, rom_mode):
+def rom_path(lost_levels: bool, rom_mode: str) -> str:
     """
     Return the ROM filename for a game and ROM mode.
 
