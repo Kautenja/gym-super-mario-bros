@@ -21,6 +21,9 @@ _ENEMY_TYPE_ADDRESSES: List[int] = [0x0016, 0x0017, 0x0018, 0x0019, 0x001A]
 # Flagpole = 0x31
 _STAGE_OVER_ENEMIES: np.ndarray = np.array([0x2D, 0x31])
 
+# RAM addresses for enemy status on the screen
+_ENEMY_STATUS_ADDRESSES = [0x001E, 0x001F, 0x0020, 0x0021, 0x0022]
+
 
 class SuperMarioBrosEnv(NESEnv):
     """An environment for playing Super Mario Bros with OpenAI Gym."""
@@ -54,6 +57,8 @@ class SuperMarioBrosEnv(NESEnv):
         self._time_last = 0
         # setup a variable to keep track of the last frames x position
         self._x_position_last = 0
+        # setup a variable to keep track of the number of killed enemies
+        self._kill_count = 0
         # reset the emulator
         self.reset()
         # skip the start screen
@@ -201,6 +206,10 @@ class SuperMarioBrosEnv(NESEnv):
 
         """
         return self.ram[0x000e]
+
+    @property
+    def _kill(self) -> int:
+        pass
 
     @property
     def _is_dying(self) -> bool:
