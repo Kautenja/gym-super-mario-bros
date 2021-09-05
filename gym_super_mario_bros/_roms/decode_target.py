@@ -1,8 +1,8 @@
 """A method to decode target values for a ROM stage environment."""
-from typing import Optional
+from typing import Optional, Tuple
 
 
-def decode_target(target: Optional[tuple[int, int]], lost_levels: bool) -> Optional[tuple[Optional[int], Optional[int], Optional[int]]]:
+def decode_target(target: Optional[Tuple[int, int]], lost_levels: bool) -> Optional[Tuple[Optional[int], Optional[int], Optional[int]]]:
     """
     Return the target area for target world and target stage.
 
