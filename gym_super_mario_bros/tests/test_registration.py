@@ -21,6 +21,8 @@ class ShouldMakeEnv:
     time = 400
     # the x position of Mario
     x_pos = 40
+    # the number of killed enemies
+    kills = 0
     # the environments ID
     env_id = None
     # the random seed to apply
@@ -40,6 +42,7 @@ class ShouldMakeEnv:
         self.assertEqual(self.stage, i['stage'])
         self.assertEqual(self.time, i['time'])
         self.assertEqual(self.x_pos, i['x_pos'])
+        self.assertEqual(self.kills, i['kills'])
         env.close()
 
     def test(self):
