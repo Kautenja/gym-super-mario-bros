@@ -21,6 +21,11 @@ _ENEMY_TYPE_ADDRESSES: List[int] = [0x0016, 0x0017, 0x0018, 0x0019, 0x001A]
 # Flagpole = 0x31
 _STAGE_OVER_ENEMIES: np.ndarray = np.array([0x2D, 0x31])
 
+# RAM addresses for enemy status on the screen
+# https://datacrystal.romhacking.net/wiki/Super_Mario_Bros.:RAM_map
+_ENEMY_STATUS_ADDRESSES: List[int] = [0x001E, 0x001F, 0x0020, 0x0021, 0x0022]
+_ENEMY_KILLED_STATUS: List[int] = [0x04, 0x20, 0x22, 0x23, 0x84]
+
 
 class SuperMarioBrosEnv(NESEnv):
     """An environment for playing Super Mario Bros with OpenAI Gym."""
@@ -54,6 +59,9 @@ class SuperMarioBrosEnv(NESEnv):
         self._time_last = 0
         # setup a variable to keep track of the last frames x position
         self._x_position_last = 0
+        # setup a variable to keep track of the number of killed enemies
+        self._kill_count = 0
+        self._prev_enemy_status = [0] * len(_ENEMY_STATUS_ADDRESSES)
         # reset the emulator
         self.reset()
         # skip the start screen
@@ -201,6 +209,16 @@ class SuperMarioBrosEnv(NESEnv):
 
         """
         return self.ram[0x000e]
+
+    @property
+    def _kills(self) -> int:
+        """Return the number of killed enemies."""
+        current_enemy_status = [self.ram[address] for address in _ENEMY_STATUS_ADDRESSES]
+        for i in range(len(_ENEMY_STATUS_ADDRESSES)):
+            if self._prev_enemy_status[i] == 0 and current_enemy_status[i] in _ENEMY_KILLED_STATUS:
+                self._kill_count += 1
+        self._prev_enemy_status = current_enemy_status
+        return self._kill_count
 
     @property
     def _is_dying(self) -> bool:
@@ -357,6 +375,8 @@ class SuperMarioBrosEnv(NESEnv):
         """Handle and RAM hacking before a reset occurs."""
         self._time_last = 0
         self._x_position_last = 0
+        self._kill_count = 0
+        self._prev_enemy_status = [0] * len(_ENEMY_STATUS_ADDRESSES)
 
     def _did_reset(self) -> None:
         """Handle any RAM hacking after a reset occurs."""
@@ -412,6 +432,7 @@ class SuperMarioBrosEnv(NESEnv):
             world=self._world,
             x_pos=self._x_position,
             y_pos=self._y_position,
+            kills=self._kills
         )
 
 
