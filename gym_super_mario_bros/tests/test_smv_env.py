@@ -67,6 +67,7 @@ class ShouldStepGameEnv(TestCase):
         self.assertEqual(1, i['stage'])
         self.assertEqual(400, i['time'])
         self.assertEqual(40, i['x_pos'])
+        self.assertEqual(0, i['kills'])
         env.close()
 
 
@@ -87,4 +88,5 @@ class ShouldStepStageEnv(TestCase):
         self.assertEqual(2, i['stage'])
         self.assertEqual(400, i['time'])
         self.assertEqual(40, i['x_pos'])
+        self.assertEqual(0, i['kills'])
         env.close()
