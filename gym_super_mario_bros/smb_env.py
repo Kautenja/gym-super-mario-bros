@@ -1,6 +1,6 @@
 """An OpenAI Gym environment for Super Mario Bros. and Lost Levels."""
 from collections import defaultdict
-from typing import Optional, Union, Tuple, List, Dict
+from typing import Optional, Union, Tuple, Dict
 from nes_py import NESEnv
 import numpy as np
 from ._roms import decode_target
@@ -10,28 +10,28 @@ from ._roms import rom_path
 _STATUS_MAP = defaultdict(lambda: 'fireball', {0: 'small', 1: 'tall'})
 
 # a set of state values indicating that Mario is "busy"
-_BUSY_STATES: List[int] = [0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x07]
+_BUSY_STATES = [0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x07]
 
 # RAM addresses for enemy types on the screen
-_ENEMY_TYPE_ADDRESSES: List[int] = [0x0016, 0x0017, 0x0018, 0x0019, 0x001A]
+_ENEMY_TYPE_ADDRESSES = [0x0016, 0x0017, 0x0018, 0x0019, 0x001A]
 
 # enemies whose context indicate that a stage change will occur (opposed to an
 # enemy that implies a stage change wont occur -- i.e., a vine)
 # Bowser = 0x2D
 # Flagpole = 0x31
-_STAGE_OVER_ENEMIES: np.ndarray = np.array([0x2D, 0x31])
+_STAGE_OVER_ENEMIES = np.array([0x2D, 0x31])
 
 # RAM addresses for enemy status on the screen
 # https://datacrystal.romhacking.net/wiki/Super_Mario_Bros.:RAM_map
-_ENEMY_STATUS_ADDRESSES: List[int] = [0x001E, 0x001F, 0x0020, 0x0021, 0x0022]
-_ENEMY_KILLED_STATUS: List[int] = [0x04, 0x20, 0x22, 0x23, 0x84]
+_ENEMY_STATUS_ADDRESSES = [0x001E, 0x001F, 0x0020, 0x0021, 0x0022]
+_ENEMY_KILLED_STATUS = [0x04, 0x20, 0x22, 0x23, 0x84]
 
 
 class SuperMarioBrosEnv(NESEnv):
     """An environment for playing Super Mario Bros with OpenAI Gym."""
 
     # the legal range of rewards for each step
-    reward_range: Tuple[int, int] = (-15, 15)
+    reward_range = (-15, 15)
 
     def __init__(self, rom_mode: str = 'vanilla', lost_levels: bool = False, target: Optional[Tuple[int, int]] = None):
         """
