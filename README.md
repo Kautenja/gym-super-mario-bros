@@ -42,7 +42,7 @@ This is because gym environments are registered at runtime. By default,
 discrete actions. To contstrain this, `gym_super_mario_bros.actions` provides
 three actions lists (`RIGHT_ONLY`, `SIMPLE_MOVEMENT`, and `COMPLEX_MOVEMENT`)
 for the `nes_py.wrappers.JoypadSpace` wrapper. See
-[gym_super_mario_bros/actions.py](gym_super_mario_bros/actions.py) for a
+[gym_super_mario_bros/actions.py](https://github.com/Kautenja/gym-super-mario-bros/blob/master/gym_super_mario_bros/actions.py) for a
 breakdown of the legal actions in each of these three lists.
 
 ```python
