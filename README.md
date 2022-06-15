@@ -138,6 +138,24 @@ example, to use the standard ROM with random stage selection use
 `SuperMarioBrosRandomStages-v0`. To seed the random stage selection use the
 `seed` method of the env, i.e., `env.seed(1)`, before any calls to `reset`.
 
+In addition to randomly selecting any of the 32 original stages, a subset of
+user-defined stages can be specified to limit the random choice of stages to a
+specific subset. For example, the stage selector could be limited to only
+sample castle stages, water levels, underground, and more.
+
+To specify a subset of stages to randomly sample from, create a list of each
+stage to allow to be sampled and pass that list to the `gym.make()` function.
+For example:
+
+```python
+import gym
+
+gym.make('SuperMarioBrosRandomStages-v0', stages=['1-4', '2-4', '3-4', '4-4'])
+```
+
+The example above will sample a random stage from 1-4, 2-4, 3-4, and 4-4 upon
+every call to `reset`.
+
 ## Step
 
 Info about the rewards and info returned by the `step` method.
