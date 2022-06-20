@@ -220,7 +220,7 @@ class SuperMarioBrosEnv(NESEnv):
         """Return True if the game has ended, False otherwise."""
         # the life counter will get set to 255 (0xff) when there are no lives
         # left. It goes 2, 1, 0 for the 3 lives of the game
-        return self._life == 0xff
+        return bool(self._life == 0xff)
 
     @property
     def _is_busy(self):
