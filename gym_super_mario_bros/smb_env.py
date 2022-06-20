@@ -394,7 +394,7 @@ class SuperMarioBrosEnv(NESEnv):
 
     def _get_reward(self):
         """Return the reward after a step occurs."""
-        return self._x_reward + self._time_penalty + self._death_penalty
+        return float(self._x_reward + self._time_penalty + self._death_penalty)
 
     def _get_done(self):
         """Return True if the episode is over, False otherwise."""
