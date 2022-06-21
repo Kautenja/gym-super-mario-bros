@@ -20,7 +20,7 @@ class SuperMarioBrosRandomStagesEnv(gym.Env):
     # action space is a bitmap of button press values for the 8 NES buttons
     action_space = SuperMarioBrosEnv.action_space
 
-    def __init__(self, rom_mode='vanilla', stages=[]):
+    def __init__(self, rom_mode='vanilla', stages=None):
         """
         Initialize a new Super Mario Bros environment.
 
@@ -55,17 +55,10 @@ class SuperMarioBrosRandomStagesEnv(gym.Env):
         # create a placeholder for the subset of stages to choose
         self.stages = stages
 
-    def _select_random_level(self):
-        """Select a random level to use."""
-        if len(self.stages) > 0:
-            level = self.np_random.choice(self.stages)
-            world, stage = level.split('-')
-            world = int(world) - 1
-            stage = int(stage) - 1
-        else:
-            world = self.np_random.randint(1, 9) - 1
-            stage = self.np_random.randint(1, 5) - 1
-        self.env = self.envs[world][stage]
+    @property
+    def screen(self):
+        """Return the screen from the underlying environment"""
+        return self.env.screen
 
     def seed(self, seed=None):
         """
@@ -87,18 +80,42 @@ class SuperMarioBrosRandomStagesEnv(gym.Env):
         # return the list of seeds used by RNG(s) in the environment
         return [seed]
 
-    def reset(self):
+    def reset(self, seed=None, options=None, return_info=None):
         """
         Reset the state of the environment and returns an initial observation.
+
+        Args:
+            seed (int): an optional random number seed for the next episode
+            options (dict): An optional options for resetting the environment.
+                Can include the key 'stages' to override the random set of
+                stages to sample from.
+            return_info (any): unused
 
         Returns:
             state (np.ndarray): next frame as a result of the given action
 
         """
-        # select a new level
-        self._select_random_level()
+        # Get the collection of stages to sample from
+        stages = self.stages
+        if options is not None and 'stages' in options:
+            stages = options['stages']
+        # Select a random level
+        if stages is not None and len(stages) > 0:
+            level = self.np_random.choice(stages)
+            world, stage = level.split('-')
+            world = int(world) - 1
+            stage = int(stage) - 1
+        else:
+            world = self.np_random.randint(1, 9) - 1
+            stage = self.np_random.randint(1, 5) - 1
+        # Set the environment based on the world and stage.
+        self.env = self.envs[world][stage]
         # reset the environment
-        return self.env.reset()
+        return self.env.reset(
+            seed=seed,
+            options=options,
+            return_info=return_info
+        )
 
     def step(self, action):
         """
