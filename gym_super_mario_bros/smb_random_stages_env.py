@@ -1,7 +1,6 @@
 """An OpenAI Gym Super Mario Bros. environment that randomly selects levels."""
 import gym
 import numpy as np
-from nes_py.nes_env import SCREEN_HEIGHT, SCREEN_WIDTH
 from .smb_env import SuperMarioBrosEnv
 
 
@@ -95,6 +94,8 @@ class SuperMarioBrosRandomStagesEnv(gym.Env):
             state (np.ndarray): next frame as a result of the given action
 
         """
+        # Seed the RNG for this environment.
+        self.seed(seed)
         # Get the collection of stages to sample from
         stages = self.stages
         if options is not None and 'stages' in options:
@@ -165,26 +166,7 @@ class SuperMarioBrosRandomStagesEnv(gym.Env):
             a numpy array if mode is 'rgb_array', None otherwise
 
         """
-        if mode == 'human':
-            # if the viewer isn't setup, import it and create one
-            if self.viewer is None:
-                from nes_py._image_viewer import ImageViewer
-                # get the caption for the ImageViewer
-                # create the ImageViewer to display frames
-                self.viewer = ImageViewer(
-                    caption=self.__class__.__name__,
-                    height=SCREEN_HEIGHT,
-                    width=SCREEN_WIDTH,
-                )
-            # show the screen on the image viewer
-            self.viewer.show(self.env.screen)
-        elif mode == 'rgb_array':
-            return self.env.screen
-        else:
-            # unpack the modes as comma delineated strings ('a', 'b', ...)
-            render_modes = [repr(x) for x in self.metadata['render.modes']]
-            msg = 'valid render modes are: {}'.format(', '.join(render_modes))
-            raise NotImplementedError(msg)
+        return SuperMarioBrosEnv.render(self, mode=mode)
 
     def get_keys_to_action(self):
         """Return the dictionary of keyboard keys to actions."""
