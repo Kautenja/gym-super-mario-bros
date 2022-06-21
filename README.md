@@ -80,6 +80,9 @@ gym_super_mario_bros -e <the environment ID to play> -m <`human` or `random`>
 **NOTE:** by default, `-e` is set to `SuperMarioBros-v0` and `-m` is set to
 `human`.
 
+**NOTE:** `SuperMarioBrosRandomStages-*` support the `--stages/-S` flag for
+supplying the set of stages to sample from like `-S 1-4 2-4 3-4 4-4`.
+
 ## Environments
 
 These environments allow 3 attempts (lives) to make it through the 32 stages
@@ -130,13 +133,15 @@ id `SuperMarioBros-4-2-v1`.
 ### Random Stage Selection
 
 The random stage selection environment randomly selects a stage and allows a
-single attempt to clear it. Upon a death and subsequent call to `reset`, the
-environment randomly selects a new stage.  This is only available for the
+single attempt to clear it. Upon a death and subsequent call to `reset` the
+environment randomly selects a new stage. This is only available for the
 standard Super Mario Bros. game, _not_ Lost Levels (at the moment). To use
 these environments, append `RandomStages` to the `SuperMarioBros` id. For
 example, to use the standard ROM with random stage selection use
 `SuperMarioBrosRandomStages-v0`. To seed the random stage selection use the
-`seed` method of the env, i.e., `env.seed(1)`, before any calls to `reset`.
+`seed` method of the env, i.e., `env.seed(222)`, before any calls to `reset`.
+Alternatively pass the `seed` keyword argument to the `reset` method directly
+like `reset(seed=222)`.
 
 In addition to randomly selecting any of the 32 original stages, a subset of
 user-defined stages can be specified to limit the random choice of stages to a
@@ -148,8 +153,6 @@ stage to allow to be sampled and pass that list to the `gym.make()` function.
 For example:
 
 ```python
-import gym
-
 gym.make('SuperMarioBrosRandomStages-v0', stages=['1-4', '2-4', '3-4', '4-4'])
 ```
 
