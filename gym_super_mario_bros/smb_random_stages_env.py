@@ -20,12 +20,13 @@ class SuperMarioBrosRandomStagesEnv(gym.Env):
     # action space is a bitmap of button press values for the 8 NES buttons
     action_space = SuperMarioBrosEnv.action_space
 
-    def __init__(self, rom_mode='vanilla'):
+    def __init__(self, rom_mode='vanilla', stages=[]):
         """
         Initialize a new Super Mario Bros environment.
 
         Args:
             rom_mode (str): the ROM mode to use when loading ROMs from disk
+            stages (list): select stages at random from a specific subset
 
         Returns:
             None
@@ -51,11 +52,19 @@ class SuperMarioBrosRandomStagesEnv(gym.Env):
         self.env = self.envs[0][0]
         # create a placeholder for the image viewer to render the screen
         self.viewer = None
+        # create a placeholder for the subset of stages to choose
+        self.stages = stages
 
     def _select_random_level(self):
         """Select a random level to use."""
-        world = self.np_random.randint(1, 9) - 1
-        stage = self.np_random.randint(1, 5) - 1
+        if len(self.stages) > 0:
+            level = self.np_random.choice(self.stages)
+            world, stage = level.split('-')
+            world = int(world) - 1
+            stage = int(stage) - 1
+        else:
+            world = self.np_random.randint(1, 9) - 1
+            stage = self.np_random.randint(1, 5) - 1
         self.env = self.envs[world][stage]
 
     def seed(self, seed=None):

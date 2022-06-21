@@ -25,9 +25,14 @@ class ShouldMakeEnv:
     env_id = None
     # the random seed to apply
     seed = None
+    # the subset of stages to sample from
+    stages = None
 
-    def _test_env(self, env_id):
-        env = make(env_id)
+    def _test_env(self, env_id, stages):
+        if stages is not None:
+            env = make(env_id)
+        else:
+            env = make(env_id)
         if self.seed is not None:
             env.seed(self.seed)
         env.reset()
@@ -44,10 +49,10 @@ class ShouldMakeEnv:
 
     def test(self):
         if isinstance(self.env_id, str):
-            self._test_env(self.env_id)
+            self._test_env(self.env_id, self.stages)
         elif isinstance(self.env_id, list):
             for env_id in self.env_id:
-                self._test_env(env_id)
+                self._test_env(env_id, self.stages)
 
 
 class ShouldMakeSuperMarioBros(ShouldMakeEnv, TestCase):
@@ -393,3 +398,18 @@ class ShouldMakeSuperMarioBros_8_4(ShouldMakeEnv, TestCase):
     stage = 4
     # the environments ID
     env_id = ['SuperMarioBros-8-4-v{}'.format(v) for v in range(4)]
+
+
+class ShouldMakeSuperMarioBrosRandomStagesSubset(ShouldMakeEnv, TestCase):
+    # the random number seed for this environment
+    seed = 1
+    # the amount of time left
+    time = 300
+    # the current world
+    world = 2
+    # the current stage
+    stage = 4
+    # the stages to sample from
+    stages = ['1-4', '2-4', '3-4', '4-4']
+    # the environments ID for all versions of Super Mario Bros
+    env_id = ['SuperMarioBrosRandomStages-v{}'.format(v) for v in range(4)]
