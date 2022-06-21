@@ -30,12 +30,10 @@ class ShouldMakeEnv:
 
     def _test_env(self, env_id, stages):
         if stages is not None:
-            env = make(env_id)
+            env = make(env_id, stages=stages)
         else:
             env = make(env_id)
-        if self.seed is not None:
-            env.seed(self.seed)
-        env.reset()
+        env.reset(seed=self.seed)
         s, r, d, i = env.step(0)
         self.assertEqual(self.coins, i['coins'])
         self.assertEqual(self.flag_get, i['flag_get'])
@@ -406,10 +404,10 @@ class ShouldMakeSuperMarioBrosRandomStagesSubset(ShouldMakeEnv, TestCase):
     # the amount of time left
     time = 300
     # the current world
-    world = 2
+    world = 4
     # the current stage
-    stage = 4
+    stage = 2
     # the stages to sample from
-    stages = ['1-4', '2-4', '3-4', '4-4']
+    stages = ['4-2']
     # the environments ID for all versions of Super Mario Bros
     env_id = ['SuperMarioBrosRandomStages-v{}'.format(v) for v in range(4)]
