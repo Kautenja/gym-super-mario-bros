@@ -1,5 +1,6 @@
 """Super Mario Bros for OpenAI Gym."""
 import argparse
+import sys
 import gym
 from nes_py.wrappers import JoypadSpace
 from nes_py.app.play_human import play_human
@@ -18,31 +19,32 @@ _ACTION_SPACES = {
 def _get_args():
     """Parse command line arguments and return them."""
     parser = argparse.ArgumentParser(description=__doc__)
-    # add the argument for the Super Mario Bros environment to run
     parser.add_argument('--env', '-e',
         type=str,
         default='SuperMarioBros-v0',
         help='The name of the environment to play'
     )
-    # add the argument for the mode of execution as either human or random
     parser.add_argument('--mode', '-m',
         type=str,
         default='human',
         choices=['human', 'random'],
         help='The execution mode for the emulation'
     )
-    # add the argument for adjusting the action space
     parser.add_argument('--actionspace', '-a',
         type=str,
         default='nes',
         choices=['nes', 'right', 'simple', 'complex'],
         help='the action space wrapper to use'
     )
-    # add the argument for the number of steps to take in random mode
     parser.add_argument('--steps', '-s',
         type=int,
         default=500,
         help='The number of random steps to take.',
+    )
+    parser.add_argument('--stages', '-S',
+        type=str,
+        nargs='+',
+        help='The random stages to sample from for a random stage env'
     )
     # parse arguments and return them
     return parser.parse_args()
@@ -52,8 +54,11 @@ def main():
     """The main entry point for the command line interface."""
     # parse arguments from the command line (argparse validates arguments)
     args = _get_args()
+    if args.stages is not None and 'RandomStages' not in args.env:
+        print('--stages,-S should only be specified for RandomStages environments')
+        sys.exit(1)
     # build the environment with the given ID
-    env = gym.make(args.env)
+    env = gym.make(args.env, stages=args.stages)
     # wrap the environment with an action space if specified
     if args.actionspace != 'nes':
         print(args.actionspace)
