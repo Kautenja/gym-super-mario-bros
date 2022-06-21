@@ -402,7 +402,7 @@ class ShouldMakeSuperMarioBrosRandomStagesSubset(ShouldMakeEnv, TestCase):
     # the random number seed for this environment
     seed = 1
     # the amount of time left
-    time = 300
+    time = 400
     # the current world
     world = 4
     # the current stage
