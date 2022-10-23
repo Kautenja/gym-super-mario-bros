@@ -177,7 +177,12 @@ dying. To model this game, three separate variables compose the reward:
     -   moving right ⇔ _v > 0_
     -   moving left ⇔ _v < 0_
     -   not moving ⇔ _v = 0_
-2.  _c_: the difference in the game clock between frames
+2. _s_: the difference in agent's score values between frames
+    -   Encourages getting power ups and finishing the level faster
+    -   _s = s0 - s1_
+        -   _s0_ is the score before the step
+        -   _s1_ is the score after the step
+3.  _c_: the difference in the game clock between frames
     -   the penalty prevents the agent from standing still
     -   _c = c0 - c1_
         -   _c0_ is the clock reading before the step
@@ -187,9 +192,9 @@ dying. To model this game, three separate variables compose the reward:
 3.  _d_: a death penalty that penalizes the agent for dying in a state
     -   this penalty encourages the agent to avoid death
     -   alive ⇔ _d = 0_
-    -   dead ⇔ _d = -15_
+    -   dead ⇔ _d_ sets the entire reward to -15
 
-_r = v + c + d_
+_r = v + s + c + d_
 
 The reward is clipped into the range _(-15, 15)_.
 
