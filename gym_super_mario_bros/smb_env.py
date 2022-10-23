@@ -1,4 +1,6 @@
 """An OpenAI Gym environment for Super Mario Bros. and Lost Levels."""
+from typing import Any
+
 from collections import defaultdict
 from nes_py import NESEnv
 import numpy as np
@@ -335,24 +337,45 @@ class SuperMarioBrosEnv(NESEnv):
         return _reward
 
     @property
-    def _time_penalty(self):
+    def _time_reward(self):
         """Return the reward for the in-game clock ticking."""
-        _reward = self._time - self._time_last
-        self._time_last = self._time
-        # time can only decrease, a positive reward results from a reset and
-        # should default to 0 reward
-        if _reward > 0:
+        time_bonus = 7
+        _reward = 0  # initialize a variable to hold the reward
+        # if the time has decreased, then penalize the agent to encourage it to keep moving
+        if self._time_last > self._time:
+            _reward = self._time - self._time_last
+        # if the time has stayed the same, then reward the agent to do more in less time
+        elif self._time_last == self._time:
+            _reward = time_bonus
+        # time can only decrease, a positive increase results from a reset and should default to 0 reward
+        elif self._time > self._time_last:
             return 0
+        self._time_last = self._time  # the time is now the last time
 
+        return _reward  # return the reward
+
+    @property
+    def _score_reward(self):
+        """Return the reward for the score increasing."""
+        # encourage the agent to get powerups and coins
+        # you also more earn points for completing levels faster
+        score_diff = self._score - self._score_last
+
+        # divide by 15 because getting a coin is 100 points which would be too much of a reward
+        _reward = int(round(score_diff/15, 0))  # round to the nearest integer
+        if _reward >= 1000:
+            _reward = int(round(_reward / 10))  # Things like flowers give 1000 points which is too much of a reward
+
+        self._score_last = self._score  # the score is now the last score
         return _reward
 
     @property
     def _death_penalty(self):
         """Return the reward earned by dying."""
         if self._is_dying or self._is_dead:
-            return -25
+            return False  # the agent is dead all rewards will be removed
 
-        return 0
+        return True
 
     # MARK: nes-py API calls
 
@@ -380,7 +403,7 @@ class SuperMarioBrosEnv(NESEnv):
         # if done flag is set a reset is incoming anyway, ignore any hacking
         if done:
             return
-        # if mario is dying, then cut to the chase and kill hi,
+        # if mario is dying, then cut to the chase and kill him,
         if self._is_dying:
             self._kill_mario()
         # skip world change scenes (must call before other skip methods)
@@ -394,7 +417,11 @@ class SuperMarioBrosEnv(NESEnv):
 
     def _get_reward(self):
         """Return the reward after a step occurs."""
-        return self._x_reward + self._time_penalty + self._death_penalty
+        if self._death_penalty:
+            # Heavily penalize the agent for dying
+            return self.reward_range[0]  # The first element of the range is the minimum reward possible
+
+        return self._x_reward + self._time_reward + self._score_reward
 
     def _get_done(self):
         """Return True if the episode is over, False otherwise."""
