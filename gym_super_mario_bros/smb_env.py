@@ -361,7 +361,7 @@ class SuperMarioBrosEnv(NESEnv):
         # you also more earn points for completing levels faster
         score_diff = self._score - self._score_last
 
-        # divide by 15 because getting a coin is 100 points which would be too much of a reward
+        # divide by 15 because getting a coin and killing enemies is 100 points which would be too much of a reward
         _reward = int(round(score_diff/15, 0))  # round to the nearest integer
         if _reward >= 1000:
             _reward = int(round(_reward / 10))  # Things like flowers give 1000 points which is too much of a reward
