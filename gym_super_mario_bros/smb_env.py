@@ -55,10 +55,12 @@ class SuperMarioBrosEnv(NESEnv):
         # set the target world, stage, and area variables
         target = decode_target(target, lost_levels)
         self._target_world, self._target_stage, self._target_area = target
-        # setup a variable to keep track of the last frames time
+        # set up a variable to keep track of the last frames time
         self._time_last = 0
-        # setup a variable to keep track of the last frames x position
+        # set up a variable to keep track of the last frames x position
         self._x_position_last = 0
+        # set up a variable to keep track of the last frames score
+        self._score_last = 0
         # reset the emulator
         self.reset()
         # skip the start screen

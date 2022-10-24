@@ -5,7 +5,11 @@
     <option name="CUSTOM_SCOPE_NAME" value="Open Files" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="08a6873e-1e48-4c73-b1e0-4945c84a17c6" name="Changes" comment="" />
+    <list default="true" id="08a6873e-1e48-4c73-b1e0-4945c84a17c6" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/smb_env.py" beforeDir="false" afterPath="$PROJECT_DIR$/smb_env.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../setup.py" beforeDir="false" afterPath="$PROJECT_DIR$/../setup.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -39,6 +43,7 @@
       <updated>1666552492383</updated>
       <workItem from="1666552494995" duration="3081000" />
       <workItem from="1666555618610" duration="3367000" />
+      <workItem from="1666612153666" duration="1146000" />
     </task>
     <servers />
   </component>
