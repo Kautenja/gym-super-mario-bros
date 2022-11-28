@@ -8,23 +8,7 @@ from ._roms import decode_target
 from ._roms import rom_path
 
 
-# create a dictionary mapping value of status register to string names
-_STATUS_MAP = defaultdict(lambda: 'fireball', {0:'small', 1: 'tall'})
 
-
-# a set of state values indicating that Mario is "busy"
-_BUSY_STATES = [0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x07]
-
-
-# RAM addresses for enemy types on the screen
-_ENEMY_TYPE_ADDRESSES = [0x0016, 0x0017, 0x0018, 0x0019, 0x001A]
-
-
-# enemies whose context indicate that a stage change will occur (opposed to an
-# enemy that implies a stage change wont occur -- i.e., a vine)
-# Bowser = 0x2D
-# Flagpole = 0x31
-_STAGE_OVER_ENEMIES = np.array([0x2D, 0x31])
 
 
 class SuperMarioBrosEnv(NESEnv):
@@ -32,6 +16,20 @@ class SuperMarioBrosEnv(NESEnv):
 
     # the legal range of rewards for each step
     reward_range = (-15, 15)
+    # create a dictionary mapping value of status register to string names
+    _STATUS_MAP = defaultdict(lambda: 'fireball', {0: 'small', 1: 'tall'})
+
+    # a set of state values indicating that Mario is "busy"
+    _BUSY_STATES = [0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x07]
+
+    # RAM addresses for enemy types on the screen
+    _ENEMY_TYPE_ADDRESSES = [0x0016, 0x0017, 0x0018, 0x0019, 0x001A]
+
+    # enemies whose context indicate that a stage change will occur (opposed to an
+    # enemy that implies a stage change wont occur -- i.e., a vine)
+    # Bowser = 0x2D
+    # Flagpole = 0x31
+    _STAGE_OVER_ENEMIES = np.array([0x2D, 0x31])
 
     def __init__(self, rom_mode='vanilla', lost_levels=False, target=None):
         """
@@ -323,63 +321,6 @@ class SuperMarioBrosEnv(NESEnv):
         # step forward one frame
         self._frame_advance(0)
 
-    # MARK: Reward Function
-
-    @property
-    def _x_reward(self):
-        """Return the reward based on left right movement between steps."""
-        _reward = self._x_position - self._x_position_last
-        self._x_position_last = self._x_position
-        # TODO: check whether this is still necessary
-        # resolve an issue where after death the x position resets. The x delta
-        # is typically has at most magnitude of 3, 5 is a safe bound
-        if _reward < -5 or _reward > 5:
-            return 0
-
-        return _reward
-
-    @property
-    def _time_reward(self):
-        """Return the reward for the in-game clock ticking."""
-        time_bonus = 2
-        _reward = 0  # initialize a variable to hold the reward
-        # if the time has decreased, then penalize the agent to encourage it to keep moving
-        if self._time_last > self._time:
-            _reward = self._time - self._time_last
-        # if the time has stayed the same, then reward the agent to do more in less time
-        elif self._time_last == self._time:
-            _reward = time_bonus
-        # time can only decrease, a positive increase results from a reset and should default to 0 reward
-        elif self._time > self._time_last:
-            return 0
-        self._time_last = self._time  # the time is now the last time
-
-        return _reward  # return the reward
-
-    @property
-    def _score_reward(self):
-        """Return the reward for the score increasing."""
-        # encourage the agent to get powerups and coins
-        # you also more earn points for completing levels faster
-        score_diff = self._score - self._score_last
-
-        # divide by 15 because getting a coin and killing enemies is 100 points which would be too much of a reward
-        # the round function returns a float, so we cast to int
-        _reward = int(round(score_diff/15, 0))  # round to the nearest integer
-        if _reward >= 1000:
-            _reward = int(round(_reward / 10))  # Things like flowers give 1000 points which is too much of a reward
-
-        self._score_last = self._score  # the score is now the last score
-        return _reward
-
-    @property
-    def _death_penalty(self):
-        """Return the reward earned by dying."""
-        if self._is_dying or self._is_dead:
-            return False  # the agent is dead all rewards will be removed
-
-        return True
-
     # MARK: nes-py API calls
 
     def _will_reset(self):
@@ -417,14 +358,6 @@ class SuperMarioBrosEnv(NESEnv):
         # skip occupied states like the black screen between lives that shows
         # how many lives the player has left
         self._skip_occupied_states()
-
-    def _get_reward(self):
-        """Return the reward after a step occurs."""
-        if self._death_penalty:
-            # Heavily penalize the agent for dying
-            return self.reward_range[0]  # The first element of the range is the minimum reward possible
-
-        return self._x_reward + self._time_reward + self._score_reward
 
     def _get_done(self):
         """Return True if the episode is over, False otherwise."""
