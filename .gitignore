@@ -134,3 +134,4 @@ ENV/
 .mypy_cache/
 gym_super_mario_bros/.idea/other.xml
 gym_super_mario_bros/.idea/workspace.xml
+gym_super_mario_bros/.idea/misc.xml
