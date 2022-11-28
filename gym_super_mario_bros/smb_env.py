@@ -272,7 +272,7 @@ class SuperMarioBrosEnv(NESEnv):
         self.ram[0x07A0] = 0
 
     def _skip_change_area(self):
-        """Skip change area animations by by running down timers."""
+        """Skip change area animations by running down timers."""
         change_area_timer = self.ram[0x06DE]
         if change_area_timer > 1 and change_area_timer < 255:
             self.ram[0x06DE] = 1
@@ -341,7 +341,7 @@ class SuperMarioBrosEnv(NESEnv):
     @property
     def _time_reward(self):
         """Return the reward for the in-game clock ticking."""
-        time_bonus = 7
+        time_bonus = 2
         _reward = 0  # initialize a variable to hold the reward
         # if the time has decreased, then penalize the agent to encourage it to keep moving
         if self._time_last > self._time:
@@ -364,6 +364,7 @@ class SuperMarioBrosEnv(NESEnv):
         score_diff = self._score - self._score_last
 
         # divide by 15 because getting a coin and killing enemies is 100 points which would be too much of a reward
+        # the round function returns a float, so we cast to int
         _reward = int(round(score_diff/15, 0))  # round to the nearest integer
         if _reward >= 1000:
             _reward = int(round(_reward / 10))  # Things like flowers give 1000 points which is too much of a reward
