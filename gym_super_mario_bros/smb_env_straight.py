@@ -24,13 +24,11 @@ class SuperMarioBrosEnvStraight(smb_env.SuperMarioBrosEnv):
 
     @property
     def x_reward(self):
-        """Return the x reward for the current step"""
+        """Return the reward for Mario moving in the correct direction"""
         # encourage to move to the right
         x_diff = self.x - self.x_last
         self.x_last = self.x
+        # when the game resets, Mario's x position drastically drops
+        return x_diff if x_diff > -5 else 0
 
-        # the game resets the Mario's x position drastically drops
-        if not x_diff < -5:
-            return x_diff
-        else:
-            return 0
+
