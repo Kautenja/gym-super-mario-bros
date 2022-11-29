@@ -2,7 +2,7 @@
 import gym
 
 
-def _register_mario_env(id: str, is_random=False, **kwargs):
+def _register_mario_env(id, is_random=False, env_variant='SuperMarioBrosEnvStraight', **kwargs):
     """
     Register a Super Mario Bros. (1/2) environment with OpenAI Gym.
 
@@ -21,23 +21,26 @@ def _register_mario_env(id: str, is_random=False, **kwargs):
         entry_point = 'gym_super_mario_bros:SuperMarioBrosRandomStagesEnv'
     else:
         # set the entry point to the standard Super Mario Bros. environment
-        entry_point = 'gym_super_mario_bros:SuperMarioBrosEnv'
+        entry_point = f'gym_super_mario_bros:{env_variant}'
     # register the environment
     gym.envs.registration.register(
         id=id,
         entry_point=entry_point,
         max_episode_steps=99999999,
-        reward_threshold=9999999,
+        reward_threshold=99999999,
         kwargs=kwargs,
         nondeterministic=True,
     )
 
 
 # Super Mario Bros.
-_register_mario_env('SuperMarioBros-v0', rom_mode='vanilla')
-_register_mario_env('SuperMarioBros-v1', rom_mode='downsample')
-_register_mario_env('SuperMarioBros-v2', rom_mode='pixel')
-_register_mario_env('SuperMarioBros-v3', rom_mode='rectangle')
+ENV_VARIANTS = ['SuperMarioBrosEnvStraight', 'SuperMarioBrosEnvExplore']
+SHORTENED_ENV_NAMES = ['Straight', 'Explore']
+
+ROM_MODES = ['vanilla', 'downsample', 'pixel', 'rectangle']
+for i, mode in enumerate(ROM_MODES):
+    for variant, name in zip(ENV_VARIANTS, SHORTENED_ENV_NAMES):
+        _register_mario_env(f'SuperMarioBros-{name}-v{i}', rom_mode=mode, env_variant=variant)
 
 
 # Super Mario Bros. Random Levels
@@ -48,8 +51,10 @@ _register_mario_env('SuperMarioBrosRandomStages-v3', is_random=True, rom_mode='r
 
 
 # Super Mario Bros. 2 (Lost Levels)
-_register_mario_env('SuperMarioBros2-v0', lost_levels=True, rom_mode='vanilla')
-_register_mario_env('SuperMarioBros2-v1', lost_levels=True, rom_mode='downsample')
+for i in range(0, 1):
+    mode = ROM_MODES[i]
+    for variant, name in zip(ENV_VARIANTS, SHORTENED_ENV_NAMES):
+        _register_mario_env(f'SuperMarioBros2-{name}-v{i}', lost_levels=True, rom_mode=mode, env_variant=variant)
 
 
 def _register_mario_stage_env(id: str, **kwargs):
