@@ -1,5 +1,5 @@
 """Registration code of Gym environments in this package."""
-import gym
+import gymnasium as gym
 
 
 def _register_mario_env(id, is_random=False, **kwargs):
