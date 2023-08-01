@@ -56,7 +56,8 @@ done = True
 for step in range(5000):
     if done:
         state = env.reset()
-    state, reward, done, info = env.step(env.action_space.sample())
+    state, reward, terminated, truncated, info = env.step(env.action_space.sample())
+    done = terminated or truncated
     env.render()
 
 env.close()
