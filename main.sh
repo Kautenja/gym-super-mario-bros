@@ -24,7 +24,6 @@
 #     cli                 Run the package CLI; pass extra args after the command
 #     play                Alias for cli
 #     random              Run the package CLI in random mode
-#     speedtest           Run the legacy speedtest.py script
 #     *                   Execute the command directly from the project root
 #
 # Examples:
@@ -33,7 +32,6 @@
 #     ./main.sh deployment
 #     ./main.sh cli --env SuperMarioBros-v0 --actionspace simple
 #     ./main.sh random --env SuperMarioBros-v0 --steps 100
-#     ./main.sh speedtest
 #
 
 set -euo pipefail
@@ -186,11 +184,6 @@ case "${COMMAND}" in
 
 "random")
   "${PYTHON}" -m gym_super_mario_bros._app.cli --mode random "$@"
-  exit 0
-  ;;
-
-"speedtest")
-  "${PYTHON}" speedtest.py "$@"
   exit 0
   ;;
 
