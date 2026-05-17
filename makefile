@@ -13,8 +13,8 @@ clean:
 
 # build the deployment package
 deployment: clean
-	python3 setup.py sdist bdist_wheel
+	python3 -m build
 
 # ship the deployment package to PyPi
 ship: test deployment
-	twine upload dist/*
+	python3 -m twine upload dist/*

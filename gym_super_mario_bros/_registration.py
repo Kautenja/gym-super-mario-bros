@@ -30,6 +30,7 @@ def _register_mario_env(id, is_random=False, **kwargs):
         reward_threshold=9999999,
         kwargs=kwargs,
         nondeterministic=True,
+        disable_env_checker=True,
     )
 
 
@@ -72,6 +73,7 @@ def _register_mario_stage_env(id, **kwargs):
         reward_threshold=9999999,
         kwargs=kwargs,
         nondeterministic=True,
+        disable_env_checker=True,
     )
 
 

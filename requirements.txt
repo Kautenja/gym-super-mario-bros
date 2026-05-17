@@ -1,10 +1,4 @@
-gym>=0.10.9
-matplotlib>=2.0.2
-nes-py>=4.0.0
-numpy>=1.14.2
-opencv-python>=3.4.0.12
-pygame>=1.9.3
-pyglet>=1.3.2
-setuptools>=39.0.1
-tqdm>=4.19.5
-twine>=1.11.0
+nes-py @ git+https://github.com/Kautenja/nes-py.git@989aa0268990b686fe0bd430e2a9f529f39e0f29
+gym>=0.25.2,<0.26
+build>=1.2.1
+PyYAML>=6.0.2

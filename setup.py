@@ -29,10 +29,7 @@ setup(
         'Operating System :: POSIX :: Linux',
         'Operating System :: Microsoft :: Windows',
         'Programming Language :: Python :: 3 :: Only',
-        'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
-        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.13',
         'Topic :: Games/Entertainment :: Side-Scrolling/Arcade Games',
         'Topic :: Scientific/Engineering :: Artificial Intelligence',
     ],
@@ -40,9 +37,18 @@ setup(
     author='Christian Kauten',
     author_email='kautencreations@gmail.com',
     license='Proprietary',
+    python_requires='>=3.13',
     packages=find_packages(exclude=['tests', '*.tests', '*.tests.*']),
     package_data={ 'gym_super_mario_bros': ['_roms/*.nes'] },
-    install_requires=['nes-py>=8.1.4'],
+    install_requires=[
+        'gym>=0.25.2,<0.26',
+        'nes-py>=8.2.1',
+    ],
+    extras_require={
+        'release': [
+            'twine>=6.1.0',
+        ],
+    },
     entry_points={
         'console_scripts': [
             'gym_super_mario_bros = gym_super_mario_bros._app.cli:main',
