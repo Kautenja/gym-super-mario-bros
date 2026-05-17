@@ -13,13 +13,16 @@ permissions:
 
 jobs:
   build-test:
-    name: ${{ matrix.name }}
-    runs-on: ${{ matrix.runner }}
+    name: ${{ matrix.platform.name }} / Python ${{ matrix.python-version }}
+    runs-on: ${{ matrix.platform.runner }}
 
     strategy:
       fail-fast: false
       matrix:
-        include:
+        python-version:
+          - '3.13'
+          - '3.14'
+        platform:
           - name: Linux x64
             runner: ubuntu-24.04
             artifact: linux-x64
@@ -43,7 +46,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
-          python-version: '3.13'
+          python-version: ${{ matrix.python-version }}
 
       - name: Install dependencies
         run: |
@@ -60,7 +63,7 @@ jobs:
       - name: Upload distributions
         uses: actions/upload-artifact@v7
         with:
-          name: gym-super-mario-bros-${{ matrix.artifact }}-dist
+          name: gym-super-mario-bros-${{ matrix.platform.artifact }}-py${{ matrix.python-version }}-dist
           path: dist/*
           if-no-files-found: error
 
