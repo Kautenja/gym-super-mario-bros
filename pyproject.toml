@@ -1,3 +1,50 @@
 [build-system]
 requires = ["setuptools>=69", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "gym_super_mario_bros"
+version = "7.4.0"
+description = "Super Mario Bros. for OpenAI Gym"
+readme = { file = "README.md", content-type = "text/markdown" }
+requires-python = ">=3.13"
+license = { text = "Proprietary" }
+authors = [
+  { name = "Christian Kauten", email = "kautencreations@gmail.com" },
+]
+keywords = [
+  "OpenAI-Gym",
+  "NES",
+  "Super-Mario-Bros",
+  "Lost-Levels",
+  "Reinforcement-Learning-Environment",
+]
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Science/Research",
+  "License :: Free For Educational Use",
+  "Operating System :: MacOS :: MacOS X",
+  "Operating System :: POSIX :: Linux",
+  "Operating System :: Microsoft :: Windows",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Games/Entertainment :: Side-Scrolling/Arcade Games",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+  "gym>=0.25.2,<0.26",
+  "nes-py>=8.2.1",
+]
+
+[project.urls]
+Homepage = "https://github.com/Kautenja/gym-super-mario-bros"
+
+[project.scripts]
+gym_super_mario_bros = "gym_super_mario_bros._app.cli:main"
+
+[tool.setuptools.packages.find]
+exclude = ["tests", "*.tests", "*.tests.*"]
+
+[tool.setuptools.package-data]
+gym_super_mario_bros = ["_roms/*.nes"]

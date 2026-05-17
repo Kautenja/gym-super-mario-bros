@@ -211,6 +211,15 @@ keys:
 | `x_pos`    | `int`  | Mario's _x_ position in the stage (from the left)
 | `y_pos`    | `int`  | Mario's _y_ position in the stage (from the bottom)
 
+## Publishing
+
+PyPI releases are published by the `Publish to PyPI` GitHub Actions workflow
+through PyPI trusted publishing, not by local `twine` credentials. Configure the
+PyPI project publisher with owner `Kautenja`, repository `gym-super-mario-bros`,
+workflow filename `publish.yml`, and environment `pypi`. Then create a GitHub
+release from a tag matching `pyproject.toml`'s version, with or without a
+leading `v`.
+
 ## Citation
 
 Please cite `gym-super-mario-bros` if you use it in your research.
