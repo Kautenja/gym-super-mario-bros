@@ -52,13 +52,24 @@ class ShouldRaiseErrorOnAboveBoundsStage(TestCase):
 
 class ShouldStepGameEnv(TestCase):
     def test(self):
-        env = SuperMarioBrosEnv()
+        env = SuperMarioBrosEnv(render_mode='rgb_array')
         self.assertFalse(env.unwrapped.is_single_stage_env)
         self.assertIsNone(env.unwrapped._target_world)
         self.assertIsNone(env.unwrapped._target_stage)
         self.assertIsNone(env.unwrapped._target_area)
-        env.reset()
-        s, r, d, i = env.step(0)
+        reset_result = env.reset()
+        self.assertEqual(2, len(reset_result))
+        state, reset_info = reset_result
+        self.assertEqual(env.observation_space.shape, state.shape)
+        self.assertIsInstance(reset_info, dict)
+        step_result = env.step(0)
+        self.assertEqual(5, len(step_result))
+        s, r, terminated, truncated, i = step_result
+        self.assertEqual(env.observation_space.shape, s.shape)
+        self.assertIsInstance(terminated, bool)
+        self.assertIsInstance(truncated, bool)
+        self.assertFalse(truncated)
+        self.assertIsNotNone(env.render())
         self.assertEqual(0, i['coins'])
         self.assertEqual(False, i['flag_get'])
         self.assertEqual(2, i['life'])
@@ -72,13 +83,24 @@ class ShouldStepGameEnv(TestCase):
 
 class ShouldStepStageEnv(TestCase):
     def test(self):
-        env = SuperMarioBrosEnv(target=(4, 2))
+        env = SuperMarioBrosEnv(target=(4, 2), render_mode='rgb_array')
         self.assertTrue(env.unwrapped.is_single_stage_env)
         self.assertIsInstance(env.unwrapped._target_world, int)
         self.assertIsInstance(env.unwrapped._target_stage, int)
         self.assertIsInstance(env.unwrapped._target_area, int)
-        env.reset()
-        s, r, d, i = env.step(0)
+        reset_result = env.reset()
+        self.assertEqual(2, len(reset_result))
+        state, reset_info = reset_result
+        self.assertEqual(env.observation_space.shape, state.shape)
+        self.assertIsInstance(reset_info, dict)
+        step_result = env.step(0)
+        self.assertEqual(5, len(step_result))
+        s, r, terminated, truncated, i = step_result
+        self.assertEqual(env.observation_space.shape, s.shape)
+        self.assertIsInstance(terminated, bool)
+        self.assertIsInstance(truncated, bool)
+        self.assertFalse(truncated)
+        self.assertIsNotNone(env.render())
         self.assertEqual(0, i['coins'])
         self.assertEqual(False, i['flag_get'])
         self.assertEqual(2, i['life'])

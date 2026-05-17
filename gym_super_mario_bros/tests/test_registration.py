@@ -1,4 +1,4 @@
-"""Test cases for the gym registered environments."""
+"""Test cases for the Gymnasium registered environments."""
 from unittest import TestCase
 from .._registration import make
 
@@ -30,11 +30,22 @@ class ShouldMakeEnv:
 
     def _test_env(self, env_id, stages):
         if stages is not None:
-            env = make(env_id, stages=stages)
+            env = make(env_id, stages=stages, render_mode='rgb_array')
         else:
-            env = make(env_id)
-        env.reset(seed=self.seed)
-        s, r, d, i = env.step(0)
+            env = make(env_id, render_mode='rgb_array')
+        reset_result = env.reset(seed=self.seed)
+        self.assertEqual(2, len(reset_result))
+        state, reset_info = reset_result
+        self.assertEqual(env.observation_space.shape, state.shape)
+        self.assertIsInstance(reset_info, dict)
+        step_result = env.step(0)
+        self.assertEqual(5, len(step_result))
+        s, r, terminated, truncated, i = step_result
+        self.assertEqual(env.observation_space.shape, s.shape)
+        self.assertIsInstance(terminated, bool)
+        self.assertIsInstance(truncated, bool)
+        self.assertFalse(truncated)
+        self.assertIsNotNone(env.render())
         self.assertEqual(self.coins, i['coins'])
         self.assertEqual(self.flag_get, i['flag_get'])
         self.assertEqual(self.life, i['life'])
@@ -64,11 +75,49 @@ class ShouldMakeSuperMarioBrosRandomStages(ShouldMakeEnv, TestCase):
     # the amount of time left
     time = 300
     # the current world
-    world = 6
+    world = 4
     # the current stage
-    stage = 4
+    stage = 3
     # the environments ID for all versions of Super Mario Bros
     env_id = ['SuperMarioBrosRandomStages-v{}'.format(v) for v in range(4)]
+
+
+class ShouldReproduceSuperMarioBrosRandomStages(TestCase):
+    def _selected_stage(self, seed, options=None):
+        env = make('SuperMarioBrosRandomStages-v0', render_mode='rgb_array')
+        try:
+            _, info = env.reset(seed=seed, options=options)
+            return info['world'], info['stage']
+        finally:
+            env.close()
+
+    def test_fixed_seed_is_reproducible(self):
+        first_stage = self._selected_stage(seed=123)
+        second_stage = self._selected_stage(seed=123)
+        self.assertEqual(first_stage, second_stage)
+
+    def test_options_can_override_stage_subset(self):
+        stage = self._selected_stage(
+            seed=123,
+            options={'stages': ['4-2']},
+        )
+        self.assertEqual((4, 2), stage)
+
+
+class ShouldTruncateWithGymnasiumTimeLimit(TestCase):
+    def test(self):
+        env = make(
+            'SuperMarioBros-v0',
+            render_mode='rgb_array',
+            max_episode_steps=1,
+        )
+        try:
+            env.reset(seed=123)
+            _, _, terminated, truncated, _ = env.step(0)
+            self.assertFalse(terminated)
+            self.assertTrue(truncated)
+        finally:
+            env.close()
 
 
 class ShouldMakeSuperMarioBrosLostLevels(ShouldMakeEnv, TestCase):
@@ -85,6 +134,15 @@ class ShouldMakeSuperMarioBros_1_1(ShouldMakeEnv, TestCase):
     stage = 1
     # the environments ID
     env_id = ['SuperMarioBros-1-1-v{}'.format(v) for v in range(4)]
+
+
+class ShouldMakeSuperMarioBrosAlias_1_1(ShouldMakeEnv, TestCase):
+    # the current world
+    world = 1
+    # the current stage
+    stage = 1
+    # the environments ID
+    env_id = ['SuperMarioBros1-1-v{}'.format(v) for v in range(4)]
 
 
 class ShouldMakeSuperMarioBros_1_2(ShouldMakeEnv, TestCase):

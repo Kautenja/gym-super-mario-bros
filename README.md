@@ -19,7 +19,7 @@
 
 ![Mario](https://user-images.githubusercontent.com/2184469/40949613-7542733a-6834-11e8-895b-ce1cc3af9dbb.gif)
 
-An [OpenAI Gym](https://github.com/openai/gym) environment for
+A [Gymnasium](https://gymnasium.farama.org/) environment for
 Super Mario Bros. & Super Mario Bros. 2 (Lost Levels) on The Nintendo
 Entertainment System (NES) using
 [the nes-py emulator](https://github.com/Kautenja/nes-py).
@@ -37,7 +37,7 @@ pip install gym-super-mario-bros
 ### Python
 
 You must import `gym_super_mario_bros` before trying to make an environment.
-This is because gym environments are registered at runtime. By default,
+This is because Gymnasium environments are registered at runtime. By default,
 `gym_super_mario_bros` environments use the full NES action space of 256
 discrete actions. To contstrain this, `gym_super_mario_bros.actions` provides
 three actions lists (`RIGHT_ONLY`, `SIMPLE_MOVEMENT`, and `COMPLEX_MOVEMENT`)
@@ -46,24 +46,26 @@ for the `nes_py.wrappers.JoypadSpace` wrapper. See
 breakdown of the legal actions in each of these three lists.
 
 ```python
+import gymnasium as gym
 from nes_py.wrappers import JoypadSpace
 import gym_super_mario_bros
 from gym_super_mario_bros.actions import SIMPLE_MOVEMENT
-env = gym_super_mario_bros.make('SuperMarioBros-v0')
+env = gym.make('SuperMarioBros-v0', render_mode='human')
 env = JoypadSpace(env, SIMPLE_MOVEMENT)
 
 done = True
 for step in range(5000):
     if done:
-        state = env.reset()
-    state, reward, done, info = env.step(env.action_space.sample())
+        state, info = env.reset()
+    state, reward, terminated, truncated, info = env.step(env.action_space.sample())
+    done = terminated or truncated
     env.render()
 
 env.close()
 ```
 
-**NOTE:** `gym_super_mario_bros.make` is just an alias to `gym.make` for
-convenience.
+**NOTE:** `gym_super_mario_bros.make` is just an alias to `gymnasium.make` for
+convenience after `gym_super_mario_bros` is imported.
 
 **NOTE:** remove calls to `render` in training code for a nontrivial
 speedup.
@@ -138,26 +140,29 @@ environment randomly selects a new stage. This is only available for the
 standard Super Mario Bros. game, _not_ Lost Levels (at the moment). To use
 these environments, append `RandomStages` to the `SuperMarioBros` id. For
 example, to use the standard ROM with random stage selection use
-`SuperMarioBrosRandomStages-v0`. To seed the random stage selection use the
-`seed` method of the env, i.e., `env.seed(222)`, before any calls to `reset`.
-Alternatively pass the `seed` keyword argument to the `reset` method directly
-like `reset(seed=222)`.
+`SuperMarioBrosRandomStages-v0`. To seed the random stage selection pass the
+`seed` keyword argument to the `reset` method directly like `reset(seed=222)`.
 
 In addition to randomly selecting any of the 32 original stages, a subset of
 user-defined stages can be specified to limit the random choice of stages to a
 specific subset. For example, the stage selector could be limited to only
 sample castle stages, water levels, underground, and more.
 
-To specify a subset of stages to randomly sample from, create a list of each
-stage to allow to be sampled and pass that list to the `gym.make()` function.
-For example:
+To specify a default subset of stages to randomly sample from, create a list
+of each stage to allow to be sampled and pass that list to the `gymnasium.make()`
+function. For example:
 
 ```python
 gym.make('SuperMarioBrosRandomStages-v0', stages=['1-4', '2-4', '3-4', '4-4'])
 ```
 
 The example above will sample a random stage from 1-4, 2-4, 3-4, and 4-4 upon
-every call to `reset`.
+every call to `reset`. A reset call can also override the subset for one
+episode:
+
+```python
+state, info = env.reset(seed=222, options={'stages': ['4-2']})
+```
 
 ## Step
 
