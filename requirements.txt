@@ -1,4 +1,4 @@
-# Developer/CI bootstrap only. Canonical distribution metadata lives in
+# Developer/CI bootstrap only. Canonical runtime metadata lives in
 # pyproject.toml.
 nes-py @ git+https://github.com/Kautenja/nes-py.git@ralph-dev
 build>=1.2.1
