@@ -37,11 +37,6 @@ dependencies = [
   "nes-py>=8.2.1",
 ]
 
-[project.optional-dependencies]
-release = [
-  "twine>=6.1.0",
-]
-
 [project.urls]
 Homepage = "https://github.com/Kautenja/gym-super-mario-bros"
 

@@ -17,7 +17,7 @@
 #     build               Alias for deployment
 #     dist                Alias for deployment
 #     package             Alias for deployment
-#     ship                Run tests, build distributions, then upload to PyPI
+#     ship                Run tests and build distributions for a release
 #     release             Alias for ship
 #     upload              Alias for ship
 #     all                 Run tests and build distributions
@@ -125,8 +125,12 @@ run_deployment() {
 run_ship() {
   run_unittest
   run_deployment
-  "${PYTHON}" -m pip install ".[release]"
-  "${PYTHON}" -m twine upload dist/*
+  cat <<'EOF'
+
+Distributions are ready in dist/.
+Publish releases through the "Publish to PyPI" GitHub Actions workflow by
+creating a GitHub release from a version-matching tag.
+EOF
 }
 
 case "${COMMAND}" in

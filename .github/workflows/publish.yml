@@ -1,0 +1,105 @@
+name: Publish to PyPI
+
+'on':
+  release:
+    types:
+      - published
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-pypi-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  check-version:
+    name: Check release version
+    runs-on: ubuntu-24.04
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Validate tag matches package version
+        id: version
+        env:
+          REF_NAME: ${{ github.ref_name }}
+          REF_TYPE: ${{ github.ref_type }}
+        run: |
+          python - <<'PY'
+          import os
+          import pathlib
+          import tomllib
+
+          ref_name = os.environ["REF_NAME"]
+          ref_type = os.environ["REF_TYPE"]
+          if ref_type != "tag":
+              raise SystemExit("PyPI publishing must run from a release tag.")
+
+          version = tomllib.loads(pathlib.Path("pyproject.toml").read_text())["project"]["version"]
+          tag_version = ref_name[1:] if ref_name.startswith("v") else ref_name
+          if tag_version != version:
+              raise SystemExit(
+                  f"Release tag {ref_name!r} does not match pyproject.toml version {version!r}."
+              )
+
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
+              print(f"version={version}", file=output)
+          PY
+
+  build-distributions:
+    name: Build distributions
+    needs: check-version
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+
+      - name: Build distributions
+        run: |
+          python -m pip install --upgrade pip build
+          python -m build --outdir dist
+
+      - name: Upload distributions
+        uses: actions/upload-artifact@v7
+        with:
+          name: gym-super-mario-bros-dist
+          path: dist/*
+          if-no-files-found: error
+
+  publish:
+    name: Publish to PyPI
+    needs:
+      - check-version
+      - build-distributions
+    runs-on: ubuntu-24.04
+    environment:
+      name: pypi
+      url: https://pypi.org/project/gym-super-mario-bros/${{ needs.check-version.outputs.version }}/
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Download distributions
+        uses: actions/download-artifact@v8
+        with:
+          name: gym-super-mario-bros-dist
+          path: dist
+
+      - name: Publish distributions to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
