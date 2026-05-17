@@ -1,10 +1,10 @@
-"""Registration code of Gym environments in this package."""
-import gym
+"""Registration code of Gymnasium environments in this package."""
+import gymnasium as gym
 
 
 def _register_mario_env(id, is_random=False, **kwargs):
     """
-    Register a Super Mario Bros. (1/2) environment with OpenAI Gym.
+    Register a Super Mario Bros. (1/2) environment with Gymnasium.
 
     Args:
         id (str): id for the env to register
@@ -55,7 +55,7 @@ _register_mario_env('SuperMarioBros2-v1', lost_levels=True, rom_mode='downsample
 
 def _register_mario_stage_env(id, **kwargs):
     """
-    Register a Super Mario Bros. (1/2) stage environment with OpenAI Gym.
+    Register a Super Mario Bros. (1/2) stage environment with Gymnasium.
 
     Args:
         id (str): id for the env to register
@@ -79,6 +79,9 @@ def _register_mario_stage_env(id, **kwargs):
 
 # a template for making individual stage environments
 _ID_TEMPLATE = 'SuperMarioBros{}-{}-{}-v{}'
+# Gymnasium smoke tests and downstream callers may omit the separator between
+# the game name and world number; keep the historical IDs and add aliases.
+_ID_ALIAS_TEMPLATE = 'SuperMarioBros{}-{}-v{}'
 # A list of ROM modes for each level environment
 _ROM_MODES = [
     'vanilla',
@@ -97,11 +100,13 @@ for version, rom_mode in enumerate(_ROM_MODES):
             # setup the frame-skipping environment
             env_id = _ID_TEMPLATE.format('', world, stage, version)
             _register_mario_stage_env(env_id, rom_mode=rom_mode, target=target)
+            env_id = _ID_ALIAS_TEMPLATE.format(world, stage, version)
+            _register_mario_stage_env(env_id, rom_mode=rom_mode, target=target)
 
 
-# create an alias to gym.make for ease of access
+# create an alias to gymnasium.make for ease of access
 make = gym.make
 
 
-# define the outward facing API of this module (none, gym provides the API)
+# define the outward facing API of this module (none, gymnasium provides the API)
 __all__ = [make.__name__]

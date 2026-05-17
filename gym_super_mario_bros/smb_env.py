@@ -1,4 +1,4 @@
-"""An OpenAI Gym environment for Super Mario Bros. and Lost Levels."""
+"""A Gymnasium environment for Super Mario Bros. and Lost Levels."""
 from collections import defaultdict
 from nes_py import NESEnv
 from ._roms import decode_target
@@ -25,12 +25,18 @@ _STAGE_OVER_ENEMIES = (0x2D, 0x31)
 
 
 class SuperMarioBrosEnv(NESEnv):
-    """An environment for playing Super Mario Bros with OpenAI Gym."""
+    """An environment for playing Super Mario Bros with Gymnasium."""
 
     # the legal range of rewards for each step
     reward_range = (-15, 15)
 
-    def __init__(self, rom_mode='vanilla', lost_levels=False, target=None):
+    def __init__(
+        self,
+        rom_mode='vanilla',
+        lost_levels=False,
+        target=None,
+        render_mode=None,
+    ):
         """
         Initialize a new Super Mario Bros environment.
 
@@ -40,6 +46,7 @@ class SuperMarioBrosEnv(NESEnv):
                 - False: load original Super Mario Bros.
                 - True: load Super Mario Bros. Lost Levels
             target (tuple): a tuple of the (world, stage) to play as a level
+            render_mode (str): the render mode to use, if any
 
         Returns:
             None
@@ -48,7 +55,7 @@ class SuperMarioBrosEnv(NESEnv):
         # decode the ROM path based on mode and lost levels flag
         rom = rom_path(lost_levels, rom_mode)
         # initialize the super object with the ROM path
-        super(SuperMarioBrosEnv, self).__init__(rom)
+        super(SuperMarioBrosEnv, self).__init__(rom, render_mode=render_mode)
         # set the target world, stage, and area variables
         target = decode_target(target, lost_levels)
         self._target_world, self._target_stage, self._target_area = target
@@ -397,7 +404,7 @@ class SuperMarioBrosEnv(NESEnv):
         """Return the reward after a step occurs."""
         return self._x_reward + self._time_penalty + self._death_penalty
 
-    def _get_done(self):
+    def _get_terminated(self):
         """Return True if the episode is over, False otherwise."""
         if self.is_single_stage_env:
             return self._is_dying or self._is_dead or self._flag_get
