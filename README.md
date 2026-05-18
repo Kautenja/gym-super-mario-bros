@@ -24,6 +24,9 @@ Super Mario Bros. & Super Mario Bros. 2 (Lost Levels) on The Nintendo
 Entertainment System (NES) using
 [the nes-py emulator](https://github.com/Kautenja/nes-py).
 
+`gym-super-mario-bros` targets Gymnasium's modern reset, step, render-mode,
+and truncation semantics. It currently supports CPython 3.13 and 3.14 in CI.
+
 ## Installation
 
 The preferred installation of `gym-super-mario-bros` is from `pip`:
@@ -32,6 +35,9 @@ The preferred installation of `gym-super-mario-bros` is from `pip`:
 pip install gym-super-mario-bros
 ```
 
+Python 3.13 or newer is required. The supported CI targets are CPython 3.13
+and 3.14.
+
 ## Usage
 
 ### Python
@@ -39,7 +45,7 @@ pip install gym-super-mario-bros
 You must import `gym_super_mario_bros` before trying to make an environment.
 This is because Gymnasium environments are registered at runtime. By default,
 `gym_super_mario_bros` environments use the full NES action space of 256
-discrete actions. To contstrain this, `gym_super_mario_bros.actions` provides
+discrete actions. To constrain this, `gym_super_mario_bros.actions` provides
 three actions lists (`RIGHT_ONLY`, `SIMPLE_MOVEMENT`, and `COMPLEX_MOVEMENT`)
 for the `nes_py.wrappers.JoypadSpace` wrapper. See
 [gym_super_mario_bros/actions.py](https://github.com/Kautenja/gym-super-mario-bros/blob/master/gym_super_mario_bros/actions.py) for a
@@ -50,13 +56,14 @@ import gymnasium as gym
 from nes_py.wrappers import JoypadSpace
 import gym_super_mario_bros
 from gym_super_mario_bros.actions import SIMPLE_MOVEMENT
+
 env = gym.make('SuperMarioBros-v0', render_mode='human')
 env = JoypadSpace(env, SIMPLE_MOVEMENT)
 
 done = True
 for step in range(5000):
     if done:
-        state, info = env.reset()
+        state, info = env.reset(seed=123)
     state, reward, terminated, truncated, info = env.step(env.action_space.sample())
     done = terminated or truncated
     env.render()
@@ -82,11 +89,12 @@ speedup.
 environments using either the keyboard, or uniform random movement.
 
 ```shell
+python -m gym_super_mario_bros --env <environment ID> --mode <human|random>
 gym_super_mario_bros --env <environment ID> --mode <human|random>
 ```
 
 **NOTE:** by default, `-e` is set to `SuperMarioBros-v0` and `-m` is set to
-`human`.
+`human`, `--actionspace/-a` is set to `nes`, and rendering is enabled.
 
 Human keyboard play opens a graphical window:
 
@@ -103,6 +111,12 @@ gym_super_mario_bros --mode random --steps 1000 --no-render --seed 123
 
 Use `--actionspace/-a` to select `nes`, `right`, `simple`, or `complex`.
 Human mode requires rendering, so `--mode human --no-render` is rejected.
+
+Print the CLI help with:
+
+```shell
+python -m gym_super_mario_bros --help
+```
 
 **NOTE:** `SuperMarioBrosRandomStages-*` support the `--stages/-S` flag for
 supplying the set of stages to sample from like `-S 1-4 2-4 3-4 4-4`.
@@ -241,11 +255,12 @@ keys:
 ## Publishing
 
 PyPI releases are published by the `Publish to PyPI` GitHub Actions workflow
-through PyPI trusted publishing, not by local `twine` credentials. Configure the
-PyPI project publisher with owner `Kautenja`, repository `gym-super-mario-bros`,
-workflow filename `publish.yml`, and environment `pypi`. Then create a GitHub
-release from a tag matching `pyproject.toml`'s version, with or without a
-leading `v`.
+through PyPI trusted publishing, not by local `twine` credentials. Configure
+the PyPI project publisher with owner `Kautenja`, repository
+`gym-super-mario-bros`, workflow filename `publish.yml`, and environment
+`pypi`. Publish a release by pushing a tag that matches `pyproject.toml`'s
+version, with or without a leading `v`, and then creating the corresponding
+GitHub release so the workflow can build and upload the distribution artifacts.
 
 ## Citation
 
