@@ -29,8 +29,8 @@ def decode_target(target, lost_levels):
         raise TypeError('target_world must be of type: int')
     else:
         if lost_levels:
-            if not 1 <= target_world <= 12:
-                raise ValueError('target_world must be in {1, ..., 12}')
+            if not 1 <= target_world <= 13:
+                raise ValueError('target_world must be in {1, ..., 13}')
         elif not 1 <= target_world <= 8:
             raise ValueError('target_world must be in {1, ..., 8}')
     # Type and value check the target level parameter
@@ -51,13 +51,6 @@ def decode_target(target, lost_levels):
         if target_world in {1, 3}:
             if target_stage >= 2:
                 target_area = target_area + 1
-        elif target_world >= 5:
-            # TODO: figure out why all worlds greater than 5 fail.
-            # target_area = target_area + 1
-            # for now just raise a value error
-            worlds = set(range(5, 12 + 1))
-            msg = 'lost levels worlds {} not supported'.format(worlds)
-            raise ValueError(msg)
     else:
         # setup the target area depending on the target world and stage
         if target_world in {1, 2, 4, 7}:

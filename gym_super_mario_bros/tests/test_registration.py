@@ -1,6 +1,169 @@
 """Test cases for the Gymnasium registered environments."""
 from unittest import TestCase
+
+import gymnasium as gym
+import gym_super_mario_bros
+
+from .. import _registration
 from .._registration import make
+
+
+_ROM_MODES = [
+    'vanilla',
+    'downsample',
+    'pixel',
+    'rectangle',
+]
+
+_LOST_LEVELS_ROM_MODES = _ROM_MODES[:2]
+
+
+def _expected_stage_ids():
+    """Return the historical stage IDs plus the separator-free aliases."""
+    for version in range(len(_ROM_MODES)):
+        for world in range(1, 9):
+            for stage in range(1, 5):
+                yield 'SuperMarioBros-{}-{}-v{}'.format(world, stage, version)
+                yield 'SuperMarioBros{}-{}-v{}'.format(world, stage, version)
+
+
+def _lost_levels_world_label(world):
+    """Return the public world label for Lost Levels stage IDs."""
+    if world <= 9:
+        return str(world)
+    return chr(ord('A') + world - 10)
+
+
+def _expected_lost_levels_stage_ids():
+    """Return the registered Lost Levels stage IDs."""
+    for version in range(len(_LOST_LEVELS_ROM_MODES)):
+        for world in range(1, 14):
+            label = _lost_levels_world_label(world)
+            for stage in range(1, 5):
+                yield 'SuperMarioBros2-{}-{}-v{}'.format(
+                    label,
+                    stage,
+                    version,
+                )
+
+
+class ShouldExposePackageApi(TestCase):
+    """Test package-level public API and Gymnasium make alias."""
+
+    def test_make_alias_is_gymnasium_make(self):
+        self.assertIs(make, gym.make)
+        self.assertIs(gym_super_mario_bros.make, gym.make)
+
+    def test_all_is_stable(self):
+        self.assertEqual(['make'], _registration.__all__)
+        self.assertEqual(
+            [
+                'make',
+                'SuperMarioBrosEnv',
+                'SuperMarioBrosRandomStagesEnv',
+            ],
+            gym_super_mario_bros.__all__,
+        )
+
+
+class ShouldRegisterExpectedGymnasiumEnvs(TestCase):
+    """Test that Gymnasium registration metadata remains stable."""
+
+    def _assert_common_registration_policy(self, env_id):
+        spec = gym.spec(env_id)
+        self.assertEqual(_registration._MAX_EPISODE_STEPS, spec.max_episode_steps)
+        self.assertEqual(_registration._REWARD_THRESHOLD, spec.reward_threshold)
+        self.assertTrue(spec.nondeterministic)
+        self.assertTrue(spec.disable_env_checker)
+
+    def test_env_checker_policy_is_explicit(self):
+        self.assertTrue(_registration._DISABLE_ENV_CHECKER)
+        self.assertIn('ROM-backed NES', _registration._DISABLE_ENV_CHECKER_REASON)
+        self.assertIn(
+            'Gymnasium passive checker',
+            _registration._DISABLE_ENV_CHECKER_REASON,
+        )
+
+    def test_core_ids_are_registered_unchanged(self):
+        for version, rom_mode in enumerate(_ROM_MODES):
+            env_id = 'SuperMarioBros-v{}'.format(version)
+            spec = gym.spec(env_id)
+            self.assertEqual(
+                'gym_super_mario_bros:SuperMarioBrosEnv',
+                spec.entry_point,
+            )
+            self.assertEqual({'rom_mode': rom_mode}, spec.kwargs)
+            self._assert_common_registration_policy(env_id)
+
+            env_id = 'SuperMarioBrosRandomStages-v{}'.format(version)
+            spec = gym.spec(env_id)
+            self.assertEqual(
+                'gym_super_mario_bros:SuperMarioBrosRandomStagesEnv',
+                spec.entry_point,
+            )
+            self.assertEqual({'rom_mode': rom_mode}, spec.kwargs)
+            self._assert_common_registration_policy(env_id)
+
+    def test_lost_levels_ids_are_registered_unchanged(self):
+        for version, rom_mode in enumerate(_ROM_MODES[:2]):
+            env_id = 'SuperMarioBros2-v{}'.format(version)
+            spec = gym.spec(env_id)
+            self.assertEqual(
+                'gym_super_mario_bros:SuperMarioBrosEnv',
+                spec.entry_point,
+            )
+            self.assertEqual(
+                {'lost_levels': True, 'rom_mode': rom_mode},
+                spec.kwargs,
+            )
+            self._assert_common_registration_policy(env_id)
+
+    def test_stage_ids_and_aliases_are_registered_unchanged(self):
+        stage_ids = list(_expected_stage_ids())
+        self.assertEqual(256, len(stage_ids))
+        for env_id in stage_ids:
+            spec = gym.spec(env_id)
+            self.assertEqual(
+                'gym_super_mario_bros:SuperMarioBrosEnv',
+                spec.entry_point,
+            )
+            self.assertIn('rom_mode', spec.kwargs)
+            self.assertIn('target', spec.kwargs)
+            self._assert_common_registration_policy(env_id)
+
+    def test_lost_levels_stage_ids_are_registered(self):
+        stage_ids = list(_expected_lost_levels_stage_ids())
+        self.assertEqual(104, len(stage_ids))
+        for env_id in stage_ids:
+            spec = gym.spec(env_id)
+            self.assertEqual(
+                'gym_super_mario_bros:SuperMarioBrosEnv',
+                spec.entry_point,
+            )
+            self.assertTrue(spec.kwargs['lost_levels'])
+            self.assertIn('rom_mode', spec.kwargs)
+            self.assertIn('target', spec.kwargs)
+            self._assert_common_registration_policy(env_id)
+
+
+class ShouldSmokeRepresentativeRegisteredEnvs(TestCase):
+    """Test representative Gymnasium creation, reset, step, render, and close."""
+
+    def test(self):
+        for env_id in (
+            'SuperMarioBros-v0',
+            'SuperMarioBrosRandomStages-v0',
+            'SuperMarioBros1-1-v0',
+        ):
+            env = gym.make(env_id, render_mode='rgb_array')
+            try:
+                state, info = env.reset(seed=123)
+                self.assertEqual(env.observation_space.shape, state.shape)
+                self.assertIsInstance(info, dict)
+                self.assertEqual(5, len(env.step(env.action_space.sample())))
+                self.assertIsNotNone(env.render())
+            finally:
+                env.close()
 
 
 class ShouldMakeEnv:
@@ -125,6 +288,31 @@ class ShouldMakeSuperMarioBrosLostLevels(ShouldMakeEnv, TestCase):
     time = 400
     # the environments ID for all versions of Super Mario Bros
     env_id = ['SuperMarioBros2-v{}'.format(v) for v in range(2)]
+
+
+class ShouldMakeLostLevels_5_1(ShouldMakeEnv, TestCase):
+    world = 5
+    stage = 1
+    env_id = ['SuperMarioBros2-5-1-v{}'.format(v) for v in range(2)]
+
+
+class ShouldMakeLostLevels_8_4(ShouldMakeEnv, TestCase):
+    world = 8
+    stage = 4
+    env_id = ['SuperMarioBros2-8-4-v{}'.format(v) for v in range(2)]
+
+
+class ShouldMakeLostLevels_A_2(ShouldMakeEnv, TestCase):
+    time = 300
+    world = 10
+    stage = 2
+    env_id = ['SuperMarioBros2-A-2-v{}'.format(v) for v in range(2)]
+
+
+class ShouldMakeLostLevels_D_4(ShouldMakeEnv, TestCase):
+    world = 13
+    stage = 4
+    env_id = ['SuperMarioBros2-D-4-v{}'.format(v) for v in range(2)]
 
 
 class ShouldMakeSuperMarioBros_1_1(ShouldMakeEnv, TestCase):

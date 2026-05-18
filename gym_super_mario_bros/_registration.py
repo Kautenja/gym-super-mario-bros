@@ -2,6 +2,19 @@
 import gymnasium as gym
 
 
+_MAX_EPISODE_STEPS = 9999999
+_REWARD_THRESHOLD = 9999999
+_DISABLE_ENV_CHECKER = True
+# Gymnasium's passive checker is intentionally disabled for registered NES
+# environments because construction eagerly loads ROM-backed emulator state and
+# skips intro frames. The test suite covers reset/step/render compatibility
+# directly without running the checker for every registered variant.
+_DISABLE_ENV_CHECKER_REASON = (
+    'ROM-backed NES environment compatibility is covered by package smoke '
+    'tests instead of Gymnasium passive checker construction probes.'
+)
+
+
 def _register_mario_env(id, is_random=False, **kwargs):
     """
     Register a Super Mario Bros. (1/2) environment with Gymnasium.
@@ -26,11 +39,13 @@ def _register_mario_env(id, is_random=False, **kwargs):
     gym.envs.registration.register(
         id=id,
         entry_point=entry_point,
-        max_episode_steps=9999999,
-        reward_threshold=9999999,
+        # Preserve Gymnasium TimeLimit wrapping while keeping the historical
+        # registration cap effectively unreachable during normal game play.
+        max_episode_steps=_MAX_EPISODE_STEPS,
+        reward_threshold=_REWARD_THRESHOLD,
         kwargs=kwargs,
         nondeterministic=True,
-        disable_env_checker=True,
+        disable_env_checker=_DISABLE_ENV_CHECKER,
     )
 
 
@@ -69,11 +84,13 @@ def _register_mario_stage_env(id, **kwargs):
     gym.envs.registration.register(
         id=id,
         entry_point='gym_super_mario_bros:SuperMarioBrosEnv',
-        max_episode_steps=9999999,
-        reward_threshold=9999999,
+        # Preserve Gymnasium TimeLimit wrapping while keeping the historical
+        # registration cap effectively unreachable during normal game play.
+        max_episode_steps=_MAX_EPISODE_STEPS,
+        reward_threshold=_REWARD_THRESHOLD,
         kwargs=kwargs,
         nondeterministic=True,
-        disable_env_checker=True,
+        disable_env_checker=_DISABLE_ENV_CHECKER,
     )
 
 
@@ -89,6 +106,14 @@ _ROM_MODES = [
     'pixel',
     'rectangle'
 ]
+_LOST_LEVELS_ROM_MODES = _ROM_MODES[:2]
+
+
+def _lost_levels_world_label(world):
+    """Return the public world label for a Lost Levels world number."""
+    if world <= 9:
+        return str(world)
+    return chr(ord('A') + world - 10)
 
 
 # iterate over all the rom modes, worlds (1-8), and stages (1-4)
@@ -104,9 +129,28 @@ for version, rom_mode in enumerate(_ROM_MODES):
             _register_mario_stage_env(env_id, rom_mode=rom_mode, target=target)
 
 
+# iterate over Lost Levels rom modes, worlds (1-9, A-D), and stages (1-4)
+for version, rom_mode in enumerate(_LOST_LEVELS_ROM_MODES):
+    for world in range(1, 14):
+        for stage in range(1, 5):
+            target = (world, stage)
+            env_id = _ID_TEMPLATE.format(
+                '2',
+                _lost_levels_world_label(world),
+                stage,
+                version,
+            )
+            _register_mario_stage_env(
+                env_id,
+                lost_levels=True,
+                rom_mode=rom_mode,
+                target=target,
+            )
+
+
 # create an alias to gymnasium.make for ease of access
 make = gym.make
 
 
 # define the outward facing API of this module (none, gymnasium provides the API)
-__all__ = [make.__name__]
+__all__ = ['make']

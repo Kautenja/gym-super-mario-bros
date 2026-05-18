@@ -24,6 +24,13 @@ print(pkg_resources.get_distribution("gym-super-mario-bros").version)
 <YOUR SCRIPT>
 ```
 
+Please also include:
+
+- the exact install command(s) you ran
+- whether this is a `pip`, `venv`, `conda`, or system Python environment
+- for Linux loader errors, the active `libstdc++` version if you know it
+- for Windows build errors, whether MSVC / Visual Studio Build Tools are installed
+
 ### Expected behavior
 
 A clear and concise description of what you expected to happen.

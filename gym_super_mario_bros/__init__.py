@@ -6,7 +6,7 @@ from ._registration import make
 
 # define the outward facing API of this package
 __all__ = [
-    make.__name__,
-    SuperMarioBrosEnv.__name__,
-    SuperMarioBrosRandomStagesEnv.__name__,
+    'make',
+    'SuperMarioBrosEnv',
+    'SuperMarioBrosRandomStagesEnv',
 ]
