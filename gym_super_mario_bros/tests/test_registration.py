@@ -15,6 +15,8 @@ _ROM_MODES = [
     'rectangle',
 ]
 
+_LOST_LEVELS_ROM_MODES = _ROM_MODES[:2]
+
 
 def _expected_stage_ids():
     """Return the historical stage IDs plus the separator-free aliases."""
@@ -23,6 +25,26 @@ def _expected_stage_ids():
             for stage in range(1, 5):
                 yield 'SuperMarioBros-{}-{}-v{}'.format(world, stage, version)
                 yield 'SuperMarioBros{}-{}-v{}'.format(world, stage, version)
+
+
+def _lost_levels_world_label(world):
+    """Return the public world label for Lost Levels stage IDs."""
+    if world <= 9:
+        return str(world)
+    return chr(ord('A') + world - 10)
+
+
+def _expected_lost_levels_stage_ids():
+    """Return the registered Lost Levels stage IDs."""
+    for version in range(len(_LOST_LEVELS_ROM_MODES)):
+        for world in range(1, 14):
+            label = _lost_levels_world_label(world)
+            for stage in range(1, 5):
+                yield 'SuperMarioBros2-{}-{}-v{}'.format(
+                    label,
+                    stage,
+                    version,
+                )
 
 
 class ShouldExposePackageApi(TestCase):
@@ -105,6 +127,20 @@ class ShouldRegisterExpectedGymnasiumEnvs(TestCase):
                 'gym_super_mario_bros:SuperMarioBrosEnv',
                 spec.entry_point,
             )
+            self.assertIn('rom_mode', spec.kwargs)
+            self.assertIn('target', spec.kwargs)
+            self._assert_common_registration_policy(env_id)
+
+    def test_lost_levels_stage_ids_are_registered(self):
+        stage_ids = list(_expected_lost_levels_stage_ids())
+        self.assertEqual(104, len(stage_ids))
+        for env_id in stage_ids:
+            spec = gym.spec(env_id)
+            self.assertEqual(
+                'gym_super_mario_bros:SuperMarioBrosEnv',
+                spec.entry_point,
+            )
+            self.assertTrue(spec.kwargs['lost_levels'])
             self.assertIn('rom_mode', spec.kwargs)
             self.assertIn('target', spec.kwargs)
             self._assert_common_registration_policy(env_id)
@@ -252,6 +288,31 @@ class ShouldMakeSuperMarioBrosLostLevels(ShouldMakeEnv, TestCase):
     time = 400
     # the environments ID for all versions of Super Mario Bros
     env_id = ['SuperMarioBros2-v{}'.format(v) for v in range(2)]
+
+
+class ShouldMakeLostLevels_5_1(ShouldMakeEnv, TestCase):
+    world = 5
+    stage = 1
+    env_id = ['SuperMarioBros2-5-1-v{}'.format(v) for v in range(2)]
+
+
+class ShouldMakeLostLevels_8_4(ShouldMakeEnv, TestCase):
+    world = 8
+    stage = 4
+    env_id = ['SuperMarioBros2-8-4-v{}'.format(v) for v in range(2)]
+
+
+class ShouldMakeLostLevels_A_2(ShouldMakeEnv, TestCase):
+    time = 300
+    world = 10
+    stage = 2
+    env_id = ['SuperMarioBros2-A-2-v{}'.format(v) for v in range(2)]
+
+
+class ShouldMakeLostLevels_D_4(ShouldMakeEnv, TestCase):
+    world = 13
+    stage = 4
+    env_id = ['SuperMarioBros2-D-4-v{}'.format(v) for v in range(2)]
 
 
 class ShouldMakeSuperMarioBros_1_1(ShouldMakeEnv, TestCase):

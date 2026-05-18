@@ -106,6 +106,14 @@ _ROM_MODES = [
     'pixel',
     'rectangle'
 ]
+_LOST_LEVELS_ROM_MODES = _ROM_MODES[:2]
+
+
+def _lost_levels_world_label(world):
+    """Return the public world label for a Lost Levels world number."""
+    if world <= 9:
+        return str(world)
+    return chr(ord('A') + world - 10)
 
 
 # iterate over all the rom modes, worlds (1-8), and stages (1-4)
@@ -119,6 +127,25 @@ for version, rom_mode in enumerate(_ROM_MODES):
             _register_mario_stage_env(env_id, rom_mode=rom_mode, target=target)
             env_id = _ID_ALIAS_TEMPLATE.format(world, stage, version)
             _register_mario_stage_env(env_id, rom_mode=rom_mode, target=target)
+
+
+# iterate over Lost Levels rom modes, worlds (1-9, A-D), and stages (1-4)
+for version, rom_mode in enumerate(_LOST_LEVELS_ROM_MODES):
+    for world in range(1, 14):
+        for stage in range(1, 5):
+            target = (world, stage)
+            env_id = _ID_TEMPLATE.format(
+                '2',
+                _lost_levels_world_label(world),
+                stage,
+                version,
+            )
+            _register_mario_stage_env(
+                env_id,
+                lost_levels=True,
+                rom_mode=rom_mode,
+                target=target,
+            )
 
 
 # create an alias to gymnasium.make for ease of access

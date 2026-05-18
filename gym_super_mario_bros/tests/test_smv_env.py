@@ -1,5 +1,6 @@
 """Test cases for the Super Mario Bros meta environment."""
 from unittest import TestCase
+from .._roms.decode_target import decode_target
 from ..smb_env import SuperMarioBrosEnv
 
 
@@ -30,7 +31,7 @@ class ShouldRaiseErrorOnBelowBoundsWorld(TestCase):
 class ShouldRaiseErrorOnAboveBoundsWorld(TestCase):
     def test(self):
         self.assertRaises(ValueError, SuperMarioBrosEnv, target=(9, 1))
-        self.assertRaises(ValueError, SuperMarioBrosEnv, target=(13, 1), lost_levels=True)
+        self.assertRaises(ValueError, SuperMarioBrosEnv, target=(14, 1), lost_levels=True)
 
 
 class ShouldRaiseErrorOnInvalidTypeStage(TestCase):
@@ -48,6 +49,16 @@ class ShouldRaiseErrorOnAboveBoundsStage(TestCase):
     def test(self):
         self.assertRaises(ValueError, SuperMarioBrosEnv, target=(1, 5))
         self.assertRaises(ValueError, SuperMarioBrosEnv, target=(1, 5), lost_levels=True)
+
+
+class ShouldDecodeLostLevelsBonusWorldTargets(TestCase):
+    def test(self):
+        for world in range(5, 14):
+            for stage in range(1, 5):
+                self.assertEqual(
+                    (world, stage, stage),
+                    decode_target((world, stage), lost_levels=True),
+                )
 
 
 class ShouldStepGameEnv(TestCase):
