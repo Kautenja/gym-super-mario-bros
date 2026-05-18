@@ -76,11 +76,27 @@ speedup.
 environments using either the keyboard, or uniform random movement.
 
 ```shell
-gym_super_mario_bros -e <the environment ID to play> -m <`human` or `random`>
+gym_super_mario_bros --env <environment ID> --mode <human|random>
 ```
 
 **NOTE:** by default, `-e` is set to `SuperMarioBros-v0` and `-m` is set to
 `human`.
+
+Human keyboard play opens a graphical window:
+
+```shell
+gym_super_mario_bros --env SuperMarioBros-v0 --mode human --actionspace simple
+```
+
+Random play can be rendered or run headlessly. Use `--seed` to seed the first
+environment reset:
+
+```shell
+gym_super_mario_bros --mode random --steps 1000 --no-render --seed 123
+```
+
+Use `--actionspace/-a` to select `nes`, `right`, `simple`, or `complex`.
+Human mode requires rendering, so `--mode human --no-render` is rejected.
 
 **NOTE:** `SuperMarioBrosRandomStages-*` support the `--stages/-S` flag for
 supplying the set of stages to sample from like `-S 1-4 2-4 3-4 4-4`.
