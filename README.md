@@ -67,6 +67,12 @@ env.close()
 **NOTE:** `gym_super_mario_bros.make` is just an alias to `gymnasium.make` for
 convenience after `gym_super_mario_bros` is imported.
 
+**NOTE:** registered environments use Gymnasium's `TimeLimit` wrapper with
+`max_episode_steps=9999999` to preserve the historical cap while allowing the
+game logic to end normal episodes with `terminated=True`. Passing a shorter
+`max_episode_steps` to `gymnasium.make()` is the supported way to test or train
+with external time truncation, which returns `truncated=True`.
+
 **NOTE:** remove calls to `render` in training code for a nontrivial
 speedup.
 
