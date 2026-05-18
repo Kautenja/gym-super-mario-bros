@@ -38,6 +38,12 @@ pip install gym-super-mario-bros
 Python 3.13 or newer is required. The supported CI targets are CPython 3.13
 and 3.14.
 
+Because `gym-super-mario-bros` depends on the native `nes-py` emulator, Linux
+`GLIBCXX_*` loader errors and Windows compiler-toolchain failures are usually
+`nes-py` installation/runtime issues rather than wrapper bugs. See the
+[`nes-py` installation notes](https://github.com/Kautenja/nes-py#installation)
+for the current compiler and runtime expectations.
+
 ## Usage
 
 ### Python
