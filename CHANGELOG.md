@@ -3,9 +3,30 @@
 This changelog is reconstructed from the repository's local tags, README,
 package metadata, and commit history.
 
-## 9.0.0 (Unreleased)
+## 9.1.0 (Unreleased)
 
-Upcoming major release aligned with the current `pyproject.toml` version.
+- Environments:
+  - Expanded validated Super Mario Bros. 3 single-stage entry points from
+    World 1-1 to World 1-1, 1-2, 1-4, and 1-6.
+  - Added `smb3_stage_matrix()` and `SMB3Stage` so curriculum, evaluation,
+    and tooling code can inspect SMB3 numbered-course metadata separately from
+    the registered reset-entry surface.
+  - Exposed the validated SMB3 entries through Gymnasium registration and
+    `MarioTask` task metadata.
+- Compatibility and maintenance:
+  - Raised the `nes-py` dependency floor to `nes-py>=9.0.1` and switched the
+    developer bootstrap requirements to the PyPI release.
+  - Added SMB3 status-bar render regression coverage for the MMC3 timing fix
+    supplied by `nes-py` 9.0.1.
+- Documentation and tests:
+  - Documented the SMB3 stage matrix helper and currently validated SMB3
+    single-stage environments.
+  - Added tests for SMB3 stage metadata, validated reset entry points,
+    registration, and task inventory filters.
+
+## 9.0.0 (2026-06-10)
+
+Major release aligned with the `pyproject.toml` package metadata.
 
 - Breaking changes:
   - Migrated the package from the legacy Gym API to Gymnasium.

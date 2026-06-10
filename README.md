@@ -100,11 +100,14 @@ import gym_super_mario_bros
 tasks = gym_super_mario_bros.all_tasks(single_stage=True)
 env_ids = gym_super_mario_bros.task_ids(game_family='smb1')
 task = gym_super_mario_bros.task_for_env_id('SuperMarioBros-4-2-v0')
+smb3_stages = gym_super_mario_bros.smb3_stage_matrix()
 ```
 
 Each `MarioTask` includes the environment ID, canonical task ID, game family,
 ROM mode, world/stage, public world label, split flags, and alias metadata for
 separator-free SMB1 IDs such as `SuperMarioBros1-1-v0`.
+The SMB3 stage matrix catalogs the numbered vanilla courses separately from
+the smaller set of validated single-stage reset entry points.
 
 ### Command Line
 
@@ -184,8 +187,13 @@ where `<world>` is a number in {1, 2, 3, 4, 5, 6, 7}. Worlds 1 through 6 have
 stages {1, 2, 3}; world 7 has stages {1, 2}.
 
 Super Mario Bros. 3 uses the vanilla ROM only. Use `SuperMarioBros3-v0` for
-the game, or `SuperMarioBros3-1-1-v0` for the validated World 1-1 single-stage
-entry point.
+the game, or the currently validated single-stage entry points
+`SuperMarioBros3-1-1-v0`, `SuperMarioBros3-1-2-v0`,
+`SuperMarioBros3-1-4-v0`, and `SuperMarioBros3-1-6-v0`.
+
+The helper `gym_super_mario_bros.smb3_stage_matrix()` returns catalog metadata
+for SMB3's numbered courses. Pass `validated=True` to limit the catalog to
+single-stage entries that are registered and smoke-tested.
 
 ## Step
 

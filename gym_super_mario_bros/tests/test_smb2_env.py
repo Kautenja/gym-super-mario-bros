@@ -208,6 +208,21 @@ class ShouldRewardSuperMarioBros2UsaMovement(TestCase):
         finally:
             env.close()
 
+    def test_vertical_page_wrap_does_not_pollute_progress_max(self):
+        env = SuperMarioBros2Env(target=(5, 1), render_mode='rgb_array')
+        try:
+            env.reset()
+            for step in range(96):
+                action = 131 if step % 16 in (8, 9, 10, 11) else 130
+                _, _, terminated, truncated, info = env.step(action)
+                self.assertFalse(terminated)
+                self.assertFalse(truncated)
+
+            self.assertLess(info['progress_max'], 1000)
+            self.assertLess(info['progress'], 1000)
+        finally:
+            env.close()
+
     def test_backtracking_is_not_penalized_by_progress(self):
         env = SuperMarioBros2Env(render_mode='rgb_array')
         try:
@@ -263,6 +278,37 @@ class ShouldRewardSuperMarioBros2UsaMovement(TestCase):
 
 class ShouldTerminateSuperMarioBros2UsaEnv(TestCase):
     """Test death, game-over, and level-complete termination helpers."""
+
+    def test_stage_env_terminates_when_life_loss_restarts_another_level(self):
+        env = SuperMarioBros2Env(target=(7, 2), render_mode='rgb_array')
+        try:
+            env.reset()
+            terminal_step = None
+
+            for step in range(1, 180):
+                _, reward, terminated, truncated, info = env.step(130)
+                if terminated or truncated:
+                    terminal_step = step, reward, terminated, truncated, info
+                    break
+
+            self.assertIsNotNone(terminal_step)
+            step, reward, terminated, truncated, info = terminal_step
+            self.assertEqual(130, step)
+            self.assertEqual(-15, reward)
+            self.assertTrue(terminated)
+            self.assertFalse(truncated)
+            self.assertTrue(info['death'])
+            self.assertFalse(info['clear'])
+            self.assertEqual(2, info['lives'])
+            self.assertEqual(0, info['level'])
+            self.assertEqual(1, info['world'])
+            self.assertEqual(1, info['stage'])
+            self.assertEqual(0.0, info['reward_components']['health'])
+            self.assertEqual(-25.0, info['reward_components']['death'])
+            self.assertEqual(-25.0, info['reward_total_unclipped'])
+            self.assertEqual(-15.0, info['reward_total_clipped'])
+        finally:
+            env.close()
 
     def test_stage_env_terminates_on_death_and_completion(self):
         env = SuperMarioBros2Env(target=(1, 1), render_mode='rgb_array')

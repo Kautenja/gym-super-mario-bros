@@ -6,13 +6,17 @@ from ..smb3_env import _decode_smb3_target
 
 
 class ShouldDecodeSuperMarioBros3Targets(TestCase):
-    """Test target validation for the validated SMB3 entry point."""
+    """Test target validation for the validated SMB3 entry points."""
 
     def test_none_target(self):
         self.assertEqual((None, None), _decode_smb3_target(None))
 
     def test_world_1_stage_1_target(self):
         self.assertEqual((1, 1), _decode_smb3_target((1, 1)))
+
+    def test_validated_world_1_targets(self):
+        for stage in (2, 4, 6):
+            self.assertEqual((1, stage), _decode_smb3_target((1, stage)))
 
     def test_invalid_target_type(self):
         self.assertRaises(TypeError, _decode_smb3_target, '1-1')
@@ -29,7 +33,9 @@ class ShouldDecodeSuperMarioBros3Targets(TestCase):
 
     def test_invalid_stage_bounds(self):
         self.assertRaises(ValueError, _decode_smb3_target, (1, 0))
-        self.assertRaises(ValueError, _decode_smb3_target, (1, 2))
+        self.assertRaises(ValueError, _decode_smb3_target, (1, 3))
+        self.assertRaises(ValueError, _decode_smb3_target, (1, 5))
+        self.assertRaises(ValueError, _decode_smb3_target, (1, 7))
 
 
 class ShouldStepSuperMarioBros3Env(TestCase):
@@ -168,6 +174,77 @@ class ShouldStepSuperMarioBros3StageEnv(TestCase):
         finally:
             env.close()
 
+    def test_validated_world_1_stage_targets(self):
+        for stage in (2, 4, 6):
+            env = SuperMarioBros3Env(target=(1, stage), render_mode='rgb_array')
+            try:
+                self.assertTrue(env.unwrapped.is_single_stage_env)
+                self.assertEqual(1, env.unwrapped._target_world)
+                self.assertEqual(stage, env.unwrapped._target_stage)
+
+                state, reset_info = env.reset()
+                self.assertEqual(env.observation_space.shape, state.shape)
+                self.assertIsInstance(reset_info, dict)
+
+                state, reward, terminated, truncated, info = env.step(0)
+                self.assertEqual(env.observation_space.shape, state.shape)
+                self.assertEqual(0.0, reward)
+                self.assertFalse(terminated)
+                self.assertFalse(truncated)
+                self.assertTrue(info['in_level'])
+                self.assertEqual(1, info['world'])
+                self.assertEqual(stage, info['stage'])
+                self.assertEqual(
+                    'SuperMarioBros3-1-{}-v0'.format(stage),
+                    info['task_id'],
+                )
+                self.assertEqual(1, info['target_world'])
+                self.assertEqual(stage, info['target_stage'])
+            finally:
+                env.close()
+
+
+class ShouldRenderSuperMarioBros3StatusBar(TestCase):
+    """Regression coverage for MMC3 status-bar CHR banking in SMB3."""
+
+    def test_world_1_stage_2_status_bar_tiles_are_stable(self):
+        env = SuperMarioBros3Env(target=(1, 2), render_mode='rgb_array')
+        try:
+            env.reset()
+            state, _, _, _, info = env.step(0)
+            self.assertEqual('SuperMarioBros3-1-2-v0', info['task_id'])
+
+            expected_pixels = {
+                (200, 13): (252, 252, 252),
+                (200, 21): (0, 0, 0),
+                (201, 16): (0, 252, 252),
+                (201, 48): (0, 252, 252),
+                (203, 96): (0, 252, 252),
+                (208, 8): (0, 0, 0),
+                (224, 208): (0, 0, 0),
+                (227, 10): (0, 0, 0),
+            }
+            for (y, x), expected in expected_pixels.items():
+                with self.subTest(pixel=(y, x)):
+                    self.assertEqual(expected, tuple(map(int, state[y, x])))
+        finally:
+            env.close()
+
+    def test_status_bar_baseline_stays_fixed_while_stage_scrolls(self):
+        env = SuperMarioBros3Env(render_mode='rgb_array')
+        try:
+            env.reset(seed=17)
+            for step in range(241):
+                state, _, terminated, truncated, _ = env.step(128)
+                self.assertFalse(terminated)
+                self.assertFalse(truncated)
+                if step in (0, 60, 120, 180, 240):
+                    with self.subTest(step=step):
+                        self.assertEqual((0, 0, 0), tuple(map(int, state[227, 10])))
+                        self.assertEqual((0, 0, 0), tuple(map(int, state[224, 10])))
+        finally:
+            env.close()
+
 
 class ShouldRewardSuperMarioBros3Movement(TestCase):
     """Test position progress reward behavior."""
@@ -249,6 +326,35 @@ class ShouldRewardSuperMarioBros3Movement(TestCase):
 class ShouldTerminateSuperMarioBros3Env(TestCase):
     """Test stage-return, death, and game-over termination helpers."""
 
+    def test_stage_env_step_returns_positive_clear_reward(self):
+        env = SuperMarioBros3Env(target=(1, 1), render_mode='rgb_array')
+        try:
+            env.reset()
+            env.unwrapped._entered_level = True
+            env.unwrapped._life_start = 4
+            env.unwrapped._life_last = 4
+            env.ram[0x0736] = 4
+            env.ram[0x05ee] = 0
+            env.ram[0x05ef] = 0
+            env.ram[0x05f0] = 0
+            env.ram[0x0075] = 0x20
+            env.ram[0x0079] = 0x40
+
+            _, reward, terminated, truncated, info = env.step(0)
+
+            self.assertTrue(terminated)
+            self.assertFalse(truncated)
+            self.assertEqual(15, reward)
+            self.assertTrue(info['flag_get'])
+            self.assertTrue(info['clear'])
+            self.assertFalse(info['death'])
+            self.assertEqual(0.0, info['reward_components']['time'])
+            self.assertEqual(50.0, info['reward_components']['completion'])
+            self.assertEqual(50.0, info['reward_total_unclipped'])
+            self.assertEqual(15.0, info['reward_total_clipped'])
+        finally:
+            env.close()
+
     def test_stage_env_terminates_on_death_and_completion(self):
         env = SuperMarioBros3Env(target=(1, 1), render_mode='rgb_array')
         try:
@@ -284,5 +390,41 @@ class ShouldTerminateSuperMarioBros3Env(TestCase):
 
             env.ram[0x0736] = 0xff
             self.assertTrue(env.unwrapped._get_terminated())
+        finally:
+            env.close()
+
+    def test_full_env_life_loss_returns_to_map_without_clear_latch(self):
+        env = SuperMarioBros3Env(render_mode='rgb_array')
+        try:
+            env.reset()
+            env.ram[0x00b4] = 0xc0
+            death_step = None
+
+            for _ in range(360):
+                _, reward, terminated, truncated, info = env.step(0)
+                if info['death']:
+                    death_step = reward, terminated, truncated, info
+                    break
+
+            self.assertIsNotNone(death_step)
+            reward, terminated, truncated, info = death_step
+            self.assertEqual(-15, reward)
+            self.assertFalse(terminated)
+            self.assertFalse(truncated)
+            self.assertFalse(info['flag_get'])
+            self.assertFalse(info['clear'])
+            self.assertTrue(info['death'])
+            self.assertFalse(info['in_level'])
+            self.assertEqual(3, info['life'])
+
+            _, reward, terminated, truncated, info = env.step(0)
+            self.assertEqual(0.0, reward)
+            self.assertFalse(terminated)
+            self.assertFalse(truncated)
+            self.assertFalse(info['flag_get'])
+            self.assertFalse(info['clear'])
+            self.assertFalse(info['death'])
+            self.assertFalse(info['in_level'])
+            self.assertEqual(3, info['life'])
         finally:
             env.close()

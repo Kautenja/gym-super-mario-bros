@@ -6,10 +6,10 @@ import gym_super_mario_bros
 
 from .. import _registration
 from .._registration import make
+from ..smb3_stages import SMB3_VALIDATED_STAGES
 
 
 _SMB2_USA_STAGES_PER_WORLD = (3, 3, 3, 3, 3, 3, 2)
-_SMB3_STAGE_IDS = ('SuperMarioBros3-1-1-v0',)
 
 
 def _expected_stage_ids():
@@ -44,7 +44,8 @@ def _expected_smb2_usa_stage_ids():
 
 def _expected_smb3_stage_ids():
     """Return the registered Super Mario Bros. 3 stage IDs."""
-    yield from _SMB3_STAGE_IDS
+    for world, stage in SMB3_VALIDATED_STAGES:
+        yield 'SuperMarioBros3-{}-{}-v0'.format(world, stage)
 
 
 class ShouldExposePackageApi(TestCase):
@@ -62,6 +63,8 @@ class ShouldExposePackageApi(TestCase):
                 'SuperMarioBrosEnv',
                 'SuperMarioBros2Env',
                 'SuperMarioBros3Env',
+                'SMB3Stage',
+                'smb3_stage_matrix',
                 'MarioTask',
                 'all_tasks',
                 'task_for_env_id',
@@ -170,14 +173,14 @@ class ShouldRegisterExpectedGymnasiumEnvs(TestCase):
 
     def test_smb3_stage_ids_are_registered(self):
         stage_ids = list(_expected_smb3_stage_ids())
-        self.assertEqual(1, len(stage_ids))
+        self.assertEqual(4, len(stage_ids))
         for env_id in stage_ids:
             spec = gym.spec(env_id)
             self.assertEqual(
                 'gym_super_mario_bros:SuperMarioBros3Env',
                 spec.entry_point,
             )
-            self.assertEqual({'target': (1, 1)}, spec.kwargs)
+            self.assertIn(spec.kwargs['target'], SMB3_VALIDATED_STAGES)
             self._assert_common_registration_policy(env_id)
 
     def test_removed_variant_ids_are_not_registered(self):

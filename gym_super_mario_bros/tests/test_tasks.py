@@ -3,6 +3,9 @@ from unittest import TestCase
 
 from ..tasks import MarioTask
 from ..tasks import all_tasks
+from ..smb3_stages import SMB3_STAGES_PER_WORLD
+from ..smb3_stages import SMB3_VALIDATED_STAGES
+from ..smb3_stages import smb3_stage_matrix
 from ..tasks import task_for_config
 from ..tasks import task_for_env_id
 from ..tasks import task_ids
@@ -15,13 +18,14 @@ class ShouldExposeRegisteredTaskMetadata(TestCase):
         canonical_tasks = all_tasks()
         all_env_ids = task_ids(include_aliases=True)
 
-        self.assertEqual(109, len(canonical_tasks))
-        self.assertEqual(141, len(all_env_ids))
+        self.assertEqual(112, len(canonical_tasks))
+        self.assertEqual(144, len(all_env_ids))
         self.assertIn('SuperMarioBros-v0', all_env_ids)
         self.assertIn('SuperMarioBros1-1-v0', all_env_ids)
         self.assertIn('SuperMarioBros2-D-4-v0', all_env_ids)
         self.assertIn('SuperMarioBros2USA-7-2-v0', all_env_ids)
         self.assertIn('SuperMarioBros3-1-1-v0', all_env_ids)
+        self.assertIn('SuperMarioBros3-1-6-v0', all_env_ids)
         self.assertNotIn('SuperMarioBrosRandomStages-v0', all_env_ids)
 
     def test_task_lookup_by_env_id(self):
@@ -54,14 +58,43 @@ class ShouldExposeRegisteredTaskMetadata(TestCase):
             'SuperMarioBros2USA-7-2-v0',
             task_for_config('smb2_usa', 0, world=7, stage=2).env_id,
         )
+        self.assertEqual(
+            'SuperMarioBros3-1-4-v0',
+            task_for_config('smb3', 0, world=1, stage=4).env_id,
+        )
 
     def test_filters_are_available_for_eval_matrices(self):
         stage_tasks = all_tasks(single_stage=True)
         smb3_tasks = all_tasks(game_family='smb3')
 
-        self.assertEqual(105, len(stage_tasks))
+        self.assertEqual(108, len(stage_tasks))
         self.assertEqual(
-            ('SuperMarioBros3-v0', 'SuperMarioBros3-1-1-v0'),
+            (
+                'SuperMarioBros3-v0',
+                'SuperMarioBros3-1-1-v0',
+                'SuperMarioBros3-1-2-v0',
+                'SuperMarioBros3-1-4-v0',
+                'SuperMarioBros3-1-6-v0',
+            ),
             tuple(task.env_id for task in smb3_tasks),
         )
         self.assertRaises(ValueError, all_tasks, split='unknown')
+
+
+class ShouldExposeSuperMarioBros3StageMatrix(TestCase):
+    """Test the conservative SMB3 numbered-course catalog."""
+
+    def test_matrix_covers_numbered_courses(self):
+        stages = smb3_stage_matrix()
+
+        self.assertEqual(sum(SMB3_STAGES_PER_WORLD), len(stages))
+        self.assertEqual(
+            ('SuperMarioBros3-1-1-v0', 'SuperMarioBros3-1-2-v0'),
+            tuple(stage.env_id for stage in stages[:2]),
+        )
+        self.assertEqual('SuperMarioBros3-8-2-v0', stages[-1].env_id)
+
+    def test_validated_filter_matches_registered_entry_recipes(self):
+        stages = smb3_stage_matrix(validated=True)
+
+        self.assertEqual(SMB3_VALIDATED_STAGES, tuple(stage.target for stage in stages))

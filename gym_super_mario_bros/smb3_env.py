@@ -4,6 +4,7 @@ from collections import defaultdict
 from nes_py import NESEnv
 
 from ._roms import smb3_rom_path
+from .smb3_stages import SMB3_VALIDATED_STAGES
 from .tasks import task_for_config
 
 
@@ -23,6 +24,36 @@ _STATUS_MAP = defaultdict(
 _MAP_START = (0x40, 0x20)
 _WORLD_1_LEVEL_1_PANEL = (0x20, 0x40)
 _WORLD_1_LEVEL_1_JUNCTION = (0x40, 0x40)
+_MAP_PLAYER_Y = 0x0075
+_MAP_PLAYER_X_HI = 0x0077
+_MAP_PLAYER_X = 0x0079
+_MAP_PLAYER_MOVE = 0x007b
+_MAP_PLAYER_DIRECTION = 0x007d
+_MAP_PLAYER_TILE = 0x00e5
+
+
+_SMB3_STAGE_ENTRY_RECIPES = {
+    (1, 1): dict(
+        start=(0x40, 0x40, 0x00, 0x4a, 0x01),
+        action=16,
+        panel=_WORLD_1_LEVEL_1_PANEL,
+    ),
+    (1, 2): dict(
+        start=(0x20, 0x60, 0x00, 0x47, 0x01),
+        action=128,
+        panel=(0x20, 0x80),
+    ),
+    (1, 4): dict(
+        start=(0x40, 0x80, 0x00, 0x46, 0x04),
+        action=128,
+        panel=(0x40, 0xa0),
+    ),
+    (1, 6): dict(
+        start=(0xa0, 0x60, 0x00, 0xa3, 0x01),
+        action=128,
+        panel=(0xa0, 0x80),
+    ),
+}
 
 
 def _decode_smb3_target(target):
@@ -44,13 +75,14 @@ def _decode_smb3_target(target):
     target_world, target_stage = target
     if not isinstance(target_world, int):
         raise TypeError('target_world must be of type: int')
-    if target_world != 1:
-        raise ValueError('target_world must be 1 for Super Mario Bros. 3')
-
     if not isinstance(target_stage, int):
         raise TypeError('target_stage must be of type: int')
-    if target_stage != 1:
-        raise ValueError('target_stage must be 1 for Super Mario Bros. 3')
+    if (target_world, target_stage) not in SMB3_VALIDATED_STAGES:
+        raise ValueError(
+            'target must be one of: {}'.format(
+                ', '.join('{}-{}'.format(*target) for target in SMB3_VALIDATED_STAGES)
+            )
+        )
 
     return target_world, target_stage
 
@@ -88,6 +120,7 @@ class SuperMarioBros3Env(NESEnv):
         self._score_last = 0
         self._status_last = 0
         self._completion_rewarded = False
+        self._life_loss_pending = False
         self._last_reward_components = {}
         self._last_reward_unclipped = 0.0
         self._last_reward_clipped = 0.0
@@ -310,6 +343,7 @@ class SuperMarioBros3Env(NESEnv):
             self._entered_level and
             self._is_on_map and
             not self._is_dying and
+            not self._life_loss_pending and
             not self._is_game_over
         )
 
@@ -342,6 +376,22 @@ class SuperMarioBros3Env(NESEnv):
         """Enter World 1-1 from the World 1 map start."""
         self._walk_map(128, _WORLD_1_LEVEL_1_JUNCTION)
         self._walk_map(16, _WORLD_1_LEVEL_1_PANEL)
+        self._enter_map_panel()
+        self._current_world = 1
+        self._current_stage = 1
+
+    def _write_map_entry_start(self, recipe):
+        """Place Mario on a map path next to the target panel."""
+        y, x, x_hi, tile, direction = recipe['start']
+        self.ram[_MAP_PLAYER_Y] = y
+        self.ram[_MAP_PLAYER_X_HI] = x_hi
+        self.ram[_MAP_PLAYER_X] = x
+        self.ram[_MAP_PLAYER_MOVE] = 0
+        self.ram[_MAP_PLAYER_DIRECTION] = direction
+        self.ram[_MAP_PLAYER_TILE] = tile
+
+    def _enter_map_panel(self):
+        """Enter the currently selected world-map panel."""
         for _ in range(120):
             self._frame_advance(0)
         self._press_and_release(1)
@@ -352,8 +402,18 @@ class SuperMarioBros3Env(NESEnv):
         for _ in range(180):
             self._frame_advance(0)
         self._entered_level = True
-        self._current_world = 1
-        self._current_stage = 1
+
+    def _enter_target_stage(self):
+        """Enter the configured validated SMB3 stage from the World 1 map."""
+        target = (self._target_world, self._target_stage)
+        recipe = _SMB3_STAGE_ENTRY_RECIPES[target]
+        self._write_map_entry_start(recipe)
+        for _ in range(10):
+            self._frame_advance(0)
+        self._walk_map(recipe['action'], recipe['panel'])
+        self._enter_map_panel()
+        self._current_world = self._target_world
+        self._current_stage = self._target_stage
 
     def _skip_start_screen(self):
         """Skip title and map screens to reach the first playable level."""
@@ -362,7 +422,10 @@ class SuperMarioBros3Env(NESEnv):
         self._advance_until_map_start()
         for _ in range(120):
             self._frame_advance(0)
-        self._enter_world_1_level_1()
+        if self.is_single_stage_env:
+            self._enter_target_stage()
+        else:
+            self._enter_world_1_level_1()
         self._life_start = self._life
         self._life_last = self._life
         self._time_last = self._time
@@ -400,6 +463,9 @@ class SuperMarioBros3Env(NESEnv):
     @property
     def _time_penalty(self):
         """Return the reward for the in-game clock ticking."""
+        if not self._is_in_level:
+            self._time_last = self._time
+            return 0
         _reward = self._time - self._time_last
         self._time_last = self._time
         if _reward > 0:
@@ -507,6 +573,7 @@ class SuperMarioBros3Env(NESEnv):
         self._score_last = 0
         self._status_last = 0
         self._completion_rewarded = False
+        self._life_loss_pending = False
         self._reset_reward_components()
 
     def _did_reset(self):
@@ -519,7 +586,22 @@ class SuperMarioBros3Env(NESEnv):
         self._score_last = self._score
         self._status_last = self._powerup_level
         self._completion_rewarded = False
+        self._life_loss_pending = False
         self._reset_reward_components()
+
+    def _did_step(self, done):
+        """Handle non-terminal map returns after a life loss."""
+        if done:
+            return
+        if self._is_in_level:
+            self._life_loss_pending = False
+            return
+        if self._is_dying and not self._is_game_over:
+            self._life_loss_pending = True
+            self._life_start = self._life
+            self._life_last = self._life
+            self._time_last = self._time
+            self._x_position_max = self._x_position
 
     def _get_reward(self):
         """Return the reward after a step occurs."""
