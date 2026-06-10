@@ -3,7 +3,7 @@
 This changelog is reconstructed from the repository's local tags, README,
 package metadata, and commit history.
 
-## 8.0.0 (Unreleased)
+## 9.0.0 (Unreleased)
 
 Upcoming major release aligned with the current `pyproject.toml` version.
 
@@ -12,6 +12,9 @@ Upcoming major release aligned with the current `pyproject.toml` version.
   - Raised the minimum Python version to 3.13.
   - Raised the runtime dependency floor to `gymnasium>=1.0.0` and
     `nes-py>=9.0.0`.
+  - Removed `SuperMarioBrosRandomStagesEnv`, the
+    `SuperMarioBrosRandomStages-*` environment family, and non-vanilla SMB1
+    and Lost Levels ROM variants.
 - Packaging and publishing:
   - Replaced the legacy `setup.py`-first packaging flow with modern
     `pyproject.toml` metadata.
@@ -21,6 +24,14 @@ Upcoming major release aligned with the current `pyproject.toml` version.
   - Moved CI from Travis CI to GitHub Actions and added Python 3.14 parity.
   - Replaced the old `makefile` workflow with `main.sh`.
   - Clarified wrapper bootstrap metadata and refreshed README usage guidance.
+- Environments:
+  - Added vanilla Super Mario Bros. 2 (USA) support through
+    `SuperMarioBros2USA-v0` and 20 single-stage
+    `SuperMarioBros2USA-<world>-<stage>-v0` environments.
+  - Added vanilla Super Mario Bros. 3 support through `SuperMarioBros3-v0`
+    and the validated `SuperMarioBros3-1-1-v0` single-stage environment.
+  - Enriched SMB1, SMB2 USA, and SMB3 info dictionaries and expanded reward
+    shaping beyond raw rightward velocity.
 
 ## 7.4.0 (2022-06-20)
 

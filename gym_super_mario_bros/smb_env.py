@@ -2,7 +2,9 @@
 from collections import defaultdict
 from nes_py import NESEnv
 from ._roms import decode_target
-from ._roms import rom_path
+from ._roms import smb1_rom_path
+from ._roms import smb2jp_rom_path
+from .tasks import task_for_config
 
 
 # create a dictionary mapping value of status register to string names
@@ -32,7 +34,6 @@ class SuperMarioBrosEnv(NESEnv):
 
     def __init__(
         self,
-        rom_mode='vanilla',
         lost_levels=False,
         target=None,
         render_mode=None,
@@ -41,7 +42,6 @@ class SuperMarioBrosEnv(NESEnv):
         Initialize a new Super Mario Bros environment.
 
         Args:
-            rom_mode (str): the ROM mode to use when loading ROMs from disk
             lost_levels (bool): whether to load the ROM with lost levels.
                 - False: load original Super Mario Bros.
                 - True: load Super Mario Bros. Lost Levels
@@ -52,17 +52,28 @@ class SuperMarioBrosEnv(NESEnv):
             None
 
         """
-        # decode the ROM path based on mode and lost levels flag
-        rom = rom_path(lost_levels, rom_mode)
+        if not isinstance(lost_levels, bool):
+            raise TypeError('lost_levels must be of type: bool')
+        rom = smb2jp_rom_path() if lost_levels else smb1_rom_path()
         # initialize the super object with the ROM path
         super(SuperMarioBrosEnv, self).__init__(rom, render_mode=render_mode)
+        self._rom_mode = 'vanilla'
+        self._rom_version = 0
+        self._lost_levels = lost_levels
         # set the target world, stage, and area variables
         target = decode_target(target, lost_levels)
         self._target_world, self._target_stage, self._target_area = target
         # setup a variable to keep track of the last frames time
         self._time_last = 0
-        # setup a variable to keep track of the last frames x position
-        self._x_position_last = 0
+        # setup variables to keep track of reward shaping state
+        self._x_position_max = 0
+        self._score_last = 0
+        self._coins_last = 0
+        self._status_last = 0
+        self._completion_rewarded = False
+        self._last_reward_components = {}
+        self._last_reward_unclipped = 0.0
+        self._last_reward_clipped = 0.0
         # reset the emulator
         self.reset()
         # skip the start screen
@@ -74,6 +85,35 @@ class SuperMarioBrosEnv(NESEnv):
     def is_single_stage_env(self):
         """Return True if this environment is a stage environment."""
         return self._target_world is not None and self._target_area is not None
+
+    @property
+    def _game(self):
+        """Return the normalized game identifier."""
+        if self._lost_levels:
+            return 'lost_levels'
+        return 'smb1'
+
+    @property
+    def _world_label(self):
+        """Return the public world label for task metadata."""
+        if self._lost_levels and self._world >= 10:
+            return chr(ord('A') + self._world - 10)
+        return str(self._world)
+
+    @property
+    def _task(self):
+        """Return metadata for the current configured task."""
+        world = None
+        stage = None
+        if self.is_single_stage_env:
+            world = self._target_world
+            stage = self._target_stage
+        return task_for_config(
+            self._game,
+            self._rom_version,
+            world=world,
+            stage=stage,
+        )
 
     # MARK: Memory access
 
@@ -189,7 +229,17 @@ class SuperMarioBrosEnv(NESEnv):
     @property
     def _player_status(self):
         """Return the player status as a string."""
-        return _STATUS_MAP[self._read_mem(0x0756)]
+        return _STATUS_MAP[self._status_value]
+
+    @property
+    def _status_value(self):
+        """Return the raw player status value."""
+        return self._read_mem(0x0756)
+
+    @property
+    def _powerup_level(self):
+        """Return a compact powerup level for reward shaping."""
+        return min(self._status_value, 2)
 
     @property
     def _player_state(self):
@@ -263,6 +313,11 @@ class SuperMarioBrosEnv(NESEnv):
         """Return a boolean determining if the agent reached a flag."""
         return self._is_world_over or self._is_stage_over
 
+    @property
+    def _enemy_types(self):
+        """Return the currently loaded enemy type bytes."""
+        return tuple(self._read_mem(address) for address in _ENEMY_TYPE_ADDRESSES)
+
     # MARK: RAM Hacks
 
     def _write_stage(self):
@@ -309,6 +364,11 @@ class SuperMarioBrosEnv(NESEnv):
             self._time_last = self._time
             self._frame_advance(8)
             self._frame_advance(0)
+        self._x_position_max = self._x_position
+        self._score_last = self._score
+        self._coins_last = self._coins
+        self._status_last = self._powerup_level
+        self._completion_rewarded = False
 
     def _skip_end_of_world(self):
         """Skip the cutscene that plays at the end of a world."""
@@ -330,16 +390,14 @@ class SuperMarioBrosEnv(NESEnv):
     # MARK: Reward Function
 
     @property
-    def _x_reward(self):
-        """Return the reward based on left right movement between steps."""
-        _reward = self._x_position - self._x_position_last
-        self._x_position_last = self._x_position
-        # TODO: check whether this is still necessary
-        # resolve an issue where after death the x position resets. The x delta
-        # is typically has at most magnitude of 3, 5 is a safe bound
-        if _reward < -5 or _reward > 5:
+    def _progress_reward(self):
+        """Return the reward for reaching a new best horizontal position."""
+        _reward = self._x_position - self._x_position_max
+        if _reward <= 0:
             return 0
-
+        self._x_position_max = self._x_position
+        if _reward > 5:
+            return 0
         return _reward
 
     @property
@@ -362,17 +420,120 @@ class SuperMarioBrosEnv(NESEnv):
 
         return 0
 
+    @property
+    def _score_reward(self):
+        """Return the reward for increasing the in-game score."""
+        _reward = self._score - self._score_last
+        self._score_last = self._score
+        if _reward <= 0:
+            return 0
+        return _reward / 100
+
+    @property
+    def _coin_reward(self):
+        """Return the reward for collecting coins."""
+        _reward = self._coins - self._coins_last
+        if _reward < -50:
+            _reward += 100
+        self._coins_last = self._coins
+        if _reward <= 0:
+            return 0
+        return _reward * 5
+
+    @property
+    def _powerup_reward(self):
+        """Return the reward for powerup gains and losses."""
+        _reward = self._powerup_level - self._status_last
+        self._status_last = self._powerup_level
+        return _reward * 5
+
+    @property
+    def _completion_reward(self):
+        """Return the reward for completing a stage."""
+        if self._flag_get and not self._completion_rewarded:
+            self._completion_rewarded = True
+            return 50
+        return 0
+
+    def _clip_reward_value(self, reward):
+        """Return reward clamped to the public reward range."""
+        return max(self.reward_range[0], min(self.reward_range[1], reward))
+
+    def _store_reward_components(self, components):
+        """Store the last per-step reward diagnostics."""
+        self._last_reward_components = {
+            key: float(value)
+            for key, value in components.items()
+        }
+        self._last_reward_unclipped = float(sum(self._last_reward_components.values()))
+        self._last_reward_clipped = float(
+            self._clip_reward_value(self._last_reward_unclipped)
+        )
+
+    def _reset_reward_components(self):
+        """Reset per-step reward diagnostics."""
+        self._last_reward_components = dict(
+            progress=0.0,
+            time=0.0,
+            score=0.0,
+            coins=0.0,
+            powerup=0.0,
+            completion=0.0,
+            death=0.0,
+        )
+        self._last_reward_unclipped = 0.0
+        self._last_reward_clipped = 0.0
+
+    def _reward_info(self):
+        """Return reward diagnostics for the info dictionary."""
+        return dict(
+            reward_components=dict(self._last_reward_components),
+            reward_total_unclipped=self._last_reward_unclipped,
+            reward_total_clipped=self._last_reward_clipped,
+        )
+
+    def _normalized_info(self):
+        """Return cross-game metrics for training and evaluation code."""
+        task = self._task
+        death = self._is_dying or self._is_dead
+        return dict(
+            clear=self._flag_get,
+            death=death,
+            game=task.game,
+            game_family=task.game_family,
+            lives=self._life,
+            progress=self._x_position,
+            progress_max=self._x_position_max,
+            rom_mode=self._rom_mode,
+            single_stage=self.is_single_stage_env,
+            task_id=task.task_id,
+            target_stage=self._target_stage,
+            target_world=self._target_world,
+            timeout=False,
+            world_label=self._world_label,
+        )
+
     # MARK: nes-py API calls
 
     def _will_reset(self):
         """Handle and RAM hacking before a reset occurs."""
         self._time_last = 0
-        self._x_position_last = 0
+        self._x_position_max = 0
+        self._score_last = 0
+        self._coins_last = 0
+        self._status_last = 0
+        self._completion_rewarded = False
+        self._reset_reward_components()
 
     def _did_reset(self):
         """Handle any RAM hacking after a reset occurs."""
         self._time_last = self._time
-        self._x_position_last = self._x_position
+        self._x_position_max = self._x_position
+        self._score_last = self._score
+        self._coins_last = self._coins
+        self._status_last = self._powerup_level
+        self._completion_rewarded = False
+        self._reset_reward_components()
 
     def _did_step(self, done):
         """
@@ -402,7 +563,18 @@ class SuperMarioBrosEnv(NESEnv):
 
     def _get_reward(self):
         """Return the reward after a step occurs."""
-        return self._x_reward + self._time_penalty + self._death_penalty
+        self._store_reward_components(
+            dict(
+                progress=self._progress_reward,
+                time=self._time_penalty,
+                score=self._score_reward,
+                coins=self._coin_reward,
+                powerup=self._powerup_reward,
+                completion=self._completion_reward,
+                death=self._death_penalty,
+            )
+        )
+        return self._last_reward_unclipped
 
     def _get_terminated(self):
         """Return True if the episode is over, False otherwise."""
@@ -412,18 +584,36 @@ class SuperMarioBrosEnv(NESEnv):
 
     def _get_info(self):
         """Return the info after a step occurs"""
-        return dict(
+        info = dict(
+            area=self._area,
             coins=self._coins,
+            enemy_types=self._enemy_types,
             flag_get=self._flag_get,
+            is_dead=self._is_dead,
+            is_dying=self._is_dying,
+            is_game_over=self._is_game_over,
+            is_stage_over=self._is_stage_over,
+            is_world_over=self._is_world_over,
+            left_x_pos=self._left_x_position,
+            level=self._level,
             life=self._life,
+            player_state=self._player_state,
+            powerup_level=self._powerup_level,
             score=self._score,
             stage=self._stage,
             status=self._player_status,
+            status_value=self._status_value,
             time=self._time,
             world=self._world,
             x_pos=self._x_position,
+            x_pos_max=self._x_position_max,
+            y_pixel=self._y_pixel,
             y_pos=self._y_position,
+            y_viewport=self._y_viewport,
         )
+        info.update(self._normalized_info())
+        info.update(self._reward_info())
+        return info
 
 
 # explicitly define the outward facing API of this module

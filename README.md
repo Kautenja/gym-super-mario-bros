@@ -17,11 +17,10 @@
 [python-version]: https://img.shields.io/pypi/pyversions/gym-super-mario-bros.svg
 [python-home]: https://python.org
 
-![Mario](https://user-images.githubusercontent.com/2184469/40949613-7542733a-6834-11e8-895b-ce1cc3af9dbb.gif)
-
 A [Gymnasium](https://gymnasium.farama.org/) environment for
-Super Mario Bros. & Super Mario Bros. 2 (Lost Levels) on The Nintendo
-Entertainment System (NES) using
+Super Mario Bros., Super Mario Bros. 2 (Lost Levels), and Super Mario
+Bros. 2 (USA), and Super Mario Bros. 3 on The Nintendo Entertainment System
+(NES) using
 [the nes-py emulator](https://github.com/Kautenja/nes-py).
 
 `gym-super-mario-bros` targets Gymnasium's modern reset, step, render-mode,
@@ -89,6 +88,24 @@ with external time truncation, which returns `truncated=True`.
 **NOTE:** remove calls to `render` in training code for a nontrivial
 speedup.
 
+### Task Metadata
+
+`gym_super_mario_bros` exposes lightweight task metadata for curriculum,
+conditioning, and evaluation-matrix code without constructing ROM-backed
+environments:
+
+```python
+import gym_super_mario_bros
+
+tasks = gym_super_mario_bros.all_tasks(single_stage=True)
+env_ids = gym_super_mario_bros.task_ids(game_family='smb1')
+task = gym_super_mario_bros.task_for_env_id('SuperMarioBros-4-2-v0')
+```
+
+Each `MarioTask` includes the environment ID, canonical task ID, game family,
+ROM mode, world/stage, public world label, split flags, and alias metadata for
+separator-free SMB1 IDs such as `SuperMarioBros1-1-v0`.
+
 ### Command Line
 
 `gym_super_mario_bros` features a command line interface for playing
@@ -124,9 +141,6 @@ Print the CLI help with:
 python -m gym_super_mario_bros --help
 ```
 
-**NOTE:** `SuperMarioBrosRandomStages-*` support the `--stages/-S` flag for
-supplying the set of stages to sample from like `-S 1-4 2-4 3-4 4-4`.
-
 ## Environments
 
 These environments allow 3 attempts (lives) to make it through the 32 stages
@@ -136,21 +150,12 @@ to an agent nor can an agent perform actions during these instances. If a
 cut-scene is not able to be skipped by hacking the NES's RAM, the environment
 will lock the Python process until the emulator is ready for the next action.
 
-| Environment                     | Game | ROM           | Screenshot |
-|:--------------------------------|:-----|:--------------|:-----------|
-| `SuperMarioBros-v0`             | SMB  | standard      | ![][v0]    |
-| `SuperMarioBros-v1`             | SMB  | downsample    | ![][v1]    |
-| `SuperMarioBros-v2`             | SMB  | pixel         | ![][v2]    |
-| `SuperMarioBros-v3`             | SMB  | rectangle     | ![][v3]    |
-| `SuperMarioBros2-v0`            | SMB2 | standard      | ![][2-v0]  |
-| `SuperMarioBros2-v1`            | SMB2 | downsample    | ![][2-v1]  |
-
-[v0]: https://user-images.githubusercontent.com/2184469/40948820-3d15e5c2-6830-11e8-81d4-ecfaffee0a14.png
-[v1]: https://user-images.githubusercontent.com/2184469/40948819-3cff6c48-6830-11e8-8373-8fad1665ac72.png
-[v2]: https://user-images.githubusercontent.com/2184469/40948818-3cea09d4-6830-11e8-8efa-8f34d8b05b11.png
-[v3]: https://user-images.githubusercontent.com/2184469/40948817-3cd6600a-6830-11e8-8abb-9cee6a31d377.png
-[2-v0]: https://user-images.githubusercontent.com/2184469/40948822-3d3b8412-6830-11e8-860b-af3802f5373f.png
-[2-v1]: https://user-images.githubusercontent.com/2184469/40948821-3d2d61a2-6830-11e8-8789-a92e750aa9a8.png
+| Environment                     | Game | ROM           |
+|:--------------------------------|:-----|:--------------|
+| `SuperMarioBros-v0`             | SMB  | standard      |
+| `SuperMarioBros2-v0`            | SMB2 | standard      |
+| `SuperMarioBros2USA-v0`         | SMB2 USA | standard  |
+| `SuperMarioBros3-v0`            | SMB3 | standard      |
 
 ### Individual Stages
 
@@ -165,46 +170,22 @@ where:
 
 -   `<world>` is a number in {1, 2, 3, 4, 5, 6, 7, 8} indicating the world
 -   `<stage>` is a number in {1, 2, 3, 4} indicating the stage within a world
--   `<version>` is a number in {0, 1, 2, 3} specifying the ROM mode to use
-    - 0: standard ROM
-    - 1: downsampled ROM
-    - 2: pixel ROM
-    - 3: rectangle ROM
+-   `<version>` is 0 for the standard ROM
 
-For example, to play 4-2 on the downsampled ROM, you would use the environment
-id `SuperMarioBros-4-2-v1`.
+For example, to play 4-2 on the standard ROM, you would use the environment
+id `SuperMarioBros-4-2-v0`.
 
-### Random Stage Selection
+Super Mario Bros. 2 (USA) uses the vanilla ROM only. Use
+`SuperMarioBros2USA-v0` for the full game, or the template
 
-The random stage selection environment randomly selects a stage and allows a
-single attempt to clear it. Upon a death and subsequent call to `reset` the
-environment randomly selects a new stage. This is only available for the
-standard Super Mario Bros. game, _not_ Lost Levels (at the moment). To use
-these environments, append `RandomStages` to the `SuperMarioBros` id. For
-example, to use the standard ROM with random stage selection use
-`SuperMarioBrosRandomStages-v0`. To seed the random stage selection pass the
-`seed` keyword argument to the `reset` method directly like `reset(seed=222)`.
+    SuperMarioBros2USA-<world>-<stage>-v0
 
-In addition to randomly selecting any of the 32 original stages, a subset of
-user-defined stages can be specified to limit the random choice of stages to a
-specific subset. For example, the stage selector could be limited to only
-sample castle stages, water levels, underground, and more.
+where `<world>` is a number in {1, 2, 3, 4, 5, 6, 7}. Worlds 1 through 6 have
+stages {1, 2, 3}; world 7 has stages {1, 2}.
 
-To specify a default subset of stages to randomly sample from, create a list
-of each stage to allow to be sampled and pass that list to the `gymnasium.make()`
-function. For example:
-
-```python
-gym.make('SuperMarioBrosRandomStages-v0', stages=['1-4', '2-4', '3-4', '4-4'])
-```
-
-The example above will sample a random stage from 1-4, 2-4, 3-4, and 4-4 upon
-every call to `reset`. A reset call can also override the subset for one
-episode:
-
-```python
-state, info = env.reset(seed=222, options={'stages': ['4-2']})
-```
+Super Mario Bros. 3 uses the vanilla ROM only. Use `SuperMarioBros3-v0` for
+the game, or `SuperMarioBros3-1-1-v0` for the validated World 1-1 single-stage
+entry point.
 
 ## Step
 
@@ -212,51 +193,56 @@ Info about the rewards and info returned by the `step` method.
 
 ### Reward Function
 
-The reward function assumes the objective of the game is to move as far right
-as possible (increase the agent's _x_ value), as fast as possible, without
-dying. To model this game, three separate variables compose the reward:
-
-1.  _v_: the difference in agent _x_ values between states
-    -   in this case this is instantaneous velocity for the given step
-    -   _v = x1 - x0_
-        -   _x0_ is the x position before the step
-        -   _x1_ is the x position after the step
-    -   moving right ⇔ _v > 0_
-    -   moving left ⇔ _v < 0_
-    -   not moving ⇔ _v = 0_
-2.  _c_: the difference in the game clock between frames
-    -   the penalty prevents the agent from standing still
-    -   _c = c0 - c1_
-        -   _c0_ is the clock reading before the step
-        -   _c1_ is the clock reading after the step
-    -   no clock tick ⇔ _c = 0_
-    -   clock tick ⇔ _c < 0_
-3.  _d_: a death penalty that penalizes the agent for dying in a state
-    -   this penalty encourages the agent to avoid death
-    -   alive ⇔ _d = 0_
-    -   dead ⇔ _d = -15_
-
-_r = v + c + d_
+The reward function combines dense progress with objective events. Progress is
+rewarded only when the agent reaches a new best position for the attempt, so
+tactical backtracking is not punished by the movement term. Score increases,
+coins, cherries, powerups, health changes, level completion, time pressure, and
+death penalties are then added when the underlying game exposes reliable RAM
+counters for that title.
 
 The reward is clipped into the range _(-15, 15)_.
+The `info` dictionary also includes `reward_components`,
+`reward_total_unclipped`, and `reward_total_clipped` so training code can log or
+choose alternate reward transforms without recomputing RAM-dependent shaping.
 
 ### `info` dictionary
 
 The `info` dictionary returned by the `step` method contains the following
 keys:
 
-| Key        | Type   | Description
-|:-----------|:-------|:------------------------------------------------------|
-| `coins   ` | `int`  | The number of collected coins
-| `flag_get` | `bool` | True if Mario reached a flag or ax
-| `life`     | `int`  | The number of lives left, i.e., _{3, 2, 1}_
-| `score`    | `int`  | The cumulative in-game score
-| `stage`    | `int`  | The current stage, i.e., _{1, ..., 4}_
-| `status`   | `str`  | Mario's status, i.e., _{'small', 'tall', 'fireball'}_
-| `time`     | `int`  | The time left on the clock
-| `world`    | `int`  | The current world, i.e., _{1, ..., 8}_
-| `x_pos`    | `int`  | Mario's _x_ position in the stage (from the left)
-| `y_pos`    | `int`  | Mario's _y_ position in the stage (from the bottom)
+| Key | Type | Description |
+|:----|:-----|:------------|
+| `coins` | `int` | The number of collected coins where available |
+| `flag_get` | `bool` | True if Mario reached a flag, ax, or stage-complete state |
+| `life` | `int` | The title-specific displayed life count |
+| `score` | `int` | The cumulative in-game score where available |
+| `stage` | `int` | The current stage |
+| `status` | `str` | Mario's title-specific powerup status |
+| `time` | `int` | The time left on the clock where available |
+| `world` | `int` | The current world |
+| `x_pos` | `int` | Mario's horizontal position where available |
+| `y_pos` | `int` | Mario's vertical position where available |
+| `clear` | `bool` | Cross-game completion flag for the active stage/task |
+| `death` | `bool` | Cross-game death/life-loss flag |
+| `game` | `str` | Normalized game identifier such as `smb1` or `smb3` |
+| `game_family` | `str` | Grouping key for task suites and evaluation matrices |
+| `progress` | `int` | Cross-game progress metric used by the reward function |
+| `progress_max` | `int` | Best progress reached during the current attempt |
+| `rom_mode` | `str` | ROM mode, currently `vanilla` for registered environments |
+| `single_stage` | `bool` | True for single-stage registered tasks |
+| `task_id` | `str` | Canonical task ID suitable for task conditioning |
+| `target_world` | `int` or `None` | Configured target world for single-stage tasks |
+| `target_stage` | `int` or `None` | Configured target stage for single-stage tasks |
+| `timeout` | `bool` | Reserved cross-game timeout flag; external Gymnasium `TimeLimit` still sets `truncated=True` |
+| `world_label` | `str` | Public world label, including Lost Levels bonus worlds |
+| `reward_components` | `dict` | Per-step shaped reward terms before clipping |
+| `reward_total_unclipped` | `float` | Per-step shaped reward before `reward_range` clipping |
+| `reward_total_clipped` | `float` | Per-step shaped reward after `reward_range` clipping |
+
+Newer SMB2 USA and SMB3 environments include additional game-specific keys
+such as raw transition state, health, lives, map position, powerup timers,
+P-meter state, invulnerability timers, and progress maxima where those values
+are available from the ROM's RAM map.
 
 ## Publishing
 

@@ -4,12 +4,9 @@ from .._roms.decode_target import decode_target
 from ..smb_env import SuperMarioBrosEnv
 
 
-class ShouldRaiseErrorOnInvalidRomMode(TestCase):
+class ShouldRejectRomModeArgument(TestCase):
     def test(self):
-        self.assertRaises(ValueError, SuperMarioBrosEnv, rom_mode=-1)
-        self.assertRaises(ValueError, SuperMarioBrosEnv, rom_mode=5)
-        self.assertRaises(ValueError, SuperMarioBrosEnv, rom_mode=-1, lost_levels=True)
-        self.assertRaises(ValueError, SuperMarioBrosEnv, rom_mode=5, lost_levels=True)
+        self.assertRaises(TypeError, SuperMarioBrosEnv, rom_mode='vanilla')
 
 
 class ShouldRaiseErrorOnInvalidTypeLostLevels(TestCase):
@@ -89,6 +86,49 @@ class ShouldStepGameEnv(TestCase):
         self.assertEqual(1, i['stage'])
         self.assertEqual(400, i['time'])
         self.assertEqual(40, i['x_pos'])
+        self.assertEqual(1, i['area'])
+        self.assertEqual((0, 0, 0, 0, 0), i['enemy_types'])
+        self.assertFalse(i['is_dead'])
+        self.assertFalse(i['is_dying'])
+        self.assertFalse(i['is_game_over'])
+        self.assertFalse(i['is_stage_over'])
+        self.assertFalse(i['is_world_over'])
+        self.assertEqual(40, i['left_x_pos'])
+        self.assertEqual(0, i['level'])
+        self.assertEqual(8, i['player_state'])
+        self.assertEqual(0, i['powerup_level'])
+        self.assertEqual(0, i['status_value'])
+        self.assertEqual(40, i['x_pos_max'])
+        self.assertEqual(176, i['y_pixel'])
+        self.assertEqual(79, i['y_pos'])
+        self.assertEqual(1, i['y_viewport'])
+        self.assertFalse(i['clear'])
+        self.assertFalse(i['death'])
+        self.assertEqual('smb1', i['game'])
+        self.assertEqual('smb1', i['game_family'])
+        self.assertEqual(40, i['progress'])
+        self.assertEqual(40, i['progress_max'])
+        self.assertEqual('vanilla', i['rom_mode'])
+        self.assertFalse(i['single_stage'])
+        self.assertEqual('SuperMarioBros-v0', i['task_id'])
+        self.assertFalse(i['timeout'])
+        self.assertEqual('1', i['world_label'])
+        self.assertIsNone(i['target_world'])
+        self.assertIsNone(i['target_stage'])
+        self.assertEqual(0.0, i['reward_total_unclipped'])
+        self.assertEqual(0.0, i['reward_total_clipped'])
+        self.assertEqual(
+            {
+                'progress',
+                'time',
+                'score',
+                'coins',
+                'powerup',
+                'completion',
+                'death',
+            },
+            set(i['reward_components']),
+        )
         env.close()
 
 
@@ -120,4 +160,74 @@ class ShouldStepStageEnv(TestCase):
         self.assertEqual(2, i['stage'])
         self.assertEqual(400, i['time'])
         self.assertEqual(40, i['x_pos'])
+        self.assertEqual(13, i['level'])
+        self.assertEqual(40, i['x_pos_max'])
+        self.assertFalse(i['clear'])
+        self.assertFalse(i['death'])
+        self.assertEqual('smb1', i['game'])
+        self.assertEqual(40, i['progress'])
+        self.assertEqual(40, i['progress_max'])
+        self.assertTrue(i['single_stage'])
+        self.assertEqual('SuperMarioBros-4-2-v0', i['task_id'])
+        self.assertEqual(4, i['target_world'])
+        self.assertEqual(2, i['target_stage'])
         env.close()
+
+
+class ShouldRewardSuperMarioBrosObjectives(TestCase):
+    """Test objective reward shaping for SMB1 and Lost Levels."""
+
+    def test_new_best_progress_does_not_penalize_backtracking(self):
+        env = SuperMarioBrosEnv(render_mode='rgb_array')
+        try:
+            env.reset()
+            env.ram[0x0086] = 43
+            self.assertEqual(3, env.unwrapped._progress_reward)
+
+            env.ram[0x0086] = 41
+            self.assertEqual(0, env.unwrapped._progress_reward)
+        finally:
+            env.close()
+
+    def test_score_coin_powerup_and_completion_rewards(self):
+        env = SuperMarioBrosEnv(render_mode='rgb_array')
+        try:
+            env.reset()
+
+            env.unwrapped._score_last = 0
+            env.ram[0x07de:0x07e4] = [0, 0, 0, 1, 0, 0]
+            self.assertEqual(1, env.unwrapped._score_reward)
+
+            env.unwrapped._coins_last = 0
+            env.ram[0x07ed:0x07ef] = [0, 1]
+            self.assertEqual(5, env.unwrapped._coin_reward)
+
+            env.unwrapped._status_last = 0
+            env.ram[0x0756] = 1
+            self.assertEqual(5, env.unwrapped._powerup_reward)
+
+            env.ram[0x0756] = 0
+            self.assertEqual(-5, env.unwrapped._powerup_reward)
+
+            env.ram[0x0016] = 0x31
+            env.ram[0x001d] = 3
+            self.assertEqual(50, env.unwrapped._completion_reward)
+            self.assertEqual(0, env.unwrapped._completion_reward)
+        finally:
+            env.close()
+
+    def test_reward_diagnostics_match_clipped_step_reward(self):
+        env = SuperMarioBrosEnv(render_mode='rgb_array')
+        try:
+            env.reset()
+            env.ram[0x0086] = 43
+
+            reward = env.unwrapped._get_reward()
+            info = env.unwrapped._reward_info()
+
+            self.assertEqual(3.0, reward)
+            self.assertEqual(3.0, info['reward_components']['progress'])
+            self.assertEqual(3.0, info['reward_total_unclipped'])
+            self.assertEqual(3.0, info['reward_total_clipped'])
+        finally:
+            env.close()
