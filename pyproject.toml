@@ -37,7 +37,7 @@ classifiers = [
 ]
 dependencies = [
     "gymnasium>=1.0.0",
-    "nes-py>=9.0.0",
+    "nes-py>=9.0.1",
 ]
 
 [project.scripts]

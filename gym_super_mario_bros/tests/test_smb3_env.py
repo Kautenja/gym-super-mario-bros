@@ -204,6 +204,48 @@ class ShouldStepSuperMarioBros3StageEnv(TestCase):
                 env.close()
 
 
+class ShouldRenderSuperMarioBros3StatusBar(TestCase):
+    """Regression coverage for MMC3 status-bar CHR banking in SMB3."""
+
+    def test_world_1_stage_2_status_bar_tiles_are_stable(self):
+        env = SuperMarioBros3Env(target=(1, 2), render_mode='rgb_array')
+        try:
+            env.reset()
+            state, _, _, _, info = env.step(0)
+            self.assertEqual('SuperMarioBros3-1-2-v0', info['task_id'])
+
+            expected_pixels = {
+                (200, 13): (252, 252, 252),
+                (200, 21): (0, 0, 0),
+                (201, 16): (0, 252, 252),
+                (201, 48): (0, 252, 252),
+                (203, 96): (0, 252, 252),
+                (208, 8): (0, 0, 0),
+                (224, 208): (0, 0, 0),
+                (227, 10): (0, 0, 0),
+            }
+            for (y, x), expected in expected_pixels.items():
+                with self.subTest(pixel=(y, x)):
+                    self.assertEqual(expected, tuple(map(int, state[y, x])))
+        finally:
+            env.close()
+
+    def test_status_bar_baseline_stays_fixed_while_stage_scrolls(self):
+        env = SuperMarioBros3Env(render_mode='rgb_array')
+        try:
+            env.reset(seed=17)
+            for step in range(241):
+                state, _, terminated, truncated, _ = env.step(128)
+                self.assertFalse(terminated)
+                self.assertFalse(truncated)
+                if step in (0, 60, 120, 180, 240):
+                    with self.subTest(step=step):
+                        self.assertEqual((0, 0, 0), tuple(map(int, state[227, 10])))
+                        self.assertEqual((0, 0, 0), tuple(map(int, state[224, 10])))
+        finally:
+            env.close()
+
+
 class ShouldRewardSuperMarioBros3Movement(TestCase):
     """Test position progress reward behavior."""
 
