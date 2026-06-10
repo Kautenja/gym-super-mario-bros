@@ -2,7 +2,8 @@
 from collections import defaultdict
 from nes_py import NESEnv
 from ._roms import decode_target
-from ._roms import rom_path
+from ._roms import smb1_rom_path
+from ._roms import smb2jp_rom_path
 
 
 # create a dictionary mapping value of status register to string names
@@ -32,7 +33,6 @@ class SuperMarioBrosEnv(NESEnv):
 
     def __init__(
         self,
-        rom_mode='vanilla',
         lost_levels=False,
         target=None,
         render_mode=None,
@@ -41,7 +41,6 @@ class SuperMarioBrosEnv(NESEnv):
         Initialize a new Super Mario Bros environment.
 
         Args:
-            rom_mode (str): the ROM mode to use when loading ROMs from disk
             lost_levels (bool): whether to load the ROM with lost levels.
                 - False: load original Super Mario Bros.
                 - True: load Super Mario Bros. Lost Levels
@@ -52,8 +51,9 @@ class SuperMarioBrosEnv(NESEnv):
             None
 
         """
-        # decode the ROM path based on mode and lost levels flag
-        rom = rom_path(lost_levels, rom_mode)
+        if not isinstance(lost_levels, bool):
+            raise TypeError('lost_levels must be of type: bool')
+        rom = smb2jp_rom_path() if lost_levels else smb1_rom_path()
         # initialize the super object with the ROM path
         super(SuperMarioBrosEnv, self).__init__(rom, render_mode=render_mode)
         # set the target world, stage, and area variables

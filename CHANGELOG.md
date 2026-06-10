@@ -3,7 +3,7 @@
 This changelog is reconstructed from the repository's local tags, README,
 package metadata, and commit history.
 
-## 8.0.0 (Unreleased)
+## 9.0.0 (Unreleased)
 
 Upcoming major release aligned with the current `pyproject.toml` version.
 
@@ -12,6 +12,9 @@ Upcoming major release aligned with the current `pyproject.toml` version.
   - Raised the minimum Python version to 3.13.
   - Raised the runtime dependency floor to `gymnasium>=1.0.0` and
     `nes-py>=9.0.0`.
+  - Removed `SuperMarioBrosRandomStagesEnv`, the
+    `SuperMarioBrosRandomStages-*` environment family, and non-vanilla SMB1
+    and Lost Levels ROM variants.
 - Packaging and publishing:
   - Replaced the legacy `setup.py`-first packaging flow with modern
     `pyproject.toml` metadata.

@@ -8,25 +8,16 @@ from .. import _registration
 from .._registration import make
 
 
-_ROM_MODES = [
-    'vanilla',
-    'downsample',
-    'pixel',
-    'rectangle',
-]
-
-_LOST_LEVELS_ROM_MODES = _ROM_MODES[:2]
 _SMB2_USA_STAGES_PER_WORLD = (3, 3, 3, 3, 3, 3, 2)
 _SMB3_STAGE_IDS = ('SuperMarioBros3-1-1-v0',)
 
 
 def _expected_stage_ids():
     """Return the historical stage IDs plus the separator-free aliases."""
-    for version in range(len(_ROM_MODES)):
-        for world in range(1, 9):
-            for stage in range(1, 5):
-                yield 'SuperMarioBros-{}-{}-v{}'.format(world, stage, version)
-                yield 'SuperMarioBros{}-{}-v{}'.format(world, stage, version)
+    for world in range(1, 9):
+        for stage in range(1, 5):
+            yield 'SuperMarioBros-{}-{}-v0'.format(world, stage)
+            yield 'SuperMarioBros{}-{}-v0'.format(world, stage)
 
 
 def _lost_levels_world_label(world):
@@ -38,15 +29,10 @@ def _lost_levels_world_label(world):
 
 def _expected_lost_levels_stage_ids():
     """Return the registered Lost Levels stage IDs."""
-    for version in range(len(_LOST_LEVELS_ROM_MODES)):
-        for world in range(1, 14):
-            label = _lost_levels_world_label(world)
-            for stage in range(1, 5):
-                yield 'SuperMarioBros2-{}-{}-v{}'.format(
-                    label,
-                    stage,
-                    version,
-                )
+    for world in range(1, 14):
+        label = _lost_levels_world_label(world)
+        for stage in range(1, 5):
+            yield 'SuperMarioBros2-{}-{}-v0'.format(label, stage)
 
 
 def _expected_smb2_usa_stage_ids():
@@ -76,7 +62,6 @@ class ShouldExposePackageApi(TestCase):
                 'SuperMarioBrosEnv',
                 'SuperMarioBros2Env',
                 'SuperMarioBros3Env',
-                'SuperMarioBrosRandomStagesEnv',
             ],
             gym_super_mario_bros.__all__,
         )
@@ -101,38 +86,24 @@ class ShouldRegisterExpectedGymnasiumEnvs(TestCase):
         )
 
     def test_core_ids_are_registered_unchanged(self):
-        for version, rom_mode in enumerate(_ROM_MODES):
-            env_id = 'SuperMarioBros-v{}'.format(version)
-            spec = gym.spec(env_id)
-            self.assertEqual(
-                'gym_super_mario_bros:SuperMarioBrosEnv',
-                spec.entry_point,
-            )
-            self.assertEqual({'rom_mode': rom_mode}, spec.kwargs)
-            self._assert_common_registration_policy(env_id)
-
-            env_id = 'SuperMarioBrosRandomStages-v{}'.format(version)
-            spec = gym.spec(env_id)
-            self.assertEqual(
-                'gym_super_mario_bros:SuperMarioBrosRandomStagesEnv',
-                spec.entry_point,
-            )
-            self.assertEqual({'rom_mode': rom_mode}, spec.kwargs)
-            self._assert_common_registration_policy(env_id)
+        env_id = 'SuperMarioBros-v0'
+        spec = gym.spec(env_id)
+        self.assertEqual(
+            'gym_super_mario_bros:SuperMarioBrosEnv',
+            spec.entry_point,
+        )
+        self.assertEqual({}, spec.kwargs)
+        self._assert_common_registration_policy(env_id)
 
     def test_lost_levels_ids_are_registered_unchanged(self):
-        for version, rom_mode in enumerate(_ROM_MODES[:2]):
-            env_id = 'SuperMarioBros2-v{}'.format(version)
-            spec = gym.spec(env_id)
-            self.assertEqual(
-                'gym_super_mario_bros:SuperMarioBrosEnv',
-                spec.entry_point,
-            )
-            self.assertEqual(
-                {'lost_levels': True, 'rom_mode': rom_mode},
-                spec.kwargs,
-            )
-            self._assert_common_registration_policy(env_id)
+        env_id = 'SuperMarioBros2-v0'
+        spec = gym.spec(env_id)
+        self.assertEqual(
+            'gym_super_mario_bros:SuperMarioBrosEnv',
+            spec.entry_point,
+        )
+        self.assertEqual({'lost_levels': True}, spec.kwargs)
+        self._assert_common_registration_policy(env_id)
 
     def test_smb2_usa_id_is_registered(self):
         env_id = 'SuperMarioBros2USA-v0'
@@ -156,20 +127,20 @@ class ShouldRegisterExpectedGymnasiumEnvs(TestCase):
 
     def test_stage_ids_and_aliases_are_registered_unchanged(self):
         stage_ids = list(_expected_stage_ids())
-        self.assertEqual(256, len(stage_ids))
+        self.assertEqual(64, len(stage_ids))
         for env_id in stage_ids:
             spec = gym.spec(env_id)
             self.assertEqual(
                 'gym_super_mario_bros:SuperMarioBrosEnv',
                 spec.entry_point,
             )
-            self.assertIn('rom_mode', spec.kwargs)
+            self.assertNotIn('rom_mode', spec.kwargs)
             self.assertIn('target', spec.kwargs)
             self._assert_common_registration_policy(env_id)
 
     def test_lost_levels_stage_ids_are_registered(self):
         stage_ids = list(_expected_lost_levels_stage_ids())
-        self.assertEqual(104, len(stage_ids))
+        self.assertEqual(52, len(stage_ids))
         for env_id in stage_ids:
             spec = gym.spec(env_id)
             self.assertEqual(
@@ -177,7 +148,7 @@ class ShouldRegisterExpectedGymnasiumEnvs(TestCase):
                 spec.entry_point,
             )
             self.assertTrue(spec.kwargs['lost_levels'])
-            self.assertIn('rom_mode', spec.kwargs)
+            self.assertNotIn('rom_mode', spec.kwargs)
             self.assertIn('target', spec.kwargs)
             self._assert_common_registration_policy(env_id)
 
@@ -205,6 +176,22 @@ class ShouldRegisterExpectedGymnasiumEnvs(TestCase):
             self.assertEqual({'target': (1, 1)}, spec.kwargs)
             self._assert_common_registration_policy(env_id)
 
+    def test_removed_variant_ids_are_not_registered(self):
+        for env_id in (
+            'SuperMarioBros-v1',
+            'SuperMarioBros-v2',
+            'SuperMarioBros-v3',
+            'SuperMarioBrosRandomStages-v0',
+            'SuperMarioBrosRandomStages-v1',
+            'SuperMarioBrosRandomStages-v2',
+            'SuperMarioBrosRandomStages-v3',
+            'SuperMarioBros2-v1',
+            'SuperMarioBros-1-1-v1',
+            'SuperMarioBros1-1-v1',
+            'SuperMarioBros2-1-1-v1',
+        ):
+            self.assertNotIn(env_id, gym.envs.registration.registry)
+
 
 class ShouldSmokeRepresentativeRegisteredEnvs(TestCase):
     """Test representative Gymnasium creation, reset, step, render, and close."""
@@ -212,7 +199,6 @@ class ShouldSmokeRepresentativeRegisteredEnvs(TestCase):
     def test(self):
         for env_id in (
             'SuperMarioBros-v0',
-            'SuperMarioBrosRandomStages-v0',
             'SuperMarioBros1-1-v0',
             'SuperMarioBros2USA-v0',
             'SuperMarioBros3-v0',
@@ -250,14 +236,9 @@ class ShouldMakeEnv:
     env_id = None
     # the random seed to apply
     seed = None
-    # the subset of stages to sample from
-    stages = None
 
-    def _test_env(self, env_id, stages):
-        if stages is not None:
-            env = make(env_id, stages=stages, render_mode='rgb_array')
-        else:
-            env = make(env_id, render_mode='rgb_array')
+    def _test_env(self, env_id):
+        env = make(env_id, render_mode='rgb_array')
         reset_result = env.reset(seed=self.seed)
         self.assertEqual(2, len(reset_result))
         state, reset_info = reset_result
@@ -282,51 +263,12 @@ class ShouldMakeEnv:
         env.close()
 
     def test(self):
-        if isinstance(self.env_id, str):
-            self._test_env(self.env_id, self.stages)
-        elif isinstance(self.env_id, list):
-            for env_id in self.env_id:
-                self._test_env(env_id, self.stages)
+        self._test_env(self.env_id)
 
 
 class ShouldMakeSuperMarioBros(ShouldMakeEnv, TestCase):
-    # the environments ID for all versions of Super Mario Bros
-    env_id = ['SuperMarioBros-v{}'.format(v) for v in range(4)]
-
-
-class ShouldMakeSuperMarioBrosRandomStages(ShouldMakeEnv, TestCase):
-    # the random number seed for this environment
-    seed = 1
-    # the amount of time left
-    time = 300
-    # the current world
-    world = 4
-    # the current stage
-    stage = 3
-    # the environments ID for all versions of Super Mario Bros
-    env_id = ['SuperMarioBrosRandomStages-v{}'.format(v) for v in range(4)]
-
-
-class ShouldReproduceSuperMarioBrosRandomStages(TestCase):
-    def _selected_stage(self, seed, options=None):
-        env = make('SuperMarioBrosRandomStages-v0', render_mode='rgb_array')
-        try:
-            _, info = env.reset(seed=seed, options=options)
-            return info['world'], info['stage']
-        finally:
-            env.close()
-
-    def test_fixed_seed_is_reproducible(self):
-        first_stage = self._selected_stage(seed=123)
-        second_stage = self._selected_stage(seed=123)
-        self.assertEqual(first_stage, second_stage)
-
-    def test_options_can_override_stage_subset(self):
-        stage = self._selected_stage(
-            seed=123,
-            options={'stages': ['4-2']},
-        )
-        self.assertEqual((4, 2), stage)
+    # the environment ID for Super Mario Bros
+    env_id = 'SuperMarioBros-v0'
 
 
 class ShouldTruncateWithGymnasiumTimeLimit(TestCase):
@@ -348,33 +290,33 @@ class ShouldTruncateWithGymnasiumTimeLimit(TestCase):
 class ShouldMakeSuperMarioBrosLostLevels(ShouldMakeEnv, TestCase):
     # the amount of time left
     time = 400
-    # the environments ID for all versions of Super Mario Bros
-    env_id = ['SuperMarioBros2-v{}'.format(v) for v in range(2)]
+    # the environment ID for Super Mario Bros. 2 (Japan)
+    env_id = 'SuperMarioBros2-v0'
 
 
 class ShouldMakeLostLevels_5_1(ShouldMakeEnv, TestCase):
     world = 5
     stage = 1
-    env_id = ['SuperMarioBros2-5-1-v{}'.format(v) for v in range(2)]
+    env_id = 'SuperMarioBros2-5-1-v0'
 
 
 class ShouldMakeLostLevels_8_4(ShouldMakeEnv, TestCase):
     world = 8
     stage = 4
-    env_id = ['SuperMarioBros2-8-4-v{}'.format(v) for v in range(2)]
+    env_id = 'SuperMarioBros2-8-4-v0'
 
 
 class ShouldMakeLostLevels_A_2(ShouldMakeEnv, TestCase):
     time = 300
     world = 10
     stage = 2
-    env_id = ['SuperMarioBros2-A-2-v{}'.format(v) for v in range(2)]
+    env_id = 'SuperMarioBros2-A-2-v0'
 
 
 class ShouldMakeLostLevels_D_4(ShouldMakeEnv, TestCase):
     world = 13
     stage = 4
-    env_id = ['SuperMarioBros2-D-4-v{}'.format(v) for v in range(2)]
+    env_id = 'SuperMarioBros2-D-4-v0'
 
 
 class ShouldMakeSuperMarioBros_1_1(ShouldMakeEnv, TestCase):
@@ -383,7 +325,7 @@ class ShouldMakeSuperMarioBros_1_1(ShouldMakeEnv, TestCase):
     # the current stage
     stage = 1
     # the environments ID
-    env_id = ['SuperMarioBros-1-1-v{}'.format(v) for v in range(4)]
+    env_id = 'SuperMarioBros-1-1-v0'
 
 
 class ShouldMakeSuperMarioBrosAlias_1_1(ShouldMakeEnv, TestCase):
@@ -392,7 +334,7 @@ class ShouldMakeSuperMarioBrosAlias_1_1(ShouldMakeEnv, TestCase):
     # the current stage
     stage = 1
     # the environments ID
-    env_id = ['SuperMarioBros1-1-v{}'.format(v) for v in range(4)]
+    env_id = 'SuperMarioBros1-1-v0'
 
 
 class ShouldMakeSuperMarioBros_1_2(ShouldMakeEnv, TestCase):
@@ -401,7 +343,7 @@ class ShouldMakeSuperMarioBros_1_2(ShouldMakeEnv, TestCase):
     # the current stage
     stage = 2
     # the environments ID
-    env_id = ['SuperMarioBros-1-2-v{}'.format(v) for v in range(4)]
+    env_id = 'SuperMarioBros-1-2-v0'
 
 
 class ShouldMakeSuperMarioBros_1_3(ShouldMakeEnv, TestCase):
@@ -412,7 +354,7 @@ class ShouldMakeSuperMarioBros_1_3(ShouldMakeEnv, TestCase):
     # the current stage
     stage = 3
     # the environments ID
-    env_id = ['SuperMarioBros-1-3-v{}'.format(v) for v in range(4)]
+    env_id = 'SuperMarioBros-1-3-v0'
 
 
 class ShouldMakeSuperMarioBros_1_4(ShouldMakeEnv, TestCase):
@@ -423,7 +365,7 @@ class ShouldMakeSuperMarioBros_1_4(ShouldMakeEnv, TestCase):
     # the current stage
     stage = 4
     # the environments ID
-    env_id = ['SuperMarioBros-1-4-v{}'.format(v) for v in range(4)]
+    env_id = 'SuperMarioBros-1-4-v0'
 
 
 class ShouldMakeSuperMarioBros_2_1(ShouldMakeEnv, TestCase):
@@ -432,7 +374,7 @@ class ShouldMakeSuperMarioBros_2_1(ShouldMakeEnv, TestCase):
     # the current stage
     stage = 1
     # the environments ID
-    env_id = ['SuperMarioBros-2-1-v{}'.format(v) for v in range(4)]
+    env_id = 'SuperMarioBros-2-1-v0'
 
 
 class ShouldMakeSuperMarioBros_2_2(ShouldMakeEnv, TestCase):
@@ -441,7 +383,7 @@ class ShouldMakeSuperMarioBros_2_2(ShouldMakeEnv, TestCase):
     # the current stage
     stage = 2
     # the environments ID
-    env_id = ['SuperMarioBros-2-2-v{}'.format(v) for v in range(4)]
+    env_id = 'SuperMarioBros-2-2-v0'
 
 
 class ShouldMakeSuperMarioBros_2_3(ShouldMakeEnv, TestCase):
@@ -452,7 +394,7 @@ class ShouldMakeSuperMarioBros_2_3(ShouldMakeEnv, TestCase):
     # the current stage
     stage = 3
     # the environments ID
-    env_id = ['SuperMarioBros-2-3-v{}'.format(v) for v in range(4)]
+    env_id = 'SuperMarioBros-2-3-v0'
 
 
 class ShouldMakeSuperMarioBros_2_4(ShouldMakeEnv, TestCase):
@@ -463,7 +405,7 @@ class ShouldMakeSuperMarioBros_2_4(ShouldMakeEnv, TestCase):
     # the current stage
     stage = 4
     # the environments ID
-    env_id = ['SuperMarioBros-2-4-v{}'.format(v) for v in range(4)]
+    env_id = 'SuperMarioBros-2-4-v0'
 
 
 class ShouldMakeSuperMarioBros_3_1(ShouldMakeEnv, TestCase):
@@ -472,7 +414,7 @@ class ShouldMakeSuperMarioBros_3_1(ShouldMakeEnv, TestCase):
     # the current stage
     stage = 1
     # the environments ID
-    env_id = ['SuperMarioBros-3-1-v{}'.format(v) for v in range(4)]
+    env_id = 'SuperMarioBros-3-1-v0'
 
 
 class ShouldMakeSuperMarioBros_3_2(ShouldMakeEnv, TestCase):
@@ -483,7 +425,7 @@ class ShouldMakeSuperMarioBros_3_2(ShouldMakeEnv, TestCase):
     # the current stage
     stage = 2
     # the environments ID
-    env_id = ['SuperMarioBros-3-2-v{}'.format(v) for v in range(4)]
+    env_id = 'SuperMarioBros-3-2-v0'
 
 
 class ShouldMakeSuperMarioBros_3_3(ShouldMakeEnv, TestCase):
@@ -494,7 +436,7 @@ class ShouldMakeSuperMarioBros_3_3(ShouldMakeEnv, TestCase):
     # the current stage
     stage = 3
     # the environments ID
-    env_id = ['SuperMarioBros-3-3-v{}'.format(v) for v in range(4)]
+    env_id = 'SuperMarioBros-3-3-v0'
 
 
 class ShouldMakeSuperMarioBros_3_4(ShouldMakeEnv, TestCase):
@@ -505,7 +447,7 @@ class ShouldMakeSuperMarioBros_3_4(ShouldMakeEnv, TestCase):
     # the current stage
     stage = 4
     # the environments ID
-    env_id = ['SuperMarioBros-3-4-v{}'.format(v) for v in range(4)]
+    env_id = 'SuperMarioBros-3-4-v0'
 
 
 class ShouldMakeSuperMarioBros_4_1(ShouldMakeEnv, TestCase):
@@ -514,7 +456,7 @@ class ShouldMakeSuperMarioBros_4_1(ShouldMakeEnv, TestCase):
     # the current stage
     stage = 1
     # the environments ID
-    env_id = ['SuperMarioBros-4-1-v{}'.format(v) for v in range(4)]
+    env_id = 'SuperMarioBros-4-1-v0'
 
 
 class ShouldMakeSuperMarioBros_4_2(ShouldMakeEnv, TestCase):
@@ -523,7 +465,7 @@ class ShouldMakeSuperMarioBros_4_2(ShouldMakeEnv, TestCase):
     # the current stage
     stage = 2
     # the environments ID
-    env_id = ['SuperMarioBros-4-2-v{}'.format(v) for v in range(4)]
+    env_id = 'SuperMarioBros-4-2-v0'
 
 
 class ShouldMakeSuperMarioBros_4_3(ShouldMakeEnv, TestCase):
@@ -534,7 +476,7 @@ class ShouldMakeSuperMarioBros_4_3(ShouldMakeEnv, TestCase):
     # the current stage
     stage = 3
     # the environments ID
-    env_id = ['SuperMarioBros-4-3-v{}'.format(v) for v in range(4)]
+    env_id = 'SuperMarioBros-4-3-v0'
 
 
 class ShouldMakeSuperMarioBros_4_4(ShouldMakeEnv, TestCase):
@@ -543,7 +485,7 @@ class ShouldMakeSuperMarioBros_4_4(ShouldMakeEnv, TestCase):
     # the current stage
     stage = 4
     # the environments ID
-    env_id = ['SuperMarioBros-4-4-v{}'.format(v) for v in range(4)]
+    env_id = 'SuperMarioBros-4-4-v0'
 
 
 class ShouldMakeSuperMarioBros_5_1(ShouldMakeEnv, TestCase):
@@ -554,7 +496,7 @@ class ShouldMakeSuperMarioBros_5_1(ShouldMakeEnv, TestCase):
     # the current stage
     stage = 1
     # the environments ID
-    env_id = ['SuperMarioBros-5-1-v{}'.format(v) for v in range(4)]
+    env_id = 'SuperMarioBros-5-1-v0'
 
 
 class ShouldMakeSuperMarioBros_5_2(ShouldMakeEnv, TestCase):
@@ -563,7 +505,7 @@ class ShouldMakeSuperMarioBros_5_2(ShouldMakeEnv, TestCase):
     # the current stage
     stage = 2
     # the environments ID
-    env_id = ['SuperMarioBros-5-2-v{}'.format(v) for v in range(4)]
+    env_id = 'SuperMarioBros-5-2-v0'
 
 
 class ShouldMakeSuperMarioBros_5_3(ShouldMakeEnv, TestCase):
@@ -574,7 +516,7 @@ class ShouldMakeSuperMarioBros_5_3(ShouldMakeEnv, TestCase):
     # the current stage
     stage = 3
     # the environments ID
-    env_id = ['SuperMarioBros-5-3-v{}'.format(v) for v in range(4)]
+    env_id = 'SuperMarioBros-5-3-v0'
 
 
 class ShouldMakeSuperMarioBros_5_4(ShouldMakeEnv, TestCase):
@@ -585,7 +527,7 @@ class ShouldMakeSuperMarioBros_5_4(ShouldMakeEnv, TestCase):
     # the current stage
     stage = 4
     # the environments ID
-    env_id = ['SuperMarioBros-5-4-v{}'.format(v) for v in range(4)]
+    env_id = 'SuperMarioBros-5-4-v0'
 
 
 class ShouldMakeSuperMarioBros_6_1(ShouldMakeEnv, TestCase):
@@ -594,7 +536,7 @@ class ShouldMakeSuperMarioBros_6_1(ShouldMakeEnv, TestCase):
     # the current stage
     stage = 1
     # the environments ID
-    env_id = ['SuperMarioBros-6-1-v{}'.format(v) for v in range(4)]
+    env_id = 'SuperMarioBros-6-1-v0'
 
 
 class ShouldMakeSuperMarioBros_6_2(ShouldMakeEnv, TestCase):
@@ -603,7 +545,7 @@ class ShouldMakeSuperMarioBros_6_2(ShouldMakeEnv, TestCase):
     # the current stage
     stage = 2
     # the environments ID
-    env_id = ['SuperMarioBros-6-2-v{}'.format(v) for v in range(4)]
+    env_id = 'SuperMarioBros-6-2-v0'
 
 
 class ShouldMakeSuperMarioBros_6_3(ShouldMakeEnv, TestCase):
@@ -614,7 +556,7 @@ class ShouldMakeSuperMarioBros_6_3(ShouldMakeEnv, TestCase):
     # the current stage
     stage = 3
     # the environments ID
-    env_id = ['SuperMarioBros-6-3-v{}'.format(v) for v in range(4)]
+    env_id = 'SuperMarioBros-6-3-v0'
 
 
 class ShouldMakeSuperMarioBros_6_4(ShouldMakeEnv, TestCase):
@@ -625,7 +567,7 @@ class ShouldMakeSuperMarioBros_6_4(ShouldMakeEnv, TestCase):
     # the current stage
     stage = 4
     # the environments ID
-    env_id = ['SuperMarioBros-6-4-v{}'.format(v) for v in range(4)]
+    env_id = 'SuperMarioBros-6-4-v0'
 
 
 class ShouldMakeSuperMarioBros_7_1(ShouldMakeEnv, TestCase):
@@ -634,7 +576,7 @@ class ShouldMakeSuperMarioBros_7_1(ShouldMakeEnv, TestCase):
     # the current stage
     stage = 1
     # the environments ID
-    env_id = ['SuperMarioBros-7-1-v{}'.format(v) for v in range(4)]
+    env_id = 'SuperMarioBros-7-1-v0'
 
 
 class ShouldMakeSuperMarioBros_7_2(ShouldMakeEnv, TestCase):
@@ -643,7 +585,7 @@ class ShouldMakeSuperMarioBros_7_2(ShouldMakeEnv, TestCase):
     # the current stage
     stage = 2
     # the environments ID
-    env_id = ['SuperMarioBros-7-2-v{}'.format(v) for v in range(4)]
+    env_id = 'SuperMarioBros-7-2-v0'
 
 
 class ShouldMakeSuperMarioBros_7_3(ShouldMakeEnv, TestCase):
@@ -654,7 +596,7 @@ class ShouldMakeSuperMarioBros_7_3(ShouldMakeEnv, TestCase):
     # the current stage
     stage = 3
     # the environments ID
-    env_id = ['SuperMarioBros-7-3-v{}'.format(v) for v in range(4)]
+    env_id = 'SuperMarioBros-7-3-v0'
 
 
 class ShouldMakeSuperMarioBros_7_4(ShouldMakeEnv, TestCase):
@@ -663,7 +605,7 @@ class ShouldMakeSuperMarioBros_7_4(ShouldMakeEnv, TestCase):
     # the current stage
     stage = 4
     # the environments ID
-    env_id = ['SuperMarioBros-7-4-v{}'.format(v) for v in range(4)]
+    env_id = 'SuperMarioBros-7-4-v0'
 
 
 class ShouldMakeSuperMarioBros_8_1(ShouldMakeEnv, TestCase):
@@ -674,7 +616,7 @@ class ShouldMakeSuperMarioBros_8_1(ShouldMakeEnv, TestCase):
     # the current stage
     stage = 1
     # the environments ID
-    env_id = ['SuperMarioBros-8-1-v{}'.format(v) for v in range(4)]
+    env_id = 'SuperMarioBros-8-1-v0'
 
 
 class ShouldMakeSuperMarioBros_8_2(ShouldMakeEnv, TestCase):
@@ -683,7 +625,7 @@ class ShouldMakeSuperMarioBros_8_2(ShouldMakeEnv, TestCase):
     # the current stage
     stage = 2
     # the environments ID
-    env_id = ['SuperMarioBros-8-2-v{}'.format(v) for v in range(4)]
+    env_id = 'SuperMarioBros-8-2-v0'
 
 
 class ShouldMakeSuperMarioBros_8_3(ShouldMakeEnv, TestCase):
@@ -694,7 +636,7 @@ class ShouldMakeSuperMarioBros_8_3(ShouldMakeEnv, TestCase):
     # the current stage
     stage = 3
     # the environments ID
-    env_id = ['SuperMarioBros-8-3-v{}'.format(v) for v in range(4)]
+    env_id = 'SuperMarioBros-8-3-v0'
 
 
 class ShouldMakeSuperMarioBros_8_4(ShouldMakeEnv, TestCase):
@@ -703,19 +645,4 @@ class ShouldMakeSuperMarioBros_8_4(ShouldMakeEnv, TestCase):
     # the current stage
     stage = 4
     # the environments ID
-    env_id = ['SuperMarioBros-8-4-v{}'.format(v) for v in range(4)]
-
-
-class ShouldMakeSuperMarioBrosRandomStagesSubset(ShouldMakeEnv, TestCase):
-    # the random number seed for this environment
-    seed = 1
-    # the amount of time left
-    time = 400
-    # the current world
-    world = 4
-    # the current stage
-    stage = 2
-    # the stages to sample from
-    stages = ['4-2']
-    # the environments ID for all versions of Super Mario Bros
-    env_id = ['SuperMarioBrosRandomStages-v{}'.format(v) for v in range(4)]
+    env_id = 'SuperMarioBros-8-4-v0'

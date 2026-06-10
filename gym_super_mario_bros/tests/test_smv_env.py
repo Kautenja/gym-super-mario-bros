@@ -4,12 +4,9 @@ from .._roms.decode_target import decode_target
 from ..smb_env import SuperMarioBrosEnv
 
 
-class ShouldRaiseErrorOnInvalidRomMode(TestCase):
+class ShouldRejectRomModeArgument(TestCase):
     def test(self):
-        self.assertRaises(ValueError, SuperMarioBrosEnv, rom_mode=-1)
-        self.assertRaises(ValueError, SuperMarioBrosEnv, rom_mode=5)
-        self.assertRaises(ValueError, SuperMarioBrosEnv, rom_mode=-1, lost_levels=True)
-        self.assertRaises(ValueError, SuperMarioBrosEnv, rom_mode=5, lost_levels=True)
+        self.assertRaises(TypeError, SuperMarioBrosEnv, rom_mode='vanilla')
 
 
 class ShouldRaiseErrorOnInvalidTypeLostLevels(TestCase):

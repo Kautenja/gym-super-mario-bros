@@ -75,11 +75,6 @@ def _parser():
         dest='progress',
         help='disable the random-mode progress bar',
     )
-    parser.add_argument('--stages', '-S',
-        type=str,
-        nargs='+',
-        help='The random stages to sample from for a random stage env'
-    )
     parser.set_defaults(progress=True)
     return parser
 
@@ -93,8 +88,6 @@ def _get_args(argv=None):
         parser.error('human mode requires graphical rendering')
     if args.mode == 'random' and args.steps <= 0:
         parser.error('--steps must be positive in random mode')
-    if args.stages is not None and 'RandomStages' not in args.env:
-        parser.error('--stages/-S should only be specified for RandomStages environments')
     return args
 
 
@@ -108,8 +101,6 @@ def _render_mode(args):
 def _make_env(args):
     """Build and wrap the environment described by args."""
     kwargs = {'render_mode': _render_mode(args)}
-    if args.stages is not None:
-        kwargs['stages'] = args.stages
     env = gym.make(args.env, **kwargs)
     # wrap the environment with an action space if specified
     if args.actionspace != 'nes':

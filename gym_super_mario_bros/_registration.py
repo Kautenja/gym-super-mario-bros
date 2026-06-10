@@ -15,30 +15,22 @@ _DISABLE_ENV_CHECKER_REASON = (
 )
 
 
-def _register_mario_env(id, is_random=False, **kwargs):
+def _register_mario_env(id, **kwargs):
     """
     Register a Super Mario Bros. (1/2) environment with Gymnasium.
 
     Args:
         id (str): id for the env to register
-        is_random (bool): whether to use the random levels environment
         kwargs (dict): keyword arguments for the SuperMarioBrosEnv initializer
 
     Returns:
         None
 
     """
-    # if the is random flag is set
-    if is_random:
-        # set the entry point to the random level environment
-        entry_point = 'gym_super_mario_bros:SuperMarioBrosRandomStagesEnv'
-    else:
-        # set the entry point to the standard Super Mario Bros. environment
-        entry_point = 'gym_super_mario_bros:SuperMarioBrosEnv'
     # register the environment
     gym.envs.registration.register(
         id=id,
-        entry_point=entry_point,
+        entry_point='gym_super_mario_bros:SuperMarioBrosEnv',
         # Preserve Gymnasium TimeLimit wrapping while keeping the historical
         # registration cap effectively unreachable during normal game play.
         max_episode_steps=_MAX_EPISODE_STEPS,
@@ -96,22 +88,11 @@ def _register_smb3_env(id, **kwargs):
 
 
 # Super Mario Bros.
-_register_mario_env('SuperMarioBros-v0', rom_mode='vanilla')
-_register_mario_env('SuperMarioBros-v1', rom_mode='downsample')
-_register_mario_env('SuperMarioBros-v2', rom_mode='pixel')
-_register_mario_env('SuperMarioBros-v3', rom_mode='rectangle')
-
-
-# Super Mario Bros. Random Levels
-_register_mario_env('SuperMarioBrosRandomStages-v0', is_random=True, rom_mode='vanilla')
-_register_mario_env('SuperMarioBrosRandomStages-v1', is_random=True, rom_mode='downsample')
-_register_mario_env('SuperMarioBrosRandomStages-v2', is_random=True, rom_mode='pixel')
-_register_mario_env('SuperMarioBrosRandomStages-v3', is_random=True, rom_mode='rectangle')
+_register_mario_env('SuperMarioBros-v0')
 
 
 # Super Mario Bros. 2 (Lost Levels)
-_register_mario_env('SuperMarioBros2-v0', lost_levels=True, rom_mode='vanilla')
-_register_mario_env('SuperMarioBros2-v1', lost_levels=True, rom_mode='downsample')
+_register_mario_env('SuperMarioBros2-v0', lost_levels=True)
 
 
 # Super Mario Bros. 2 (USA)
@@ -153,14 +134,6 @@ _ID_TEMPLATE = 'SuperMarioBros{}-{}-{}-v{}'
 # Gymnasium smoke tests and downstream callers may omit the separator between
 # the game name and world number; keep the historical IDs and add aliases.
 _ID_ALIAS_TEMPLATE = 'SuperMarioBros{}-{}-v{}'
-# A list of ROM modes for each level environment
-_ROM_MODES = [
-    'vanilla',
-    'downsample',
-    'pixel',
-    'rectangle'
-]
-_LOST_LEVELS_ROM_MODES = _ROM_MODES[:2]
 _SMB2_USA_STAGES_PER_WORLD = (3, 3, 3, 3, 3, 3, 2)
 
 
@@ -171,36 +144,31 @@ def _lost_levels_world_label(world):
     return chr(ord('A') + world - 10)
 
 
-# iterate over all the rom modes, worlds (1-8), and stages (1-4)
-for version, rom_mode in enumerate(_ROM_MODES):
-    for world in range(1, 9):
-        for stage in range(1, 5):
-            # create the target
-            target = (world, stage)
-            # setup the frame-skipping environment
-            env_id = _ID_TEMPLATE.format('', world, stage, version)
-            _register_mario_stage_env(env_id, rom_mode=rom_mode, target=target)
-            env_id = _ID_ALIAS_TEMPLATE.format(world, stage, version)
-            _register_mario_stage_env(env_id, rom_mode=rom_mode, target=target)
+# iterate over Super Mario Bros. worlds (1-8) and stages (1-4)
+for world in range(1, 9):
+    for stage in range(1, 5):
+        target = (world, stage)
+        env_id = _ID_TEMPLATE.format('', world, stage, 0)
+        _register_mario_stage_env(env_id, target=target)
+        env_id = _ID_ALIAS_TEMPLATE.format(world, stage, 0)
+        _register_mario_stage_env(env_id, target=target)
 
 
-# iterate over Lost Levels rom modes, worlds (1-9, A-D), and stages (1-4)
-for version, rom_mode in enumerate(_LOST_LEVELS_ROM_MODES):
-    for world in range(1, 14):
-        for stage in range(1, 5):
-            target = (world, stage)
-            env_id = _ID_TEMPLATE.format(
-                '2',
-                _lost_levels_world_label(world),
-                stage,
-                version,
-            )
-            _register_mario_stage_env(
-                env_id,
-                lost_levels=True,
-                rom_mode=rom_mode,
-                target=target,
-            )
+# iterate over Lost Levels worlds (1-9, A-D) and stages (1-4)
+for world in range(1, 14):
+    for stage in range(1, 5):
+        target = (world, stage)
+        env_id = _ID_TEMPLATE.format(
+            '2',
+            _lost_levels_world_label(world),
+            stage,
+            0,
+        )
+        _register_mario_stage_env(
+            env_id,
+            lost_levels=True,
+            target=target,
+        )
 
 
 # iterate over Super Mario Bros. 2 (USA) worlds (1-7) and stages

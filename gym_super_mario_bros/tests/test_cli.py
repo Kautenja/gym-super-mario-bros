@@ -72,19 +72,6 @@ class ShouldParseCliOptions(TestCase):
 
         self.assertEqual(2, error.code)
 
-    def test_stages_are_limited_to_random_stage_envs(self):
-        error = _parse_error(['--stages', '1-4'])
-
-        self.assertEqual(2, error.code)
-
-    def test_random_stage_env_accepts_stage_subset(self):
-        args = cli._get_args([
-            '--env', 'SuperMarioBrosRandomStages-v0',
-            '--stages', '1-4', '2-4',
-        ])
-
-        self.assertEqual(['1-4', '2-4'], args.stages)
-
 
 class ShouldBuildCliEnvironment(TestCase):
     """Test cases for creating environments from CLI args."""
@@ -151,24 +138,6 @@ class ShouldBuildCliEnvironment(TestCase):
                 ])
 
         self.assertEqual([{'seed': 123}, {}], env.reset_calls)
-
-    def test_random_stage_subset_is_passed_to_env(self):
-        env = _FakeEnv()
-
-        with patch.object(cli.gym, 'make', return_value=env) as gym_make:
-            with patch.object(cli, 'play_random'):
-                cli.main([
-                    '--mode', 'random',
-                    '--no-render',
-                    '--env', 'SuperMarioBrosRandomStages-v0',
-                    '--stages', '1-4', '2-4',
-                ])
-
-        gym_make.assert_called_once_with(
-            'SuperMarioBrosRandomStages-v0',
-            render_mode=None,
-            stages=['1-4', '2-4'],
-        )
 
 
 class ShouldPlayCliEnvironment(TestCase):

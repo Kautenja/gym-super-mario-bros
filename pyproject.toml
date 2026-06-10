@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "gym_super_mario_bros"
-version = "8.0.0"
+version = "9.0.0"
 description = "Super Mario Bros. for Gymnasium"
 readme = "README.md"
 requires-python = ">=3.13"

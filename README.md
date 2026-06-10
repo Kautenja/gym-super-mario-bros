@@ -125,9 +125,6 @@ Print the CLI help with:
 python -m gym_super_mario_bros --help
 ```
 
-**NOTE:** `SuperMarioBrosRandomStages-*` support the `--stages/-S` flag for
-supplying the set of stages to sample from like `-S 1-4 2-4 3-4 4-4`.
-
 ## Environments
 
 These environments allow 3 attempts (lives) to make it through the 32 stages
@@ -140,20 +137,12 @@ will lock the Python process until the emulator is ready for the next action.
 | Environment                     | Game | ROM           | Screenshot |
 |:--------------------------------|:-----|:--------------|:-----------|
 | `SuperMarioBros-v0`             | SMB  | standard      | ![][v0]    |
-| `SuperMarioBros-v1`             | SMB  | downsample    | ![][v1]    |
-| `SuperMarioBros-v2`             | SMB  | pixel         | ![][v2]    |
-| `SuperMarioBros-v3`             | SMB  | rectangle     | ![][v3]    |
 | `SuperMarioBros2-v0`            | SMB2 | standard      | ![][2-v0]  |
-| `SuperMarioBros2-v1`            | SMB2 | downsample    | ![][2-v1]  |
 | `SuperMarioBros2USA-v0`         | SMB2 USA | standard  |            |
 | `SuperMarioBros3-v0`            | SMB3 | standard      |            |
 
 [v0]: https://user-images.githubusercontent.com/2184469/40948820-3d15e5c2-6830-11e8-81d4-ecfaffee0a14.png
-[v1]: https://user-images.githubusercontent.com/2184469/40948819-3cff6c48-6830-11e8-8373-8fad1665ac72.png
-[v2]: https://user-images.githubusercontent.com/2184469/40948818-3cea09d4-6830-11e8-8efa-8f34d8b05b11.png
-[v3]: https://user-images.githubusercontent.com/2184469/40948817-3cd6600a-6830-11e8-8abb-9cee6a31d377.png
 [2-v0]: https://user-images.githubusercontent.com/2184469/40948822-3d3b8412-6830-11e8-860b-af3802f5373f.png
-[2-v1]: https://user-images.githubusercontent.com/2184469/40948821-3d2d61a2-6830-11e8-8789-a92e750aa9a8.png
 
 ### Individual Stages
 
@@ -168,14 +157,10 @@ where:
 
 -   `<world>` is a number in {1, 2, 3, 4, 5, 6, 7, 8} indicating the world
 -   `<stage>` is a number in {1, 2, 3, 4} indicating the stage within a world
--   `<version>` is a number in {0, 1, 2, 3} specifying the ROM mode to use
-    - 0: standard ROM
-    - 1: downsampled ROM
-    - 2: pixel ROM
-    - 3: rectangle ROM
+-   `<version>` is 0 for the standard ROM
 
-For example, to play 4-2 on the downsampled ROM, you would use the environment
-id `SuperMarioBros-4-2-v1`.
+For example, to play 4-2 on the standard ROM, you would use the environment
+id `SuperMarioBros-4-2-v0`.
 
 Super Mario Bros. 2 (USA) uses the vanilla ROM only. Use
 `SuperMarioBros2USA-v0` for the full game, or the template
@@ -188,38 +173,6 @@ stages {1, 2, 3}; world 7 has stages {1, 2}.
 Super Mario Bros. 3 uses the vanilla ROM only. Use `SuperMarioBros3-v0` for
 the game, or `SuperMarioBros3-1-1-v0` for the validated World 1-1 single-stage
 entry point.
-
-### Random Stage Selection
-
-The random stage selection environment randomly selects a stage and allows a
-single attempt to clear it. Upon a death and subsequent call to `reset` the
-environment randomly selects a new stage. This is only available for the
-standard Super Mario Bros. game, _not_ Lost Levels (at the moment). To use
-these environments, append `RandomStages` to the `SuperMarioBros` id. For
-example, to use the standard ROM with random stage selection use
-`SuperMarioBrosRandomStages-v0`. To seed the random stage selection pass the
-`seed` keyword argument to the `reset` method directly like `reset(seed=222)`.
-
-In addition to randomly selecting any of the 32 original stages, a subset of
-user-defined stages can be specified to limit the random choice of stages to a
-specific subset. For example, the stage selector could be limited to only
-sample castle stages, water levels, underground, and more.
-
-To specify a default subset of stages to randomly sample from, create a list
-of each stage to allow to be sampled and pass that list to the `gymnasium.make()`
-function. For example:
-
-```python
-gym.make('SuperMarioBrosRandomStages-v0', stages=['1-4', '2-4', '3-4', '4-4'])
-```
-
-The example above will sample a random stage from 1-4, 2-4, 3-4, and 4-4 upon
-every call to `reset`. A reset call can also override the subset for one
-episode:
-
-```python
-state, info = env.reset(seed=222, options={'stages': ['4-2']})
-```
 
 ## Step
 
