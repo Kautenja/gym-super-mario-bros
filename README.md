@@ -90,6 +90,24 @@ with external time truncation, which returns `truncated=True`.
 **NOTE:** remove calls to `render` in training code for a nontrivial
 speedup.
 
+### Task Metadata
+
+`gym_super_mario_bros` exposes lightweight task metadata for curriculum,
+conditioning, and evaluation-matrix code without constructing ROM-backed
+environments:
+
+```python
+import gym_super_mario_bros
+
+tasks = gym_super_mario_bros.all_tasks(single_stage=True)
+env_ids = gym_super_mario_bros.task_ids(game_family='smb1')
+task = gym_super_mario_bros.task_for_env_id('SuperMarioBros-4-2-v0')
+```
+
+Each `MarioTask` includes the environment ID, canonical task ID, game family,
+ROM mode, world/stage, public world label, split flags, and alias metadata for
+separator-free SMB1 IDs such as `SuperMarioBros1-1-v0`.
+
 ### Command Line
 
 `gym_super_mario_bros` features a command line interface for playing
@@ -188,24 +206,43 @@ death penalties are then added when the underlying game exposes reliable RAM
 counters for that title.
 
 The reward is clipped into the range _(-15, 15)_.
+The `info` dictionary also includes `reward_components`,
+`reward_total_unclipped`, and `reward_total_clipped` so training code can log or
+choose alternate reward transforms without recomputing RAM-dependent shaping.
 
 ### `info` dictionary
 
 The `info` dictionary returned by the `step` method contains the following
 keys:
 
-| Key        | Type   | Description
-|:-----------|:-------|:------------------------------------------------------|
-| `coins   ` | `int`  | The number of collected coins
-| `flag_get` | `bool` | True if Mario reached a flag or ax
-| `life`     | `int`  | The number of lives left, i.e., _{3, 2, 1}_
-| `score`    | `int`  | The cumulative in-game score
-| `stage`    | `int`  | The current stage, i.e., _{1, ..., 4}_
-| `status`   | `str`  | Mario's status, i.e., _{'small', 'tall', 'fireball'}_
-| `time`     | `int`  | The time left on the clock
-| `world`    | `int`  | The current world, i.e., _{1, ..., 8}_
-| `x_pos`    | `int`  | Mario's _x_ position in the stage (from the left)
-| `y_pos`    | `int`  | Mario's _y_ position in the stage (from the bottom)
+| Key | Type | Description |
+|:----|:-----|:------------|
+| `coins` | `int` | The number of collected coins where available |
+| `flag_get` | `bool` | True if Mario reached a flag, ax, or stage-complete state |
+| `life` | `int` | The title-specific displayed life count |
+| `score` | `int` | The cumulative in-game score where available |
+| `stage` | `int` | The current stage |
+| `status` | `str` | Mario's title-specific powerup status |
+| `time` | `int` | The time left on the clock where available |
+| `world` | `int` | The current world |
+| `x_pos` | `int` | Mario's horizontal position where available |
+| `y_pos` | `int` | Mario's vertical position where available |
+| `clear` | `bool` | Cross-game completion flag for the active stage/task |
+| `death` | `bool` | Cross-game death/life-loss flag |
+| `game` | `str` | Normalized game identifier such as `smb1` or `smb3` |
+| `game_family` | `str` | Grouping key for task suites and evaluation matrices |
+| `progress` | `int` | Cross-game progress metric used by the reward function |
+| `progress_max` | `int` | Best progress reached during the current attempt |
+| `rom_mode` | `str` | ROM mode, currently `vanilla` for registered environments |
+| `single_stage` | `bool` | True for single-stage registered tasks |
+| `task_id` | `str` | Canonical task ID suitable for task conditioning |
+| `target_world` | `int` or `None` | Configured target world for single-stage tasks |
+| `target_stage` | `int` or `None` | Configured target stage for single-stage tasks |
+| `timeout` | `bool` | Reserved cross-game timeout flag; external Gymnasium `TimeLimit` still sets `truncated=True` |
+| `world_label` | `str` | Public world label, including Lost Levels bonus worlds |
+| `reward_components` | `dict` | Per-step shaped reward terms before clipping |
+| `reward_total_unclipped` | `float` | Per-step shaped reward before `reward_range` clipping |
+| `reward_total_clipped` | `float` | Per-step shaped reward after `reward_range` clipping |
 
 Newer SMB2 USA and SMB3 environments include additional game-specific keys
 such as raw transition state, health, lives, map position, powerup timers,

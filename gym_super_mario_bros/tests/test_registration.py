@@ -62,6 +62,10 @@ class ShouldExposePackageApi(TestCase):
                 'SuperMarioBrosEnv',
                 'SuperMarioBros2Env',
                 'SuperMarioBros3Env',
+                'MarioTask',
+                'all_tasks',
+                'task_for_env_id',
+                'task_ids',
             ],
             gym_super_mario_bros.__all__,
         )

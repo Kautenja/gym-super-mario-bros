@@ -131,6 +131,25 @@ class ShouldStepSuperMarioBros2UsaEnv(TestCase):
             self.assertEqual(1, info['y_page'])
             self.assertEqual(448, info['y_pos'])
             self.assertEqual(192, info['y_screen'])
+            self.assertFalse(info['clear'])
+            self.assertFalse(info['death'])
+            self.assertEqual('smb2_usa', info['game'])
+            self.assertEqual('smb2_usa', info['game_family'])
+            self.assertEqual(0, info['progress'])
+            self.assertEqual(0, info['progress_max'])
+            self.assertEqual('vanilla', info['rom_mode'])
+            self.assertFalse(info['single_stage'])
+            self.assertEqual('SuperMarioBros2USA-v0', info['task_id'])
+            self.assertFalse(info['timeout'])
+            self.assertEqual('1', info['world_label'])
+            self.assertIsNone(info['target_world'])
+            self.assertIsNone(info['target_stage'])
+            self.assertEqual(0.0, info['reward_total_unclipped'])
+            self.assertEqual(0.0, info['reward_total_clipped'])
+            self.assertEqual(
+                {'progress', 'collectibles', 'health', 'completion', 'death'},
+                set(info['reward_components']),
+            )
         finally:
             env.close()
 
@@ -161,6 +180,13 @@ class ShouldStepSuperMarioBros2UsaStageEnv(TestCase):
             self.assertEqual(2, info['stage'])
             self.assertEqual(120, info['x_pos'])
             self.assertEqual(128, info['y_pos'])
+            self.assertFalse(info['clear'])
+            self.assertFalse(info['death'])
+            self.assertEqual('smb2_usa', info['game'])
+            self.assertTrue(info['single_stage'])
+            self.assertEqual('SuperMarioBros2USA-4-2-v0', info['task_id'])
+            self.assertEqual(4, info['target_world'])
+            self.assertEqual(2, info['target_stage'])
         finally:
             env.close()
 
@@ -215,6 +241,22 @@ class ShouldRewardSuperMarioBros2UsaMovement(TestCase):
             env.ram[0x04ec] = 0x03
             self.assertEqual(50, env.unwrapped._completion_reward)
             self.assertEqual(0, env.unwrapped._completion_reward)
+        finally:
+            env.close()
+
+    def test_reward_diagnostics_match_clipped_step_reward(self):
+        env = SuperMarioBros2Env(render_mode='rgb_array')
+        try:
+            env.reset()
+            env.ram[0x0028] = 123
+
+            reward = env.unwrapped._get_reward()
+            info = env.unwrapped._reward_info()
+
+            self.assertEqual(3.0, reward)
+            self.assertEqual(3.0, info['reward_components']['progress'])
+            self.assertEqual(3.0, info['reward_total_unclipped'])
+            self.assertEqual(3.0, info['reward_total_clipped'])
         finally:
             env.close()
 
