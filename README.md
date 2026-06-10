@@ -17,8 +17,6 @@
 [python-version]: https://img.shields.io/pypi/pyversions/gym-super-mario-bros.svg
 [python-home]: https://python.org
 
-![Mario](https://user-images.githubusercontent.com/2184469/40949613-7542733a-6834-11e8-895b-ce1cc3af9dbb.gif)
-
 A [Gymnasium](https://gymnasium.farama.org/) environment for
 Super Mario Bros., Super Mario Bros. 2 (Lost Levels), and Super Mario
 Bros. 2 (USA), and Super Mario Bros. 3 on The Nintendo Entertainment System
@@ -152,15 +150,12 @@ to an agent nor can an agent perform actions during these instances. If a
 cut-scene is not able to be skipped by hacking the NES's RAM, the environment
 will lock the Python process until the emulator is ready for the next action.
 
-| Environment                     | Game | ROM           | Screenshot |
-|:--------------------------------|:-----|:--------------|:-----------|
-| `SuperMarioBros-v0`             | SMB  | standard      | ![][v0]    |
-| `SuperMarioBros2-v0`            | SMB2 | standard      | ![][2-v0]  |
-| `SuperMarioBros2USA-v0`         | SMB2 USA | standard  |            |
-| `SuperMarioBros3-v0`            | SMB3 | standard      |            |
-
-[v0]: https://user-images.githubusercontent.com/2184469/40948820-3d15e5c2-6830-11e8-81d4-ecfaffee0a14.png
-[2-v0]: https://user-images.githubusercontent.com/2184469/40948822-3d3b8412-6830-11e8-860b-af3802f5373f.png
+| Environment                     | Game | ROM           |
+|:--------------------------------|:-----|:--------------|
+| `SuperMarioBros-v0`             | SMB  | standard      |
+| `SuperMarioBros2-v0`            | SMB2 | standard      |
+| `SuperMarioBros2USA-v0`         | SMB2 USA | standard  |
+| `SuperMarioBros3-v0`            | SMB3 | standard      |
 
 ### Individual Stages
 
