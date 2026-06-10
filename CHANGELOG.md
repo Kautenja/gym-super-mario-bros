@@ -25,6 +25,10 @@ Upcoming major release aligned with the current `pyproject.toml` version.
   - Added vanilla Super Mario Bros. 2 (USA) support through
     `SuperMarioBros2USA-v0` and 20 single-stage
     `SuperMarioBros2USA-<world>-<stage>-v0` environments.
+  - Added vanilla Super Mario Bros. 3 support through `SuperMarioBros3-v0`
+    and the validated `SuperMarioBros3-1-1-v0` single-stage environment.
+  - Enriched SMB1, SMB2 USA, and SMB3 info dictionaries and expanded reward
+    shaping beyond raw rightward velocity.
 
 ## 7.4.0 (2022-06-20)
 

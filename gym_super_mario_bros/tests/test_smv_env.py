@@ -89,6 +89,22 @@ class ShouldStepGameEnv(TestCase):
         self.assertEqual(1, i['stage'])
         self.assertEqual(400, i['time'])
         self.assertEqual(40, i['x_pos'])
+        self.assertEqual(1, i['area'])
+        self.assertEqual((0, 0, 0, 0, 0), i['enemy_types'])
+        self.assertFalse(i['is_dead'])
+        self.assertFalse(i['is_dying'])
+        self.assertFalse(i['is_game_over'])
+        self.assertFalse(i['is_stage_over'])
+        self.assertFalse(i['is_world_over'])
+        self.assertEqual(40, i['left_x_pos'])
+        self.assertEqual(0, i['level'])
+        self.assertEqual(8, i['player_state'])
+        self.assertEqual(0, i['powerup_level'])
+        self.assertEqual(0, i['status_value'])
+        self.assertEqual(40, i['x_pos_max'])
+        self.assertEqual(176, i['y_pixel'])
+        self.assertEqual(79, i['y_pos'])
+        self.assertEqual(1, i['y_viewport'])
         env.close()
 
 
@@ -120,4 +136,49 @@ class ShouldStepStageEnv(TestCase):
         self.assertEqual(2, i['stage'])
         self.assertEqual(400, i['time'])
         self.assertEqual(40, i['x_pos'])
+        self.assertEqual(13, i['level'])
+        self.assertEqual(40, i['x_pos_max'])
         env.close()
+
+
+class ShouldRewardSuperMarioBrosObjectives(TestCase):
+    """Test objective reward shaping for SMB1 and Lost Levels."""
+
+    def test_new_best_progress_does_not_penalize_backtracking(self):
+        env = SuperMarioBrosEnv(render_mode='rgb_array')
+        try:
+            env.reset()
+            env.ram[0x0086] = 43
+            self.assertEqual(3, env.unwrapped._progress_reward)
+
+            env.ram[0x0086] = 41
+            self.assertEqual(0, env.unwrapped._progress_reward)
+        finally:
+            env.close()
+
+    def test_score_coin_powerup_and_completion_rewards(self):
+        env = SuperMarioBrosEnv(render_mode='rgb_array')
+        try:
+            env.reset()
+
+            env.unwrapped._score_last = 0
+            env.ram[0x07de:0x07e4] = [0, 0, 0, 1, 0, 0]
+            self.assertEqual(1, env.unwrapped._score_reward)
+
+            env.unwrapped._coins_last = 0
+            env.ram[0x07ed:0x07ef] = [0, 1]
+            self.assertEqual(5, env.unwrapped._coin_reward)
+
+            env.unwrapped._status_last = 0
+            env.ram[0x0756] = 1
+            self.assertEqual(5, env.unwrapped._powerup_reward)
+
+            env.ram[0x0756] = 0
+            self.assertEqual(-5, env.unwrapped._powerup_reward)
+
+            env.ram[0x0016] = 0x31
+            env.ram[0x001d] = 3
+            self.assertEqual(50, env.unwrapped._completion_reward)
+            self.assertEqual(0, env.unwrapped._completion_reward)
+        finally:
+            env.close()

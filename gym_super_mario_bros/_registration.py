@@ -72,6 +72,29 @@ def _register_smb2_usa_env(id, **kwargs):
     )
 
 
+def _register_smb3_env(id, **kwargs):
+    """
+    Register a Super Mario Bros. 3 environment with Gymnasium.
+
+    Args:
+        id (str): id for the env to register
+        kwargs (dict): keyword arguments for the SuperMarioBros3Env initializer
+
+    Returns:
+        None
+
+    """
+    gym.envs.registration.register(
+        id=id,
+        entry_point='gym_super_mario_bros:SuperMarioBros3Env',
+        max_episode_steps=_MAX_EPISODE_STEPS,
+        reward_threshold=_REWARD_THRESHOLD,
+        kwargs=kwargs,
+        nondeterministic=True,
+        disable_env_checker=_DISABLE_ENV_CHECKER,
+    )
+
+
 # Super Mario Bros.
 _register_mario_env('SuperMarioBros-v0', rom_mode='vanilla')
 _register_mario_env('SuperMarioBros-v1', rom_mode='downsample')
@@ -93,6 +116,10 @@ _register_mario_env('SuperMarioBros2-v1', lost_levels=True, rom_mode='downsample
 
 # Super Mario Bros. 2 (USA)
 _register_smb2_usa_env('SuperMarioBros2USA-v0')
+
+
+# Super Mario Bros. 3
+_register_smb3_env('SuperMarioBros3-v0')
 
 
 def _register_mario_stage_env(id, **kwargs):
@@ -181,6 +208,10 @@ for world, stage_count in enumerate(_SMB2_USA_STAGES_PER_WORLD, start=1):
     for stage in range(1, stage_count + 1):
         env_id = 'SuperMarioBros2USA-{}-{}-v0'.format(world, stage)
         _register_smb2_usa_env(env_id, target=(world, stage))
+
+
+# Super Mario Bros. 3 has a validated vanilla World 1-1 entry point.
+_register_smb3_env('SuperMarioBros3-1-1-v0', target=(1, 1))
 
 
 # create an alias to gymnasium.make for ease of access

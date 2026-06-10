@@ -21,7 +21,8 @@
 
 A [Gymnasium](https://gymnasium.farama.org/) environment for
 Super Mario Bros., Super Mario Bros. 2 (Lost Levels), and Super Mario
-Bros. 2 (USA) on The Nintendo Entertainment System (NES) using
+Bros. 2 (USA), and Super Mario Bros. 3 on The Nintendo Entertainment System
+(NES) using
 [the nes-py emulator](https://github.com/Kautenja/nes-py).
 
 `gym-super-mario-bros` targets Gymnasium's modern reset, step, render-mode,
@@ -145,6 +146,7 @@ will lock the Python process until the emulator is ready for the next action.
 | `SuperMarioBros2-v0`            | SMB2 | standard      | ![][2-v0]  |
 | `SuperMarioBros2-v1`            | SMB2 | downsample    | ![][2-v1]  |
 | `SuperMarioBros2USA-v0`         | SMB2 USA | standard  |            |
+| `SuperMarioBros3-v0`            | SMB3 | standard      |            |
 
 [v0]: https://user-images.githubusercontent.com/2184469/40948820-3d15e5c2-6830-11e8-81d4-ecfaffee0a14.png
 [v1]: https://user-images.githubusercontent.com/2184469/40948819-3cff6c48-6830-11e8-8373-8fad1665ac72.png
@@ -182,6 +184,10 @@ Super Mario Bros. 2 (USA) uses the vanilla ROM only. Use
 
 where `<world>` is a number in {1, 2, 3, 4, 5, 6, 7}. Worlds 1 through 6 have
 stages {1, 2, 3}; world 7 has stages {1, 2}.
+
+Super Mario Bros. 3 uses the vanilla ROM only. Use `SuperMarioBros3-v0` for
+the game, or `SuperMarioBros3-1-1-v0` for the validated World 1-1 single-stage
+entry point.
 
 ### Random Stage Selection
 
@@ -221,31 +227,12 @@ Info about the rewards and info returned by the `step` method.
 
 ### Reward Function
 
-The reward function assumes the objective of the game is to move as far right
-as possible (increase the agent's _x_ value), as fast as possible, without
-dying. To model this game, three separate variables compose the reward:
-
-1.  _v_: the difference in agent _x_ values between states
-    -   in this case this is instantaneous velocity for the given step
-    -   _v = x1 - x0_
-        -   _x0_ is the x position before the step
-        -   _x1_ is the x position after the step
-    -   moving right ⇔ _v > 0_
-    -   moving left ⇔ _v < 0_
-    -   not moving ⇔ _v = 0_
-2.  _c_: the difference in the game clock between frames
-    -   the penalty prevents the agent from standing still
-    -   _c = c0 - c1_
-        -   _c0_ is the clock reading before the step
-        -   _c1_ is the clock reading after the step
-    -   no clock tick ⇔ _c = 0_
-    -   clock tick ⇔ _c < 0_
-3.  _d_: a death penalty that penalizes the agent for dying in a state
-    -   this penalty encourages the agent to avoid death
-    -   alive ⇔ _d = 0_
-    -   dead ⇔ _d = -15_
-
-_r = v + c + d_
+The reward function combines dense progress with objective events. Progress is
+rewarded only when the agent reaches a new best position for the attempt, so
+tactical backtracking is not punished by the movement term. Score increases,
+coins, cherries, powerups, health changes, level completion, time pressure, and
+death penalties are then added when the underlying game exposes reliable RAM
+counters for that title.
 
 The reward is clipped into the range _(-15, 15)_.
 
@@ -266,6 +253,11 @@ keys:
 | `world`    | `int`  | The current world, i.e., _{1, ..., 8}_
 | `x_pos`    | `int`  | Mario's _x_ position in the stage (from the left)
 | `y_pos`    | `int`  | Mario's _y_ position in the stage (from the bottom)
+
+Newer SMB2 USA and SMB3 environments include additional game-specific keys
+such as raw transition state, health, lives, map position, powerup timers,
+P-meter state, invulnerability timers, and progress maxima where those values
+are available from the ROM's RAM map.
 
 ## Publishing
 

@@ -96,7 +96,12 @@ class SuperMarioBros2Env(NESEnv):
         super(SuperMarioBros2Env, self).__init__(rom, render_mode=render_mode)
         target = _decode_smb2_target(target)
         self._target_world, self._target_stage, self._target_level = target
-        self._x_position_last = 0
+        self._position_origin = (0, 0)
+        self._position_progress_max = 0
+        self._coins_last = 0
+        self._cherries_last = 0
+        self._health_last = 0
+        self._completion_rewarded = False
         self.reset()
         self._skip_start_screen()
         self._backup()
@@ -163,14 +168,70 @@ class SuperMarioBros2Env(NESEnv):
         return (health >> 4) + 1
 
     @property
+    def _health_meter(self):
+        """Return the raw life meter bar count."""
+        return self._read_mem(0x04c3)
+
+    @property
+    def _character_status(self):
+        """Return the raw character status byte."""
+        return self._read_mem(0x00c7)
+
+    @property
+    def _invulnerability_timer(self):
+        """Return the invulnerability timer."""
+        return self._read_mem(0x0085)
+
+    @property
+    def _enemy_defeat_count(self):
+        """Return the enemies defeated toward the next heart drop."""
+        return self._read_mem(0x04ad)
+
+    @property
+    def _item_in_hand_height(self):
+        """Return the raw item-in-hand height byte."""
+        return self._read_mem(0x00ae)
+
+    @property
+    def _subspace_visits(self):
+        """Return the current subspace coin-grab attempt counter."""
+        return self._read_mem(0x0621)
+
+    @property
     def _x_position(self):
         """Return the current horizontal position."""
         return self._read_mem(0x0014) * 0x100 + self._read_mem(0x0028)
 
     @property
+    def _x_page(self):
+        """Return the current horizontal page."""
+        return self._read_mem(0x0014)
+
+    @property
+    def _x_screen(self):
+        """Return the current horizontal screen position."""
+        return self._read_mem(0x0028)
+
+    @property
     def _y_position(self):
         """Return the current vertical position."""
         return self._read_mem(0x001e) * 0x100 + self._read_mem(0x0032)
+
+    @property
+    def _y_page(self):
+        """Return the current vertical page."""
+        return self._read_mem(0x001e)
+
+    @property
+    def _y_screen(self):
+        """Return the current vertical screen position."""
+        return self._read_mem(0x0032)
+
+    @property
+    def _position_progress(self):
+        """Return Manhattan distance from the reset start position."""
+        x_origin, y_origin = self._position_origin
+        return abs(self._x_position - x_origin) + abs(self._y_position - y_origin)
 
     @property
     def _level_transition(self):
@@ -239,16 +300,23 @@ class SuperMarioBros2Env(NESEnv):
         # allow the entrance animation to reach a stable control point
         for _ in range(240):
             self._frame_advance(0)
-        self._x_position_last = self._x_position
+        self._position_origin = (self._x_position, self._y_position)
+        self._position_progress_max = 0
+        self._coins_last = self._coins
+        self._cherries_last = self._cherries
+        self._health_last = self._health
+        self._completion_rewarded = False
 
     # MARK: Reward Function
 
     @property
-    def _x_reward(self):
-        """Return the reward based on left right movement between steps."""
-        _reward = self._x_position - self._x_position_last
-        self._x_position_last = self._x_position
-        if _reward < -5 or _reward > 5:
+    def _progress_reward(self):
+        """Return the reward for reaching a new best distance from start."""
+        _reward = self._position_progress - self._position_progress_max
+        if _reward <= 0:
+            return 0
+        self._position_progress_max = self._position_progress
+        if _reward > 10:
             return 0
         return _reward
 
@@ -259,19 +327,63 @@ class SuperMarioBros2Env(NESEnv):
             return -25
         return 0
 
+    @property
+    def _collectible_reward(self):
+        """Return the reward for SMB2 collectible counters."""
+        coins_reward = self._coins - self._coins_last
+        cherries_reward = self._cherries - self._cherries_last
+        self._coins_last = self._coins
+        self._cherries_last = self._cherries
+        if coins_reward < 0:
+            coins_reward = 0
+        if cherries_reward < 0:
+            cherries_reward = 0
+        return coins_reward * 5 + cherries_reward * 2
+
+    @property
+    def _health_reward(self):
+        """Return the reward for gaining or losing health."""
+        _reward = self._health - self._health_last
+        self._health_last = self._health
+        return _reward * 5
+
+    @property
+    def _completion_reward(self):
+        """Return the reward for completing or warping from a level."""
+        if self._is_level_complete and not self._completion_rewarded:
+            self._completion_rewarded = True
+            return 50
+        return 0
+
     # MARK: nes-py API calls
 
     def _will_reset(self):
         """Handle and RAM hacking before a reset occurs."""
-        self._x_position_last = 0
+        self._position_origin = (0, 0)
+        self._position_progress_max = 0
+        self._coins_last = 0
+        self._cherries_last = 0
+        self._health_last = 0
+        self._completion_rewarded = False
 
     def _did_reset(self):
         """Handle any RAM hacking after a reset occurs."""
-        self._x_position_last = self._x_position
+        self._position_origin = (self._x_position, self._y_position)
+        self._position_progress_max = 0
+        self._coins_last = self._coins
+        self._cherries_last = self._cherries
+        self._health_last = self._health
+        self._completion_rewarded = False
 
     def _get_reward(self):
         """Return the reward after a step occurs."""
-        return self._x_reward + self._death_penalty
+        return (
+            self._progress_reward +
+            self._collectible_reward +
+            self._health_reward +
+            self._completion_reward +
+            self._death_penalty
+        )
 
     def _get_terminated(self):
         """Return True if the episode is over, False otherwise."""
@@ -283,16 +395,34 @@ class SuperMarioBros2Env(NESEnv):
         """Return the info after a step occurs."""
         return dict(
             character=self._character,
+            character_id=self._read_mem(0x008f),
+            character_status=self._character_status,
             cherries=self._cherries,
             coins=self._coins,
+            enemy_defeat_count=self._enemy_defeat_count,
+            health_meter=self._health_meter,
             health=self._health,
+            invulnerability_timer=self._invulnerability_timer,
+            is_dead=self._is_dead,
+            is_dying=self._is_dying,
+            is_game_over=self._is_game_over,
+            item_in_hand_height=self._item_in_hand_height,
             level=self._level,
             level_complete=self._is_level_complete,
+            level_transition=self._level_transition,
             life=self._life,
+            lives=self._lives,
+            position_progress=self._position_progress,
+            position_progress_max=self._position_progress_max,
             stage=self._stage,
+            subspace_visits=self._subspace_visits,
             world=self._world,
+            x_page=self._x_page,
             x_pos=self._x_position,
+            x_screen=self._x_screen,
+            y_page=self._y_page,
             y_pos=self._y_position,
+            y_screen=self._y_screen,
         )
 
 
