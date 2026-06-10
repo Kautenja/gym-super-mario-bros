@@ -2,6 +2,10 @@
 from .smb_env import SuperMarioBrosEnv
 from .smb2_env import SuperMarioBros2Env
 from .smb3_env import SuperMarioBros3Env
+from .tasks import MarioTask
+from .tasks import all_tasks
+from .tasks import task_for_env_id
+from .tasks import task_ids
 from ._registration import make
 
 
@@ -11,4 +15,8 @@ __all__ = [
     'SuperMarioBrosEnv',
     'SuperMarioBros2Env',
     'SuperMarioBros3Env',
+    'MarioTask',
+    'all_tasks',
+    'task_for_env_id',
+    'task_ids',
 ]
