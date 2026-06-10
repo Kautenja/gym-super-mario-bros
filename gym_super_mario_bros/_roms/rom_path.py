@@ -6,8 +6,8 @@ import os
 _ROM_PATHS = {
     # the dictionary of lost level ROM paths
     True: {
-        'vanilla': 'super-mario-bros-2.nes',
-        'downsample': 'super-mario-bros-2-downsample.nes',
+        'vanilla': 'super-mario-bros-lost-levels.nes',
+        'downsample': 'super-mario-bros-lost-levels-downsample.nes',
     },
     # the dictionary of Super Mario Bros. 1 ROM paths
     False: {
