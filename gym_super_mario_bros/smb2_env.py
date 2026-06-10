@@ -21,6 +21,14 @@ _LEVEL_TRANSITION_COMPLETE = 0x03
 _LEVEL_TRANSITION_WARP = 0x04
 
 
+def _signed_byte(value):
+    """Return an unsigned byte interpreted as a signed offset."""
+    value = int(value)
+    if value >= 0x80:
+        return value - 0x100
+    return value
+
+
 def _decode_smb2_target(target):
     """
     Return the target world, stage, and linear level index.
@@ -101,6 +109,7 @@ class SuperMarioBros2Env(NESEnv):
         self._target_world, self._target_stage, self._target_level = target
         self._position_origin = (0, 0)
         self._position_progress_max = 0
+        self._lives_start = 0
         self._coins_last = 0
         self._cherries_last = 0
         self._health_last = 0
@@ -236,7 +245,7 @@ class SuperMarioBros2Env(NESEnv):
     @property
     def _y_position(self):
         """Return the current vertical position."""
-        return self._read_mem(0x001e) * 0x100 + self._read_mem(0x0032)
+        return _signed_byte(self._read_mem(0x001e)) * 0x100 + self._read_mem(0x0032)
 
     @property
     def _y_page(self):
@@ -262,7 +271,7 @@ class SuperMarioBros2Env(NESEnv):
     @property
     def _is_dying(self):
         """Return True if the player is in a death transition."""
-        return self._level_transition == _LEVEL_TRANSITION_RESTART
+        return self._level_transition == _LEVEL_TRANSITION_RESTART or self._lost_life
 
     @property
     def _is_dead(self):
@@ -281,6 +290,20 @@ class SuperMarioBros2Env(NESEnv):
             _LEVEL_TRANSITION_COMPLETE,
             _LEVEL_TRANSITION_WARP,
         )
+
+    @property
+    def _lost_life(self):
+        """Return True if the current attempt has consumed a life."""
+        return (
+            self._lives_start > 0 and
+            self._lives != 0xff and
+            self._lives < self._lives_start
+        )
+
+    @property
+    def _left_target_stage(self):
+        """Return True if a single-stage attempt left its target level."""
+        return self.is_single_stage_env and self._level != self._target_level
 
     # MARK: RAM Hacks
 
@@ -323,6 +346,7 @@ class SuperMarioBros2Env(NESEnv):
             self._frame_advance(0)
         self._position_origin = (self._x_position, self._y_position)
         self._position_progress_max = 0
+        self._lives_start = self._lives
         self._coins_last = self._coins
         self._cherries_last = self._cherries
         self._health_last = self._health
@@ -364,6 +388,9 @@ class SuperMarioBros2Env(NESEnv):
     @property
     def _health_reward(self):
         """Return the reward for gaining or losing health."""
+        if self._lost_life:
+            self._health_last = self._health
+            return 0
         _reward = self._health - self._health_last
         self._health_last = self._health
         return _reward * 5
@@ -437,6 +464,7 @@ class SuperMarioBros2Env(NESEnv):
         """Handle and RAM hacking before a reset occurs."""
         self._position_origin = (0, 0)
         self._position_progress_max = 0
+        self._lives_start = 0
         self._coins_last = 0
         self._cherries_last = 0
         self._health_last = 0
@@ -447,11 +475,23 @@ class SuperMarioBros2Env(NESEnv):
         """Handle any RAM hacking after a reset occurs."""
         self._position_origin = (self._x_position, self._y_position)
         self._position_progress_max = 0
+        self._lives_start = self._lives
         self._coins_last = self._coins
         self._cherries_last = self._cherries
         self._health_last = self._health
         self._completion_rewarded = False
         self._reset_reward_components()
+
+    def _did_step(self, done):
+        """Reset full-game reward baselines after a non-terminal life loss."""
+        if done or not self._lost_life:
+            return
+        self._lives_start = self._lives
+        self._position_origin = (self._x_position, self._y_position)
+        self._position_progress_max = 0
+        self._coins_last = self._coins
+        self._cherries_last = self._cherries
+        self._health_last = self._health
 
     def _get_reward(self):
         """Return the reward after a step occurs."""
@@ -469,7 +509,12 @@ class SuperMarioBros2Env(NESEnv):
     def _get_terminated(self):
         """Return True if the episode is over, False otherwise."""
         if self.is_single_stage_env:
-            return self._is_dying or self._is_dead or self._is_level_complete
+            return (
+                self._is_dying or
+                self._is_dead or
+                self._is_level_complete or
+                self._left_target_stage
+            )
         return self._is_game_over
 
     def _get_info(self):

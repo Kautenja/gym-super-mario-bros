@@ -326,6 +326,35 @@ class ShouldRewardSuperMarioBros3Movement(TestCase):
 class ShouldTerminateSuperMarioBros3Env(TestCase):
     """Test stage-return, death, and game-over termination helpers."""
 
+    def test_stage_env_step_returns_positive_clear_reward(self):
+        env = SuperMarioBros3Env(target=(1, 1), render_mode='rgb_array')
+        try:
+            env.reset()
+            env.unwrapped._entered_level = True
+            env.unwrapped._life_start = 4
+            env.unwrapped._life_last = 4
+            env.ram[0x0736] = 4
+            env.ram[0x05ee] = 0
+            env.ram[0x05ef] = 0
+            env.ram[0x05f0] = 0
+            env.ram[0x0075] = 0x20
+            env.ram[0x0079] = 0x40
+
+            _, reward, terminated, truncated, info = env.step(0)
+
+            self.assertTrue(terminated)
+            self.assertFalse(truncated)
+            self.assertEqual(15, reward)
+            self.assertTrue(info['flag_get'])
+            self.assertTrue(info['clear'])
+            self.assertFalse(info['death'])
+            self.assertEqual(0.0, info['reward_components']['time'])
+            self.assertEqual(50.0, info['reward_components']['completion'])
+            self.assertEqual(50.0, info['reward_total_unclipped'])
+            self.assertEqual(15.0, info['reward_total_clipped'])
+        finally:
+            env.close()
+
     def test_stage_env_terminates_on_death_and_completion(self):
         env = SuperMarioBros3Env(target=(1, 1), render_mode='rgb_array')
         try:
@@ -361,5 +390,41 @@ class ShouldTerminateSuperMarioBros3Env(TestCase):
 
             env.ram[0x0736] = 0xff
             self.assertTrue(env.unwrapped._get_terminated())
+        finally:
+            env.close()
+
+    def test_full_env_life_loss_returns_to_map_without_clear_latch(self):
+        env = SuperMarioBros3Env(render_mode='rgb_array')
+        try:
+            env.reset()
+            env.ram[0x00b4] = 0xc0
+            death_step = None
+
+            for _ in range(360):
+                _, reward, terminated, truncated, info = env.step(0)
+                if info['death']:
+                    death_step = reward, terminated, truncated, info
+                    break
+
+            self.assertIsNotNone(death_step)
+            reward, terminated, truncated, info = death_step
+            self.assertEqual(-15, reward)
+            self.assertFalse(terminated)
+            self.assertFalse(truncated)
+            self.assertFalse(info['flag_get'])
+            self.assertFalse(info['clear'])
+            self.assertTrue(info['death'])
+            self.assertFalse(info['in_level'])
+            self.assertEqual(3, info['life'])
+
+            _, reward, terminated, truncated, info = env.step(0)
+            self.assertEqual(0.0, reward)
+            self.assertFalse(terminated)
+            self.assertFalse(truncated)
+            self.assertFalse(info['flag_get'])
+            self.assertFalse(info['clear'])
+            self.assertFalse(info['death'])
+            self.assertFalse(info['in_level'])
+            self.assertEqual(3, info['life'])
         finally:
             env.close()

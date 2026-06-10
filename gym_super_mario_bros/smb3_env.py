@@ -120,6 +120,7 @@ class SuperMarioBros3Env(NESEnv):
         self._score_last = 0
         self._status_last = 0
         self._completion_rewarded = False
+        self._life_loss_pending = False
         self._last_reward_components = {}
         self._last_reward_unclipped = 0.0
         self._last_reward_clipped = 0.0
@@ -342,6 +343,7 @@ class SuperMarioBros3Env(NESEnv):
             self._entered_level and
             self._is_on_map and
             not self._is_dying and
+            not self._life_loss_pending and
             not self._is_game_over
         )
 
@@ -461,6 +463,9 @@ class SuperMarioBros3Env(NESEnv):
     @property
     def _time_penalty(self):
         """Return the reward for the in-game clock ticking."""
+        if not self._is_in_level:
+            self._time_last = self._time
+            return 0
         _reward = self._time - self._time_last
         self._time_last = self._time
         if _reward > 0:
@@ -568,6 +573,7 @@ class SuperMarioBros3Env(NESEnv):
         self._score_last = 0
         self._status_last = 0
         self._completion_rewarded = False
+        self._life_loss_pending = False
         self._reset_reward_components()
 
     def _did_reset(self):
@@ -580,7 +586,22 @@ class SuperMarioBros3Env(NESEnv):
         self._score_last = self._score
         self._status_last = self._powerup_level
         self._completion_rewarded = False
+        self._life_loss_pending = False
         self._reset_reward_components()
+
+    def _did_step(self, done):
+        """Handle non-terminal map returns after a life loss."""
+        if done:
+            return
+        if self._is_in_level:
+            self._life_loss_pending = False
+            return
+        if self._is_dying and not self._is_game_over:
+            self._life_loss_pending = True
+            self._life_start = self._life
+            self._life_last = self._life
+            self._time_last = self._time
+            self._x_position_max = self._x_position
 
     def _get_reward(self):
         """Return the reward after a step occurs."""
