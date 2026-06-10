@@ -3,7 +3,7 @@
 This changelog is reconstructed from the repository's local tags, README,
 package metadata, and commit history.
 
-## 9.1.0 (Unreleased)
+## 9.1.0 (2026-06-10)
 
 - Environments:
   - Expanded validated Super Mario Bros. 3 single-stage entry points from
