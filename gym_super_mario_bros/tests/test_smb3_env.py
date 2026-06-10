@@ -6,13 +6,17 @@ from ..smb3_env import _decode_smb3_target
 
 
 class ShouldDecodeSuperMarioBros3Targets(TestCase):
-    """Test target validation for the validated SMB3 entry point."""
+    """Test target validation for the validated SMB3 entry points."""
 
     def test_none_target(self):
         self.assertEqual((None, None), _decode_smb3_target(None))
 
     def test_world_1_stage_1_target(self):
         self.assertEqual((1, 1), _decode_smb3_target((1, 1)))
+
+    def test_validated_world_1_targets(self):
+        for stage in (2, 4, 6):
+            self.assertEqual((1, stage), _decode_smb3_target((1, stage)))
 
     def test_invalid_target_type(self):
         self.assertRaises(TypeError, _decode_smb3_target, '1-1')
@@ -29,7 +33,9 @@ class ShouldDecodeSuperMarioBros3Targets(TestCase):
 
     def test_invalid_stage_bounds(self):
         self.assertRaises(ValueError, _decode_smb3_target, (1, 0))
-        self.assertRaises(ValueError, _decode_smb3_target, (1, 2))
+        self.assertRaises(ValueError, _decode_smb3_target, (1, 3))
+        self.assertRaises(ValueError, _decode_smb3_target, (1, 5))
+        self.assertRaises(ValueError, _decode_smb3_target, (1, 7))
 
 
 class ShouldStepSuperMarioBros3Env(TestCase):
@@ -167,6 +173,35 @@ class ShouldStepSuperMarioBros3StageEnv(TestCase):
             self.assertEqual(1, info['target_stage'])
         finally:
             env.close()
+
+    def test_validated_world_1_stage_targets(self):
+        for stage in (2, 4, 6):
+            env = SuperMarioBros3Env(target=(1, stage), render_mode='rgb_array')
+            try:
+                self.assertTrue(env.unwrapped.is_single_stage_env)
+                self.assertEqual(1, env.unwrapped._target_world)
+                self.assertEqual(stage, env.unwrapped._target_stage)
+
+                state, reset_info = env.reset()
+                self.assertEqual(env.observation_space.shape, state.shape)
+                self.assertIsInstance(reset_info, dict)
+
+                state, reward, terminated, truncated, info = env.step(0)
+                self.assertEqual(env.observation_space.shape, state.shape)
+                self.assertEqual(0.0, reward)
+                self.assertFalse(terminated)
+                self.assertFalse(truncated)
+                self.assertTrue(info['in_level'])
+                self.assertEqual(1, info['world'])
+                self.assertEqual(stage, info['stage'])
+                self.assertEqual(
+                    'SuperMarioBros3-1-{}-v0'.format(stage),
+                    info['task_id'],
+                )
+                self.assertEqual(1, info['target_world'])
+                self.assertEqual(stage, info['target_stage'])
+            finally:
+                env.close()
 
 
 class ShouldRewardSuperMarioBros3Movement(TestCase):

@@ -1,6 +1,8 @@
 """Registration code of Gymnasium environments in this package."""
 import gymnasium as gym
 
+from .smb3_stages import smb3_stage_matrix
+
 
 _MAX_EPISODE_STEPS = 9999999
 _REWARD_THRESHOLD = 9999999
@@ -178,8 +180,9 @@ for world, stage_count in enumerate(_SMB2_USA_STAGES_PER_WORLD, start=1):
         _register_smb2_usa_env(env_id, target=(world, stage))
 
 
-# Super Mario Bros. 3 has a validated vanilla World 1-1 entry point.
-_register_smb3_env('SuperMarioBros3-1-1-v0', target=(1, 1))
+# Super Mario Bros. 3 exposes validated vanilla World 1 entry points.
+for stage in smb3_stage_matrix(validated=True):
+    _register_smb3_env(stage.env_id, target=stage.target)
 
 
 # create an alias to gymnasium.make for ease of access

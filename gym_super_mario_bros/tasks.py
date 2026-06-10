@@ -1,11 +1,13 @@
 """Task metadata for registered Super Mario Bros. environments."""
 from dataclasses import dataclass
 
+from .smb3_stages import SMB3_VALIDATED_STAGES
+from .smb3_stages import smb3_stage_matrix
+
 
 SMB1_ROM_MODES = ('vanilla',)
 LOST_LEVELS_ROM_MODES = ('vanilla',)
 SMB2_USA_STAGES_PER_WORLD = (3, 3, 3, 3, 3, 3, 2)
-SMB3_VALIDATED_STAGES = ((1, 1),)
 
 
 @dataclass(frozen=True)
@@ -161,16 +163,16 @@ def _build_tasks():
         version=0,
         rom_mode='vanilla',
     ))
-    for world, stage in SMB3_VALIDATED_STAGES:
+    for smb3_stage in smb3_stage_matrix(validated=True):
         tasks.append(MarioTask(
-            env_id='SuperMarioBros3-{}-{}-v0'.format(world, stage),
+            env_id=smb3_stage.env_id,
             game='smb3',
             game_family='smb3',
             version=0,
             rom_mode='vanilla',
-            world=world,
-            stage=stage,
-            world_label=str(world),
+            world=smb3_stage.world,
+            stage=smb3_stage.stage,
+            world_label=smb3_stage.world_label,
             single_stage=True,
         ))
 

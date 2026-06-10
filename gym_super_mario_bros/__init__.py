@@ -2,6 +2,8 @@
 from .smb_env import SuperMarioBrosEnv
 from .smb2_env import SuperMarioBros2Env
 from .smb3_env import SuperMarioBros3Env
+from .smb3_stages import SMB3Stage
+from .smb3_stages import smb3_stage_matrix
 from .tasks import MarioTask
 from .tasks import all_tasks
 from .tasks import task_for_env_id
@@ -15,6 +17,8 @@ __all__ = [
     'SuperMarioBrosEnv',
     'SuperMarioBros2Env',
     'SuperMarioBros3Env',
+    'SMB3Stage',
+    'smb3_stage_matrix',
     'MarioTask',
     'all_tasks',
     'task_for_env_id',

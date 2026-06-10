@@ -29,7 +29,10 @@ Upcoming major release aligned with the current `pyproject.toml` version.
     `SuperMarioBros2USA-v0` and 20 single-stage
     `SuperMarioBros2USA-<world>-<stage>-v0` environments.
   - Added vanilla Super Mario Bros. 3 support through `SuperMarioBros3-v0`
-    and the validated `SuperMarioBros3-1-1-v0` single-stage environment.
+    and validated World 1 single-stage environments for 1-1, 1-2, 1-4, and
+    1-6.
+  - Added an SMB3 numbered-course matrix helper for curriculum and evaluation
+    code.
   - Enriched SMB1, SMB2 USA, and SMB3 info dictionaries and expanded reward
     shaping beyond raw rightward velocity.
 
