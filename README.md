@@ -20,8 +20,8 @@
 ![Mario](https://user-images.githubusercontent.com/2184469/40949613-7542733a-6834-11e8-895b-ce1cc3af9dbb.gif)
 
 A [Gymnasium](https://gymnasium.farama.org/) environment for
-Super Mario Bros. & Super Mario Bros. 2 (Lost Levels) on The Nintendo
-Entertainment System (NES) using
+Super Mario Bros., Super Mario Bros. 2 (Lost Levels), and Super Mario
+Bros. 2 (USA) on The Nintendo Entertainment System (NES) using
 [the nes-py emulator](https://github.com/Kautenja/nes-py).
 
 `gym-super-mario-bros` targets Gymnasium's modern reset, step, render-mode,
@@ -144,6 +144,7 @@ will lock the Python process until the emulator is ready for the next action.
 | `SuperMarioBros-v3`             | SMB  | rectangle     | ![][v3]    |
 | `SuperMarioBros2-v0`            | SMB2 | standard      | ![][2-v0]  |
 | `SuperMarioBros2-v1`            | SMB2 | downsample    | ![][2-v1]  |
+| `SuperMarioBros2USA-v0`         | SMB2 USA | standard  |            |
 
 [v0]: https://user-images.githubusercontent.com/2184469/40948820-3d15e5c2-6830-11e8-81d4-ecfaffee0a14.png
 [v1]: https://user-images.githubusercontent.com/2184469/40948819-3cff6c48-6830-11e8-8373-8fad1665ac72.png
@@ -173,6 +174,14 @@ where:
 
 For example, to play 4-2 on the downsampled ROM, you would use the environment
 id `SuperMarioBros-4-2-v1`.
+
+Super Mario Bros. 2 (USA) uses the vanilla ROM only. Use
+`SuperMarioBros2USA-v0` for the full game, or the template
+
+    SuperMarioBros2USA-<world>-<stage>-v0
+
+where `<world>` is a number in {1, 2, 3, 4, 5, 6, 7}. Worlds 1 through 6 have
+stages {1, 2, 3}; world 7 has stages {1, 2}.
 
 ### Random Stage Selection
 

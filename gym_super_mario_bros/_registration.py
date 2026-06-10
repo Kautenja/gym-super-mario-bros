@@ -49,6 +49,29 @@ def _register_mario_env(id, is_random=False, **kwargs):
     )
 
 
+def _register_smb2_usa_env(id, **kwargs):
+    """
+    Register a Super Mario Bros. 2 (USA) environment with Gymnasium.
+
+    Args:
+        id (str): id for the env to register
+        kwargs (dict): keyword arguments for the SuperMarioBros2Env initializer
+
+    Returns:
+        None
+
+    """
+    gym.envs.registration.register(
+        id=id,
+        entry_point='gym_super_mario_bros:SuperMarioBros2Env',
+        max_episode_steps=_MAX_EPISODE_STEPS,
+        reward_threshold=_REWARD_THRESHOLD,
+        kwargs=kwargs,
+        nondeterministic=True,
+        disable_env_checker=_DISABLE_ENV_CHECKER,
+    )
+
+
 # Super Mario Bros.
 _register_mario_env('SuperMarioBros-v0', rom_mode='vanilla')
 _register_mario_env('SuperMarioBros-v1', rom_mode='downsample')
@@ -66,6 +89,10 @@ _register_mario_env('SuperMarioBrosRandomStages-v3', is_random=True, rom_mode='r
 # Super Mario Bros. 2 (Lost Levels)
 _register_mario_env('SuperMarioBros2-v0', lost_levels=True, rom_mode='vanilla')
 _register_mario_env('SuperMarioBros2-v1', lost_levels=True, rom_mode='downsample')
+
+
+# Super Mario Bros. 2 (USA)
+_register_smb2_usa_env('SuperMarioBros2USA-v0')
 
 
 def _register_mario_stage_env(id, **kwargs):
@@ -107,6 +134,7 @@ _ROM_MODES = [
     'rectangle'
 ]
 _LOST_LEVELS_ROM_MODES = _ROM_MODES[:2]
+_SMB2_USA_STAGES_PER_WORLD = (3, 3, 3, 3, 3, 3, 2)
 
 
 def _lost_levels_world_label(world):
@@ -146,6 +174,13 @@ for version, rom_mode in enumerate(_LOST_LEVELS_ROM_MODES):
                 rom_mode=rom_mode,
                 target=target,
             )
+
+
+# iterate over Super Mario Bros. 2 (USA) worlds (1-7) and stages
+for world, stage_count in enumerate(_SMB2_USA_STAGES_PER_WORLD, start=1):
+    for stage in range(1, stage_count + 1):
+        env_id = 'SuperMarioBros2USA-{}-{}-v0'.format(world, stage)
+        _register_smb2_usa_env(env_id, target=(world, stage))
 
 
 # create an alias to gymnasium.make for ease of access

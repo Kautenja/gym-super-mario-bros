@@ -1,5 +1,6 @@
 """Registration code of Gymnasium environments in this package."""
 from .smb_env import SuperMarioBrosEnv
+from .smb2_env import SuperMarioBros2Env
 from .smb_random_stages_env import SuperMarioBrosRandomStagesEnv
 from ._registration import make
 
@@ -8,5 +9,6 @@ from ._registration import make
 __all__ = [
     'make',
     'SuperMarioBrosEnv',
+    'SuperMarioBros2Env',
     'SuperMarioBrosRandomStagesEnv',
 ]

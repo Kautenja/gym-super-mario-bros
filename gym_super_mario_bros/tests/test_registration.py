@@ -16,6 +16,7 @@ _ROM_MODES = [
 ]
 
 _LOST_LEVELS_ROM_MODES = _ROM_MODES[:2]
+_SMB2_USA_STAGES_PER_WORLD = (3, 3, 3, 3, 3, 3, 2)
 
 
 def _expected_stage_ids():
@@ -47,6 +48,13 @@ def _expected_lost_levels_stage_ids():
                 )
 
 
+def _expected_smb2_usa_stage_ids():
+    """Return the registered Super Mario Bros. 2 (USA) stage IDs."""
+    for world, stage_count in enumerate(_SMB2_USA_STAGES_PER_WORLD, start=1):
+        for stage in range(1, stage_count + 1):
+            yield 'SuperMarioBros2USA-{}-{}-v0'.format(world, stage)
+
+
 class ShouldExposePackageApi(TestCase):
     """Test package-level public API and Gymnasium make alias."""
 
@@ -60,6 +68,7 @@ class ShouldExposePackageApi(TestCase):
             [
                 'make',
                 'SuperMarioBrosEnv',
+                'SuperMarioBros2Env',
                 'SuperMarioBrosRandomStagesEnv',
             ],
             gym_super_mario_bros.__all__,
@@ -118,6 +127,16 @@ class ShouldRegisterExpectedGymnasiumEnvs(TestCase):
             )
             self._assert_common_registration_policy(env_id)
 
+    def test_smb2_usa_id_is_registered(self):
+        env_id = 'SuperMarioBros2USA-v0'
+        spec = gym.spec(env_id)
+        self.assertEqual(
+            'gym_super_mario_bros:SuperMarioBros2Env',
+            spec.entry_point,
+        )
+        self.assertEqual({}, spec.kwargs)
+        self._assert_common_registration_policy(env_id)
+
     def test_stage_ids_and_aliases_are_registered_unchanged(self):
         stage_ids = list(_expected_stage_ids())
         self.assertEqual(256, len(stage_ids))
@@ -145,6 +164,18 @@ class ShouldRegisterExpectedGymnasiumEnvs(TestCase):
             self.assertIn('target', spec.kwargs)
             self._assert_common_registration_policy(env_id)
 
+    def test_smb2_usa_stage_ids_are_registered(self):
+        stage_ids = list(_expected_smb2_usa_stage_ids())
+        self.assertEqual(20, len(stage_ids))
+        for env_id in stage_ids:
+            spec = gym.spec(env_id)
+            self.assertEqual(
+                'gym_super_mario_bros:SuperMarioBros2Env',
+                spec.entry_point,
+            )
+            self.assertIn('target', spec.kwargs)
+            self._assert_common_registration_policy(env_id)
+
 
 class ShouldSmokeRepresentativeRegisteredEnvs(TestCase):
     """Test representative Gymnasium creation, reset, step, render, and close."""
@@ -154,6 +185,7 @@ class ShouldSmokeRepresentativeRegisteredEnvs(TestCase):
             'SuperMarioBros-v0',
             'SuperMarioBrosRandomStages-v0',
             'SuperMarioBros1-1-v0',
+            'SuperMarioBros2USA-v0',
         ):
             env = gym.make(env_id, render_mode='rgb_array')
             try:

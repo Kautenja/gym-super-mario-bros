@@ -21,6 +21,10 @@ Upcoming major release aligned with the current `pyproject.toml` version.
   - Moved CI from Travis CI to GitHub Actions and added Python 3.14 parity.
   - Replaced the old `makefile` workflow with `main.sh`.
   - Clarified wrapper bootstrap metadata and refreshed README usage guidance.
+- Environments:
+  - Added vanilla Super Mario Bros. 2 (USA) support through
+    `SuperMarioBros2USA-v0` and 20 single-stage
+    `SuperMarioBros2USA-<world>-<stage>-v0` environments.
 
 ## 7.4.0 (2022-06-20)
 

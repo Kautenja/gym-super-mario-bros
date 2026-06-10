@@ -19,6 +19,9 @@ _ROM_PATHS = {
 }
 
 
+_SUPER_MARIO_BROS_2_USA_ROM = 'super-mario-bros-2.nes'
+
+
 def rom_path(lost_levels, rom_mode):
     """
     Return the ROM filename for a game and ROM mode.
@@ -49,5 +52,19 @@ def rom_path(lost_levels, rom_mode):
     return rom
 
 
+def smb2_rom_path():
+    """
+    Return the ROM filename for Super Mario Bros. 2 (USA).
+
+    Returns (str):
+        the absolute path to the Super Mario Bros. 2 (USA) ROM
+
+    """
+    return os.path.join(
+        os.path.dirname(os.path.abspath(__file__)),
+        _SUPER_MARIO_BROS_2_USA_ROM,
+    )
+
+
 # explicitly define the outward facing API of this module
-__all__ = [rom_path.__name__]
+__all__ = [rom_path.__name__, smb2_rom_path.__name__]
