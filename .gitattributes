@@ -1,0 +1,18 @@
+# Include the project's Python source, helpers, and tests in language statistics.
+*.py linguist-detectable
+
+# Exclude bundled game assets while retaining the Python ROM helpers.
+gym_super_mario_bros/_roms/*.nes linguist-vendored -linguist-detectable
+
+# Exclude documentation, citations, and licensing notices.
+*.md linguist-documentation
+docs/** linguist-documentation
+/CITATION.bib linguist-documentation
+/CITATION.cff linguist-documentation
+/LICENSE linguist-documentation
+
+# Exclude development tooling and configuration from language statistics.
+/.github/** -linguist-detectable
+/main.sh -linguist-detectable
+/pyproject.toml -linguist-detectable
+/requirements.txt -linguist-detectable
