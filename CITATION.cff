@@ -1,0 +1,25 @@
+cff-version: 1.2.0
+message: >-
+  If you use gym-super-mario-bros in your research, please cite the original
+  2018 software citation below and identify the software version or commit used.
+type: software
+title: "Super Mario Bros for OpenAI Gym"
+abstract: >-
+  A Gymnasium environment for Super Mario Bros., Super Mario Bros. 2 (Lost
+  Levels), Super Mario Bros. 2 (USA), and Super Mario Bros. 3 on the Nintendo
+  Entertainment System, using the nes-py emulator.
+authors:
+  - family-names: Kauten
+    given-names: Christian
+repository-code: "https://github.com/Kautenja/gym-super-mario-bros"
+version: "9.1.0"
+preferred-citation:
+  type: generic
+  title: "Super Mario Bros for OpenAI Gym"
+  authors:
+    - family-names: Kauten
+      given-names: Christian
+  year: 2018
+  publisher:
+    name: GitHub
+  url: "https://github.com/Kautenja/gym-super-mario-bros"

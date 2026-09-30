@@ -265,6 +265,13 @@ GitHub release so the workflow can build and upload the distribution artifacts.
 ## Citation
 
 Please cite `gym-super-mario-bros` if you use it in your research.
+Use the original 2018 citation below to keep references consistent with prior
+publications, including its original OpenAI Gym title. Identify the software
+version or commit used separately in your methods or reproducibility details.
+
+Download [CITATION.bib](CITATION.bib) for BibTeX, or use
+[CITATION.cff](CITATION.cff) for machine-readable citation metadata and GitHub's
+"Cite this repository" feature.
 
 ```tex
 @misc{gym-super-mario-bros,
