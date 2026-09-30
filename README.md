@@ -252,6 +252,11 @@ such as raw transition state, health, lives, map position, powerup timers,
 P-meter state, invulnerability timers, and progress maxima where those values
 are available from the ROM's RAM map.
 
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup, architecture,
+testing, compatibility guidance, and pull request instructions.
+
 ## Publishing
 
 PyPI releases are published by the `Publish to PyPI` GitHub Actions workflow
