@@ -1,0 +1,21 @@
+Nintendo ROM asset notice
+SPDX reference: LicenseRef-Nintendo-ROMs
+
+This notice applies to these third-party files:
+
+  gym_super_mario_bros/_roms/super-mario-bros.nes
+  gym_super_mario_bros/_roms/super-mario-bros-lost-levels.nes
+  gym_super_mario_bros/_roms/super-mario-bros-2.nes
+  gym_super_mario_bros/_roms/super-mario-bros-3.nes
+
+These game ROMs are excluded from the project's MIT License. Copyright and
+other rights remain with Nintendo and the respective rights holders. This
+project grants no license to copy, modify, or redistribute these files.
+Their inclusion in a repository or package is not a grant of such rights.
+
+The project is not affiliated with nor approved by Nintendo Co., Ltd.
+No rights to Nintendo trademarks, characters, game artwork, or audio are
+granted by the project's software license.
+
+The Python source files in the same directory are original project code
+and are covered by the MIT License. See LICENSE and LICENSING.md.

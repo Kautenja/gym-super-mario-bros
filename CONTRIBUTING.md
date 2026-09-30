@@ -22,7 +22,10 @@ observed behavior. Include a traceback for exceptions and screenshots when
 they help explain a rendering problem. Discuss substantial API or environment
 behavior changes in an issue before starting.
 
-Read the [README](README.md), [changelog](CHANGELOG.md), and [license](LICENSE).
+Read the [README](README.md), [changelog](CHANGELOG.md), and
+[licensing guide](LICENSING.md). Original code uses the [MIT License](LICENSE);
+the Nintendo ROM assets are excluded from that grant. Preserve that distinction
+when changing assets or packaging.
 Follow the [Google Python Style Guide][python-style] referenced by the
 [pull request template](.github/PULL_REQUEST_TEMPLATE.md), while keeping edits
 consistent with nearby code. Preserve existing attribution and license notices.

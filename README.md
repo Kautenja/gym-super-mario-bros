@@ -5,12 +5,12 @@
 [![PythonVersion][python-version]][python-home]
 [![Stable][pypi-status]][pypi-home]
 [![Format][pypi-format]][pypi-home]
-[![License][pypi-license]](LICENSE)
+[![Code License][code-license]](LICENSING.md)
 
 [build-status]: https://github.com/Kautenja/gym-super-mario-bros/actions/workflows/ci.yml/badge.svg?branch=master
 [ci-server]: https://github.com/Kautenja/gym-super-mario-bros/actions/workflows/ci.yml
 [pypi-version]: https://badge.fury.io/py/gym-super-mario-bros.svg
-[pypi-license]: https://img.shields.io/pypi/l/gym-super-mario-bros.svg
+[code-license]: https://img.shields.io/github/license/Kautenja/gym-super-mario-bros.svg?label=code%20license
 [pypi-status]: https://img.shields.io/pypi/status/gym-super-mario-bros.svg
 [pypi-format]: https://img.shields.io/pypi/format/gym-super-mario-bros.svg
 [pypi-home]: https://badge.fury.io/py/gym-super-mario-bros
@@ -251,6 +251,14 @@ Newer SMB2 USA and SMB3 environments include additional game-specific keys
 such as raw transition state, health, lives, map position, powerup timers,
 P-meter state, invulnerability timers, and progress maxima where those values
 are available from the ROM's RAM map.
+
+## Licensing
+
+Original code and documentation are licensed under the [MIT License](LICENSE).
+The bundled Nintendo game ROMs are excluded; this project grants no license
+to those assets. See [LICENSING.md](LICENSING.md) for scope, dependency terms,
+and the ROM notice. This project is not affiliated with nor approved by
+Nintendo Co., Ltd.
 
 ## Contributing
 

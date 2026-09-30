@@ -3,6 +3,14 @@
 This changelog is reconstructed from the repository's local tags, README,
 package metadata, and commit history.
 
+## Unreleased
+
+- Adopted the MIT License for original code and documentation, with a standard
+  root license file for GitHub detection. Nintendo ROM assets are excluded;
+  `LICENSING.md` and the packaged ROM notice document their separate scope.
+- Updated distribution license metadata and included all licensing notices in
+  source and wheel packages.
+
 ## 9.1.0 (2026-06-10)
 
 - Environments:

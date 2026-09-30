@@ -13,6 +13,8 @@ authors:
     given-names: Christian
 repository-code: "https://github.com/Kautenja/gym-super-mario-bros"
 version: "9.1.0"
+license: MIT
+license-url: "https://github.com/Kautenja/gym-super-mario-bros/blob/master/LICENSING.md"
 preferred-citation:
   type: generic
   title: "Super Mario Bros for OpenAI Gym"

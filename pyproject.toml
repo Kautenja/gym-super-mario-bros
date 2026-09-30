@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=69", "wheel"]
+requires = ["setuptools>=77", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -8,8 +8,8 @@ version = "9.1.0"
 description = "Super Mario Bros. for Gymnasium"
 readme = "README.md"
 requires-python = ">=3.13"
-license = "LicenseRef-Proprietary"
-license-files = ["LICENSE"]
+license = "MIT AND LicenseRef-Nintendo-ROMs"
+license-files = ["LICENSE", "LICENSING.md", "docs/licenses/Nintendo-ROMs.txt"]
 authors = [
     {name = "Christian Kauten", email = "kautencreations@gmail.com"},
 ]
@@ -48,6 +48,7 @@ Homepage = "https://github.com/Kautenja/gym-super-mario-bros"
 Repository = "https://github.com/Kautenja/gym-super-mario-bros"
 
 [tool.setuptools.packages.find]
+include = ["gym_super_mario_bros*"]
 exclude = ["tests", "*.tests", "*.tests.*"]
 
 [tool.setuptools.package-data]
